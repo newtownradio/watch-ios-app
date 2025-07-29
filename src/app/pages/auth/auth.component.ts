@@ -23,6 +23,7 @@ import { User } from '../../models/bid.interface';
               Sign Out
             </button>
           </div>
+
         </div>
 
         <!-- Tab Navigation -->
@@ -30,14 +31,24 @@ import { User } from '../../models/bid.interface';
           <button 
             class="tab-btn" 
             [class.active]="activeTab === 'login'"
-            (click)="setActiveTab('login')"
+            (click)="setActiveTab('login'); $event.stopPropagation()"
+            (keyup.enter)="setActiveTab('login')"
+            (keyup.space)="setActiveTab('login')"
+            tabindex="0"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'login'"
           >
             Sign In
           </button>
           <button 
             class="tab-btn" 
             [class.active]="activeTab === 'register'"
-            (click)="setActiveTab('register')"
+            (click)="setActiveTab('register'); $event.stopPropagation()"
+            (keyup.enter)="setActiveTab('register')"
+            (keyup.space)="setActiveTab('register')"
+            tabindex="0"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'register'"
           >
             Create Account
           </button>
@@ -54,6 +65,10 @@ import { User } from '../../models/bid.interface';
                 [(ngModel)]="loginData.email"
                 name="email"
                 required
+                autocomplete="email"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
                 placeholder="Enter your email"
               >
             </div>
@@ -66,6 +81,11 @@ import { User } from '../../models/bid.interface';
                 [(ngModel)]="loginData.password"
                 name="password"
                 required
+                maxlength="50"
+                autocomplete="current-password"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
                 placeholder="Enter your password"
               >
             </div>
@@ -74,11 +94,13 @@ import { User } from '../../models/bid.interface';
               <button type="submit" class="btn-primary" [disabled]="!loginForm.valid">
                 Sign In
               </button>
-              <button type="button" class="btn-link" (click)="setActiveTab('forgot-password')">
+              <button type="button" class="btn-link" (click)="setActiveTab('forgot-password')" (keyup.enter)="setActiveTab('forgot-password')" (keyup.space)="setActiveTab('forgot-password')" tabindex="0">
                 Forgot Password?
               </button>
             </div>
           </form>
+          
+
         </div>
 
         <!-- Registration Form -->
@@ -93,6 +115,10 @@ import { User } from '../../models/bid.interface';
                   [(ngModel)]="registerData.name"
                   name="name"
                   required
+                  autocomplete="name"
+                  autocapitalize="words"
+                  autocorrect="on"
+                  spellcheck="true"
                   placeholder="Enter your full name"
                 >
               </div>
@@ -106,6 +132,10 @@ import { User } from '../../models/bid.interface';
                 [(ngModel)]="registerData.email"
                 name="email"
                 required
+                autocomplete="email"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
                 placeholder="Enter your email"
               >
             </div>
@@ -120,6 +150,11 @@ import { User } from '../../models/bid.interface';
                   name="password"
                   required
                   minlength="8"
+                  maxlength="50"
+                  autocomplete="new-password"
+                  autocapitalize="none"
+                  autocorrect="off"
+                  spellcheck="false"
                   placeholder="Create a password"
                 >
               </div>
@@ -131,6 +166,11 @@ import { User } from '../../models/bid.interface';
                   [(ngModel)]="registerData.confirmPassword"
                   name="confirmPassword"
                   required
+                  maxlength="50"
+                  autocomplete="new-password"
+                  autocapitalize="none"
+                  autocorrect="off"
+                  spellcheck="false"
                   placeholder="Confirm your password"
                 >
               </div>
@@ -242,6 +282,7 @@ import { User } from '../../models/bid.interface';
                   name="password"
                   required
                   minlength="8"
+                  maxlength="50"
                   placeholder="Enter new password"
                 >
               </div>
@@ -253,6 +294,7 @@ import { User } from '../../models/bid.interface';
                   [(ngModel)]="resetPasswordData.confirmPassword"
                   name="confirmPassword"
                   required
+                  maxlength="50"
                   placeholder="Confirm new password"
                 >
               </div>
@@ -276,7 +318,7 @@ import { User } from '../../models/bid.interface';
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3>{{ modalTitle }}</h3>
-          <button type="button" class="modal-close" (click)="closeModal()">×</button>
+          <button type="button" class="modal-close" (click)="closeModal()" (keyup.enter)="closeModal()" (keyup.space)="closeModal()" tabindex="0" aria-label="Close modal">×</button>
         </div>
         <div class="modal-body">
           <div [innerHTML]="modalContent"></div>
@@ -292,6 +334,14 @@ import { User } from '../../models/bid.interface';
       align-items: center;
       justify-content: center;
       padding: 20px;
+      
+      @media (max-width: 768px) {
+        padding: 16px;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 12px;
+      }
     }
 
     .auth-card {
@@ -303,11 +353,31 @@ import { User } from '../../models/bid.interface';
       max-width: 480px;
       position: relative;
       border: 1px solid #e1e5e9;
+      
+      @media (max-width: 768px) {
+        padding: 32px;
+        max-width: 100%;
+        border-radius: 16px;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
     }
 
     .auth-header {
       text-align: center;
       margin-bottom: 30px;
+      
+      @media (max-width: 768px) {
+        margin-bottom: 24px;
+      }
+      
+      @media (max-width: 480px) {
+        margin-bottom: 20px;
+      }
     }
 
     .logo {
@@ -326,6 +396,14 @@ import { User } from '../../models/bid.interface';
       color: #666;
       margin: 0;
       font-size: 0.9rem;
+      
+      @media (max-width: 768px) {
+        font-size: 0.85rem;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 0.8rem;
+      }
     }
 
     .auth-tabs {
@@ -334,6 +412,15 @@ import { User } from '../../models/bid.interface';
       border-radius: 10px;
       background: #f5f5f5;
       padding: 4px;
+      
+      @media (max-width: 768px) {
+        margin-bottom: 24px;
+      }
+      
+      @media (max-width: 480px) {
+        margin-bottom: 20px;
+        border-radius: 8px;
+      }
     }
 
     .tab-btn {
@@ -345,6 +432,17 @@ import { User } from '../../models/bid.interface';
       cursor: pointer;
       font-weight: 500;
       transition: all 0.3s ease;
+      
+      @media (max-width: 768px) {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 8px;
+        font-size: 0.85rem;
+        min-height: 44px;
+      }
     }
 
     .tab-btn.active {
@@ -354,12 +452,29 @@ import { User } from '../../models/bid.interface';
 
     .form-group {
       margin-bottom: 20px;
+      
+      @media (max-width: 768px) {
+        margin-bottom: 16px;
+      }
+      
+      @media (max-width: 480px) {
+        margin-bottom: 12px;
+      }
     }
 
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 15px;
+      
+      @media (max-width: 768px) {
+        gap: 12px;
+      }
+      
+      @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
     }
 
     label {
@@ -367,6 +482,16 @@ import { User } from '../../models/bid.interface';
       margin-bottom: 8px;
       font-weight: 500;
       color: #333;
+      
+      @media (max-width: 768px) {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+      }
     }
 
     input[type="email"],
@@ -379,6 +504,17 @@ import { User } from '../../models/bid.interface';
       font-size: 1rem;
       transition: border-color 0.3s ease;
       box-sizing: border-box;
+      
+      @media (max-width: 768px) {
+        padding: 10px 14px;
+        font-size: 16px; // Prevent zoom on iOS
+        border-radius: 8px;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 8px 12px;
+        border-radius: 6px;
+      }
     }
 
     input:focus {
@@ -424,6 +560,19 @@ import { User } from '../../models/bid.interface';
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      
+      @media (max-width: 768px) {
+        padding: 12px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 10px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        min-height: 44px;
+      }
     }
 
     .btn-primary:hover:not(:disabled) {
@@ -649,14 +798,6 @@ export class AuthComponent implements OnInit {
   ) {}
 
     ngOnInit() {
-    // Create test users for development
-    this.dataService.createTestUsers();
-
-    // Log test credentials to console for development
-    console.log('=== TEST CREDENTIALS ===');
-    console.log(this.dataService.getTestCredentials());
-    console.log('=== END TEST CREDENTIALS ===');
-
     // Check query parameters for tab selection
     this.route.queryParams.subscribe(params => {
       if (params['tab'] === 'signup') {
@@ -668,12 +809,16 @@ export class AuthComponent implements OnInit {
     // Users can manually navigate to discovery if they're already logged in
   }
 
+
+
   setActiveTab(tab: string) {
     this.activeTab = tab;
   }
 
   login() {
     const users = this.dataService.getAllUsers();
+    
+    // Find user by email and password
     const user = users.find(u => u.email === this.loginData.email && u.password === this.loginData.password);
     
     if (user) {
@@ -687,6 +832,15 @@ export class AuthComponent implements OnInit {
   register() {
     if (this.registerData.password !== this.registerData.confirmPassword) {
       alert('Passwords do not match.');
+      return;
+    }
+
+    // Check if user already exists
+    const existingUsers = this.dataService.getAllUsers();
+    const existingUser = existingUsers.find(u => u.email === this.registerData.email);
+    
+    if (existingUser) {
+      alert('An account with this email already exists. Please use a different email or try logging in.');
       return;
     }
 
@@ -884,4 +1038,6 @@ export class AuthComponent implements OnInit {
     // Refresh the page to show login form
     window.location.reload();
   }
+
+
 }

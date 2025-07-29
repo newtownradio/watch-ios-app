@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Listing, Bid, Counteroffer, Watch, User } from '../models/bid.interface';
+import { Listing, Bid, Counteroffer, Watch, User, Message, Notification } from '../models/bid.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -8,12 +8,12 @@ export class DataPersistenceService {
 
   // Storage keys
   private readonly LISTINGS_KEY = 'watch_ios_listings';
-  private readonly FAVORITES_KEY = 'watch_ios_favorites';
-  private readonly USERS_KEY = 'watch_ios_users';
   private readonly WATCHES_KEY = 'watch_ios_watches';
+  private readonly USERS_KEY = 'watch_ios_users';
+  private readonly FAVORITES_KEY = 'watch_ios_favorites_';
   private readonly CURRENT_USER_KEY = 'watch_ios_current_user';
-
-  constructor() { }
+  private readonly MESSAGES_KEY = 'watch_ios_messages';
+  private readonly NOTIFICATIONS_KEY = 'watch_ios_notifications';
 
   // ===== LISTINGS MANAGEMENT =====
 
@@ -48,7 +48,7 @@ export class DataPersistenceService {
     const listings = JSON.parse(data);
     
     // Convert date strings back to Date objects
-    return listings.map((listing: any) => ({
+    return listings.map((listing: Listing) => ({
       ...listing,
       createdAt: new Date(listing.createdAt),
       endTime: new Date(listing.endTime)
@@ -56,10 +56,17 @@ export class DataPersistenceService {
   }
 
   /**
-   * Get listings by seller ID
+   * Get listings by seller
    */
   getListingsBySeller(sellerId: string): Listing[] {
     return this.getAllListings().filter(listing => listing.sellerId === sellerId);
+  }
+
+  /**
+   * Get a specific listing by ID
+   */
+  getListingById(listingId: string): Listing | undefined {
+    return this.getAllListings().find(listing => listing.id === listingId);
   }
 
   /**
@@ -87,7 +94,7 @@ export class DataPersistenceService {
   private saveListings(listings: Listing[]): void {
     try {
       localStorage.setItem(this.LISTINGS_KEY, JSON.stringify(listings));
-    } catch (error) {
+    } catch {
       console.error('localStorage quota exceeded, clearing old data and retrying...');
       // Clear old data and retry
       this.clearAllData();
@@ -222,22 +229,35 @@ export class DataPersistenceService {
    * Save a user
    */
   saveUser(user: User): void {
-    const users = this.getAllUsers();
-    const index = users.findIndex(u => u.id === user.id);
-    if (index !== -1) {
-      users[index] = user;
-    } else {
-      users.push(user);
+    try {
+      const users = this.getAllUsers();
+      const index = users.findIndex(u => u.id === user.id);
+      if (index !== -1) {
+        users[index] = user;
+      } else {
+        users.push(user);
+      }
+      this.saveUsers(users);
+    } catch (error) {
+      console.error('Error saving user:', error);
     }
-    this.saveUsers(users);
   }
 
   /**
    * Get all users
    */
   getAllUsers(): User[] {
-    const data = localStorage.getItem(this.USERS_KEY);
-    return data ? JSON.parse(data) : [];
+    try {
+      const data = localStorage.getItem(this.USERS_KEY);
+      if (data) {
+        const users = JSON.parse(data);
+        return users;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error getting users:', error);
+      return [];
+    }
   }
 
   /**
@@ -434,9 +454,9 @@ export class DataPersistenceService {
   /**
    * Get all favorites data
    */
-  private getAllFavorites(): Array<{userId: string, listingId: string}> {
+  private getAllFavorites(): {userId: string, listingId: string}[] {
     const allUsers = this.getAllUsers();
-    const favorites: Array<{userId: string, listingId: string}> = [];
+    const favorites: {userId: string, listingId: string}[] = [];
     
     allUsers.forEach(user => {
       const userFavorites = this.getUserFavorites(user.id);
@@ -451,7 +471,7 @@ export class DataPersistenceService {
   /**
    * Convert favorites to CSV format
    */
-  private favoritesToCSV(favorites: Array<{userId: string, listingId: string}>): string {
+  private favoritesToCSV(favorites: {userId: string, listingId: string}[]): string {
     if (favorites.length === 0) return '';
     
     const headers = ['User ID', 'Listing ID'];
@@ -606,12 +626,12 @@ export class DataPersistenceService {
   }
 
   /**
-   * Create test users for development/testing
+   * Create test users for development
    */
   createTestUsers(): void {
     const existingUsers = this.getAllUsers();
+    
     if (existingUsers.length > 0) {
-      console.log('Test users already exist, skipping creation');
       return;
     }
 
@@ -620,7 +640,7 @@ export class DataPersistenceService {
         id: 'test-seller-001',
         name: 'Alex Chen',
         email: 'alex.chen@test.com',
-        password: 'K9#mP2$vL7nQ4@xR8',
+        password: 'TestPass123!',
         idVerified: false,
         disclaimerSigned: true,
         policySigned: true,
@@ -631,7 +651,7 @@ export class DataPersistenceService {
         id: 'test-buyer-001',
         name: 'Sarah Mitchell',
         email: 'sarah.m@test.com',
-        password: 'H5#jN8$wK2mP6@tL9',
+        password: 'TestPass456!',
         idVerified: false,
         disclaimerSigned: true,
         policySigned: true,
@@ -642,7 +662,7 @@ export class DataPersistenceService {
         id: 'test-collector-001',
         name: 'Marcus Rodriguez',
         email: 'm.rodriguez@test.com',
-        password: 'F3#hL7$vN4kP9@mR2',
+        password: 'TestPass789!',
         idVerified: false,
         disclaimerSigned: true,
         policySigned: true,
@@ -653,7 +673,7 @@ export class DataPersistenceService {
         id: 'test-dealer-001',
         name: 'Emma Thompson',
         email: 'e.thompson@test.com',
-        password: 'D8#gK5$wL2nP7@tM4',
+        password: 'TestPass012!',
         idVerified: false,
         disclaimerSigned: true,
         policySigned: true,
@@ -665,13 +685,6 @@ export class DataPersistenceService {
     testUsers.forEach(user => {
       this.saveUser(user);
     });
-
-    console.log('Test users created successfully');
-    console.log('Test Credentials:');
-    console.log('1. Seller: alex.chen@test.com / K9#mP2$vL7nQ4@xR8');
-    console.log('2. Buyer: sarah.m@test.com / H5#jN8$wK2mP6@tL9');
-    console.log('3. Collector: m.rodriguez@test.com / F3#hL7$vN4kP9@mR2');
-    console.log('4. Dealer: e.thompson@test.com / D8#gK5$wL2nP7@tM4');
   }
 
   /**
@@ -683,25 +696,256 @@ Test Credentials for Development:
 
 1. Seller Account:
    Email: alex.chen@test.com
-   Password: K9#mP2$vL7nQ4@xR8
+   Password: TestPass123!
    Name: Alex Chen
 
 2. Buyer Account:
    Email: sarah.m@test.com
-   Password: H5#jN8$wK2mP6@tL9
+   Password: TestPass456!
    Name: Sarah Mitchell
 
 3. Collector Account:
    Email: m.rodriguez@test.com
-   Password: F3#hL7$vN4kP9@mR2
+   Password: TestPass789!
    Name: Marcus Rodriguez
 
 4. Dealer Account:
    Email: e.thompson@test.com
-   Password: D8#gK5$wL2nP7@tM4
+   Password: TestPass012!
    Name: Emma Thompson
 
 Note: These are test accounts for development purposes only.
     `;
+  }
+
+  // ===== MESSAGING METHODS =====
+
+  /**
+   * Save a message
+   */
+  saveMessage(message: Message): void {
+    try {
+      const messages = this.getAllMessages();
+      messages.push(message);
+      localStorage.setItem(this.MESSAGES_KEY, JSON.stringify(messages));
+    } catch (error) {
+      console.error('Error saving message:', error);
+    }
+  }
+
+  /**
+   * Get all messages
+   */
+  getAllMessages(): Message[] {
+    try {
+      const messagesData = localStorage.getItem(this.MESSAGES_KEY);
+      if (messagesData) {
+        const messages = JSON.parse(messagesData);
+        const parsedMessages = messages.map((msg: Message) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }));
+        return parsedMessages;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error getting messages:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get messages by receiver
+   */
+  getMessagesByReceiver(receiverId: string): Message[] {
+    return this.getAllMessages().filter(msg => msg.receiverId === receiverId);
+  }
+
+  /**
+   * Get messages by sender
+   */
+  getMessagesBySender(senderId: string): Message[] {
+    return this.getAllMessages().filter(msg => msg.senderId === senderId);
+  }
+
+  /**
+   * Mark message as read
+   */
+  markMessageAsRead(messageId: string): void {
+    try {
+      const messages = this.getAllMessages();
+      const message = messages.find(msg => msg.id === messageId);
+      if (message) {
+        message.isRead = true;
+        localStorage.setItem(this.MESSAGES_KEY, JSON.stringify(messages));
+      }
+    } catch (error) {
+      console.error('Error marking message as read:', error);
+    }
+  }
+
+  /**
+   * Mark message as unread
+   */
+  markMessageAsUnread(messageId: string): void {
+    try {
+      const messages = this.getAllMessages();
+      const message = messages.find(msg => msg.id === messageId);
+      if (message) {
+        message.isRead = false;
+        localStorage.setItem(this.MESSAGES_KEY, JSON.stringify(messages));
+      }
+    } catch (error) {
+      console.error('Error marking message as unread:', error);
+    }
+  }
+
+  /**
+   * Delete a message
+   */
+  deleteMessage(messageId: string): void {
+    try {
+      const messages = this.getAllMessages();
+      const filteredMessages = messages.filter(msg => msg.id !== messageId);
+      localStorage.setItem(this.MESSAGES_KEY, JSON.stringify(filteredMessages));
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  }
+
+  /**
+   * Clear all messages (for testing)
+   */
+  clearMessages(): void {
+    try {
+      localStorage.removeItem(this.MESSAGES_KEY);
+    } catch (error) {
+      console.error('Error clearing messages:', error);
+    }
+  }
+
+  /**
+   * Clear all notifications (for testing)
+   */
+  clearNotifications(): void {
+    try {
+      localStorage.removeItem(this.NOTIFICATIONS_KEY);
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+    }
+  }
+
+  // ===== NOTIFICATION METHODS =====
+
+  /**
+   * Save a notification
+   */
+  saveNotification(notification: Notification): void {
+    try {
+      const notifications = this.getAllNotifications();
+      notifications.push(notification);
+      localStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(notifications));
+    } catch (error) {
+      console.error('Error saving notification:', error);
+    }
+  }
+
+  /**
+   * Get all notifications
+   */
+  getAllNotifications(): Notification[] {
+    try {
+      const notificationsData = localStorage.getItem(this.NOTIFICATIONS_KEY);
+      if (notificationsData) {
+        const notifications = JSON.parse(notificationsData);
+        return notifications.map((notif: Notification) => ({
+          ...notif,
+          timestamp: new Date(notif.timestamp)
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('Error getting notifications:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get notifications by user
+   */
+  getNotificationsByUser(userId: string): Notification[] {
+    return this.getAllNotifications().filter(notif => notif.userId === userId);
+  }
+
+  /**
+   * Mark notification as read
+   */
+  markNotificationAsRead(notificationId: string): void {
+    try {
+      const notifications = this.getAllNotifications();
+      const notification = notifications.find(notif => notif.id === notificationId);
+      if (notification) {
+        notification.isRead = true;
+        localStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(notifications));
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  }
+
+  /**
+   * Delete a notification
+   */
+  deleteNotification(notificationId: string): void {
+    try {
+      const notifications = this.getAllNotifications();
+      const filteredNotifications = notifications.filter(notif => notif.id !== notificationId);
+      localStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(filteredNotifications));
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  }
+
+  /**
+   * Create a notification for a bid
+   */
+  createBidNotification(listingId: string, bid: Bid, sellerId: string): void {
+    const listing = this.getListingById(listingId);
+    if (!listing) return;
+
+    const notification: Notification = {
+      id: this.generateId(),
+      userId: sellerId,
+      title: 'New Bid Received',
+      message: `${bid.bidderName} placed a bid of $${bid.amount.toLocaleString()} on your ${listing.title}`,
+      type: 'bid',
+      isRead: false,
+      timestamp: new Date(),
+      relatedListingId: listingId,
+      relatedBidId: bid.id
+    };
+
+    this.saveNotification(notification);
+  }
+
+  /**
+   * Create a notification for a counteroffer
+   */
+  createCounterofferNotification(listingId: string, counteroffer: Counteroffer, buyerId: string): void {
+    const listing = this.getListingById(listingId);
+    if (!listing) return;
+
+    const notification: Notification = {
+      id: this.generateId(),
+      userId: buyerId,
+      title: 'Counteroffer Received',
+      message: `Seller made a counteroffer of $${counteroffer.amount.toLocaleString()} on ${listing.title}`,
+      type: 'counteroffer',
+      isRead: false,
+      timestamp: new Date(),
+      relatedListingId: listingId
+    };
+
+    this.saveNotification(notification);
   }
 }

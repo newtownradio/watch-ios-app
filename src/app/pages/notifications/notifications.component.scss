@@ -2,11 +2,27 @@
   padding: 20px;
   max-width: 600px;
   margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
 }
 
 .page-header {
   text-align: center;
   margin-bottom: 30px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 24px;
+  }
+  
+  @media (max-width: 480px) {
+    margin-bottom: 20px;
+  }
 }
 
 .page-header h1 {
@@ -14,17 +30,37 @@
   font-weight: 700;
   color: #1f2937;
   margin: 0 0 8px 0;
+  
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
 }
 
 .page-header p {
   color: #6b7280;
   margin: 0;
+  
+  @media (max-width: 768px) {
+    font-size: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 }
 
 .notifications-list {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 480px) {
+    border-radius: 8px;
+  }
 }
 
 .notification-item {
@@ -32,6 +68,14 @@
   align-items: flex-start;
   padding: 16px;
   border-bottom: 1px solid #f3f4f6;
+  
+  @media (max-width: 768px) {
+    padding: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
 }
 
 .notification-item:last-child {
@@ -42,10 +86,24 @@
   font-size: 24px;
   margin-right: 16px;
   margin-top: 2px;
+  
+  @media (max-width: 768px) {
+    font-size: 22px;
+    margin-right: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 20px;
+    margin-right: 10px;
+  }
 }
 
 .content {
   flex: 1;
+  
+  @media (max-width: 480px) {
+    min-width: 0; // Prevent text overflow
+  }
 }
 
 .content h3 {
@@ -53,14 +111,83 @@
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 4px 0;
+  
+  @media (max-width: 768px) {
+    font-size: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 }
 
 .content p {
   color: #6b7280;
   margin: 0 0 4px 0;
+  
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
 }
 
 .time {
   font-size: 12px;
   color: #9ca3af;
+  
+  @media (max-width: 480px) {
+    font-size: 11px;
+  }
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 480px) {
+  .notifications-page {
+    overflow-x: hidden;
+  }
+  
+  .notification-item {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  
+  .content {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .content h3,
+  .content p {
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 360px) {
+  .notifications-page {
+    padding: 8px;
+  }
+  
+  .notification-item {
+    padding: 10px;
+  }
+  
+  .icon {
+    font-size: 18px;
+    margin-right: 8px;
+  }
+  
+  .content h3 {
+    font-size: 13px;
+  }
+  
+  .content p {
+    font-size: 12px;
+  }
+  
+  .time {
+    font-size: 10px;
+  }
 }

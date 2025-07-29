@@ -18,6 +18,16 @@
   z-index: 100;
   flex-shrink: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: 10px 14px;
+    padding-top: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 8px 12px;
+    padding-top: 14px;
+  }
 }
 
 .header-content {
@@ -27,6 +37,10 @@
   max-width: 1200px;
   margin: 0 auto;
   min-height: 44px;
+  
+  @media (max-width: 480px) {
+    min-height: 40px;
+  }
 }
 
 /* Logo */
@@ -45,12 +59,21 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 480px) {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 .logo-circle span {
   color: #1e3a8a;
   font-weight: 600;
   font-size: 18px;
+  
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
 }
 
 /* Hamburger Button */
@@ -64,6 +87,12 @@
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
+  
+  @media (max-width: 480px) {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 6px;
+  }
 }
 
 .hamburger-lines {
@@ -72,6 +101,12 @@
   gap: 4px;
   width: 24px;
   height: 18px;
+  
+  @media (max-width: 480px) {
+    width: 20px;
+    height: 16px;
+    gap: 3px;
+  }
 }
 
 .hamburger-lines span {
@@ -80,6 +115,10 @@
   background: white;
   border-radius: 2px;
   display: block;
+  
+  @media (max-width: 480px) {
+    height: 2px;
+  }
 }
 
 /* Menu - Mobile style for all screen sizes */
@@ -117,6 +156,22 @@
   align-items: center;
   justify-content: center;
   z-index: 2001;
+  
+  @media (max-width: 768px) {
+    top: 16px;
+    right: 16px;
+    font-size: 28px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  @media (max-width: 480px) {
+    top: 12px;
+    right: 12px;
+    font-size: 24px;
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .menu-close-btn:hover {
@@ -129,6 +184,14 @@
   padding: 80px 0 30px 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  
+  @media (max-width: 768px) {
+    padding: 70px 0 24px 0;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 60px 0 20px 0;
+  }
 }
 
 .menu-link {
@@ -142,19 +205,24 @@
   border-left: 3px solid transparent;
   min-height: 70px;
   transition: all 0.2s ease;
+  
+  @media (max-width: 768px) {
+    padding: 20px;
+    font-size: 18px;
+    min-height: 60px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 16px;
+    font-size: 16px;
+    min-height: 50px;
+  }
 }
 
 .menu-link:hover {
   background: #f3f4f6;
   color: #1e3a8a;
   border-left-color: #1e3a8a;
-}
-
-.menu-icon {
-  margin-right: 16px;
-  font-size: 22px;
-  width: 32px;
-  text-align: center;
 }
 
 .menu-text {
@@ -194,6 +262,12 @@
   /* Force iOS to recognize touch events */
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+  
+  @media (max-width: 480px) {
+    /* Enhanced mobile touch handling */
+    touch-action: pan-y pinch-zoom;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* iOS-specific touch handling */
@@ -212,9 +286,86 @@
 /* When header is present */
 .header + .main-content {
   height: calc(100vh - 76px);
+  
+  @media (max-width: 768px) {
+    height: calc(100vh - 70px);
+  }
+  
+  @media (max-width: 480px) {
+    height: calc(100vh - 64px);
+  }
 }
 
 /* When header is hidden (splash page) */
 .main-content:first-child {
   height: 100vh;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 480px) {
+  .app-container {
+    overflow-x: hidden;
+  }
+  
+  .header {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .menu {
+    box-shadow: -1px 0 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@media (max-width: 360px) {
+  .header {
+    padding: 6px 10px;
+    padding-top: 12px;
+  }
+  
+  .header-content {
+    min-height: 36px;
+  }
+  
+  .logo-circle {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .logo-circle span {
+    font-size: 14px;
+  }
+  
+  .hamburger-btn {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 4px;
+  }
+  
+  .hamburger-lines {
+    width: 18px;
+    height: 14px;
+    gap: 2px;
+  }
+  
+  .hamburger-lines span {
+    height: 2px;
+  }
+  
+  .menu-close-btn {
+    top: 8px;
+    right: 8px;
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .menu-links {
+    padding: 50px 0 16px 0;
+  }
+  
+  .menu-link {
+    padding: 12px;
+    font-size: 15px;
+    min-height: 44px;
+  }
 }

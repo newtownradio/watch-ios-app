@@ -55,7 +55,7 @@ import { PricingService } from '../../services/pricing.service';
         </div>
         
         <div class="breakdown-item">
-          <span>Commission (5%):</span>
+          <span>Commission (6%):</span>
           <span>${{ pricing.commissionFee.toLocaleString() }}</span>
         </div>
         
@@ -84,6 +84,17 @@ import { PricingService } from '../../services/pricing.service';
       padding: 20px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
+      
+      @media (max-width: 768px) {
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+      }
     }
 
     h3 {
@@ -91,10 +102,28 @@ import { PricingService } from '../../services/pricing.service';
       color: #1f2937;
       font-size: 18px;
       font-weight: 600;
+      
+      @media (max-width: 768px) {
+        font-size: 16px;
+        margin-bottom: 12px;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 15px;
+        margin-bottom: 10px;
+      }
     }
 
     .price-input, .verification-partner {
       margin-bottom: 16px;
+      
+      @media (max-width: 768px) {
+        margin-bottom: 12px;
+      }
+      
+      @media (max-width: 480px) {
+        margin-bottom: 10px;
+      }
     }
 
     label {

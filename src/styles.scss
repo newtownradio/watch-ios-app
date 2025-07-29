@@ -11,6 +11,14 @@ html {
   -ms-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation; /* Enable touch events */
+  
+  @media (max-width: 480px) {
+    font-size: 14px; // Prevent zoom on iOS
+  }
+  
+  @media (max-width: 360px) {
+    font-size: 13px;
+  }
 }
 
 body {
@@ -29,18 +37,36 @@ body {
   touch-action: manipulation; /* Enable touch events */
   -webkit-user-select: none; /* Prevent text selection during scroll */
   user-select: none;
+  
+  @media (max-width: 480px) {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  @media (max-width: 360px) {
+    font-size: 13px;
+  }
 }
 
 /* Touch improvements */
 button, a {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  
+  @media (max-width: 480px) {
+    min-height: 44px; // iOS touch target minimum
+    min-width: 44px;
+  }
 }
 
 /* Allow text selection in inputs */
 input, textarea {
   -webkit-user-select: text;
   user-select: text;
+  
+  @media (max-width: 480px) {
+    font-size: 16px; // Prevent zoom on iOS
+  }
 }
 
 /* Prevent horizontal scroll on all elements */
@@ -53,6 +79,51 @@ input, textarea {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   height: 100%;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 480px) {
+  /* Prevent horizontal overflow */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  /* Improve touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better text rendering on mobile */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Prevent text selection during scrolling */
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Allow text selection where needed */
+  .allow-select {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
+@media (max-width: 360px) {
+  html, body {
+    font-size: 13px;
+  }
+  
+  /* Smaller touch targets for very small screens */
+  button, a, [role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+  }
 }
 
 /* iOS-specific fixes */
@@ -77,5 +148,44 @@ input, textarea {
     height: -webkit-fill-available;
     overflow-y: auto;
     touch-action: manipulation;
+  }
+  
+  /* Enhanced iOS touch handling */
+  @media (max-width: 480px) {
+    body {
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y pinch-zoom;
+    }
+    
+    /* Prevent zoom on input focus */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    textarea {
+      font-size: 16px;
+    }
+  }
+}
+
+/* Android-specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  @media (max-width: 480px) {
+    /* Improve scrolling on Android */
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  @media (max-width: 480px) {
+    /* Sharper text rendering on high DPI displays */
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
   }
 }

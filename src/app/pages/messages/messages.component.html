@@ -1,0 +1,204 @@
+<div class="messages-container">
+  <!-- Header -->
+  <div class="messages-header">
+    <h1>Messages</h1>
+    <button class="compose-btn" (click)="showCompose = true" type="button">
+      <span class="compose-icon">✉️</span>
+      Compose
+    </button>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="tab-navigation">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'inbox'"
+      (click)="setActiveTab('inbox')"
+      type="button">
+      Inbox
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'sent'"
+      (click)="setActiveTab('sent')"
+      type="button">
+      Sent
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'notifications'"
+      (click)="setActiveTab('notifications')"
+      type="button">
+      Notifications
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="messages-content">
+    <!-- Message List Panel -->
+    <div class="message-list-panel" [class.hidden]="showCompose || selectedMessage">
+      <div class="message-list">
+        <div 
+          *ngFor="let message of filteredMessages" 
+          class="message-item"
+          [class.unread]="!message.isRead"
+          (click)="selectMessage(message)"
+          tabindex="0"
+          (keyup.enter)="selectMessage(message)"
+          (keyup.space)="selectMessage(message)">
+          
+          <div class="message-avatar">
+            <span>{{ getInitials(message.senderName || message.receiverName) }}</span>
+          </div>
+          
+          <div class="message-content">
+            <div class="message-header">
+              <span class="message-sender">{{ getDisplayName(message) }}</span>
+              <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+            </div>
+            <div class="message-subject">{{ getMessageSubject(message) }}</div>
+            <div class="message-preview">{{ message.content }}</div>
+          </div>
+          
+          <div class="message-actions">
+            <button 
+              class="delete-btn" 
+              (click)="deleteMessage(message.id, $event)"
+              type="button"
+              title="Delete message">
+              🗑️
+            </button>
+          </div>
+        </div>
+        
+        <div *ngIf="filteredMessages.length === 0" class="empty-state">
+          <div class="empty-icon">📧</div>
+          <h3>No messages</h3>
+          <p>{{ getEmptyStateMessage() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Detail Panel -->
+    <div class="message-detail-panel" [class.hidden]="!selectedMessage || showCompose">
+      <div *ngIf="selectedMessage" class="message-detail">
+        <div class="detail-header">
+          <button class="back-btn" (click)="selectedMessage = null" type="button">
+            ← Back
+          </button>
+          <div class="detail-actions">
+            <button 
+              class="action-btn" 
+              (click)="markAsUnread(selectedMessage.id)"
+              type="button"
+              *ngIf="selectedMessage.isRead">
+              Mark as unread
+            </button>
+            <button 
+              class="action-btn" 
+              (click)="markAsRead(selectedMessage.id)"
+              type="button"
+              *ngIf="!selectedMessage.isRead">
+              Mark as read
+            </button>
+            <button 
+              class="delete-btn" 
+              (click)="deleteMessage(selectedMessage.id)"
+              type="button">
+              Delete
+            </button>
+          </div>
+        </div>
+        
+        <div class="detail-content">
+          <div class="detail-sender">
+            <span class="sender-name">{{ getDisplayName(selectedMessage) }}</span>
+            <span class="sender-email">{{ getSenderEmail(selectedMessage) }}</span>
+          </div>
+          <div class="detail-time">{{ formatTime(selectedMessage.timestamp) }}</div>
+          <div class="detail-subject">{{ getMessageSubject(selectedMessage) }}</div>
+          <div class="detail-body">{{ selectedMessage.content }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compose Panel -->
+    <div class="compose-panel" [class.hidden]="!showCompose">
+      <div class="compose-header">
+        <button class="back-btn" (click)="showCompose = false" type="button">
+          ← Cancel
+        </button>
+        <button class="send-btn" (click)="sendMessage()" type="button">
+          Send
+        </button>
+      </div>
+      
+      <div class="compose-form">
+        <div class="form-group">
+          <label for="to-field">To:</label>
+          <div class="tag-input-container">
+            <div class="selected-users">
+              <span *ngFor="let user of selectedUsers" class="user-tag">
+                {{ user.name }}
+                <button type="button" class="remove-tag" (click)="removeSelectedUser(user)">
+                  ×
+                </button>
+              </span>
+            </div>
+            <input 
+              id="to-field"
+              type="text" 
+              [(ngModel)]="searchTerm"
+              (input)="filterUsers()"
+              (keydown)="handleKeydown($event)"
+              placeholder="Type to search for a user..."
+              autocomplete="off"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
+              [disabled]="selectedUsers.length > 0">
+            <div class="user-suggestions" *ngIf="filteredUsers.length > 0 && searchTerm.length > 0 && selectedUsers.length === 0">
+              <div 
+                *ngFor="let user of filteredUsers" 
+                class="user-suggestion"
+                (click)="selectUser(user)"
+                [class.selected]="selectedIndex === filteredUsers.indexOf(user)">
+                <div class="user-avatar">{{ getInitials(user.name) }}</div>
+                <div class="user-info">
+                  <div class="user-name">{{ user.name }}</div>
+                  <div class="user-email">{{ user.email }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="subject-field">Subject:</label>
+          <input 
+            id="subject-field"
+            type="text" 
+            [(ngModel)]="composeData.subject"
+            placeholder="Enter subject"
+            autocomplete="off"
+            autocapitalize="sentences"
+            autocorrect="on"
+            spellcheck="true">
+        </div>
+        
+        <div class="form-group">
+          <label for="message-field">Message:</label>
+          <textarea 
+            id="message-field"
+            [(ngModel)]="composeData.content"
+            placeholder="Type your message here..."
+            rows="8"
+            autocomplete="off"
+            autocapitalize="sentences"
+            autocorrect="on"
+            spellcheck="true"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -66,6 +66,34 @@ export interface User {
   createdAt?: Date; // Added for user creation tracking
 }
 
+export interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  receiverName: string;
+  content: string;
+  timestamp: Date;
+  isRead: boolean;
+  type: 'bid' | 'counteroffer' | 'general' | 'system';
+  relatedListingId?: string;
+  relatedBidId?: string;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'bid' | 'counteroffer' | 'message' | 'system' | 'listing';
+  isRead: boolean;
+  timestamp: Date;
+  actionUrl?: string;
+  relatedListingId?: string;
+  relatedBidId?: string;
+  relatedMessageId?: string;
+}
+
 export interface Watch {
   id: string;
   title: string;

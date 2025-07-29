@@ -7,7 +7,7 @@ import { PricingBreakdown, VerificationPartner } from '../models/bid.interface';
 export class PricingService {
 
   // Commission rate
-  private readonly COMMISSION_RATE = 0.05; // 5%
+  private readonly COMMISSION_RATE = 0.06; // 6%
 
   // Default costs
   private readonly DEFAULT_SHIPPING_COST = 25; // Two-way shipping

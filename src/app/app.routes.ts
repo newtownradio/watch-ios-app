@@ -4,6 +4,7 @@ import { SellComponent } from './pages/sell/sell.component';
 import { AccountComponent } from './pages/account/account.component';
 import { SplashComponent } from './pages/splash/splash.component';
 import { AuthComponent } from './pages/auth/auth.component';
+import { MessagesComponent } from './pages/messages/messages.component';
 
 export const routes: Routes = [
   { path: '', component: SplashComponent },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'discovery', component: DiscoveryComponent },
   { path: 'sell', component: SellComponent },
   { path: 'account', component: AccountComponent },
+  { path: 'messages', component: MessagesComponent },
   { path: '**', redirectTo: '' }
 ];

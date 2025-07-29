@@ -1,58 +1,174 @@
-<div class="account-page">
+<div class="account-container">
   <div class="page-header">
     <h1>Account</h1>
-    <p>Manage your profile and data</p>
+    <p>Manage your profile and track your activity</p>
   </div>
 
-  <div class="account-content">
-    <div class="profile-section">
-      <h2>Profile</h2>
+  <!-- User Profile Section -->
+  <div class="profile-section" *ngIf="currentUser">
+    <h2>Profile</h2>
+    <div class="profile-card">
+      <div class="profile-avatar">
+        <span>{{ getInitials(currentUser.name) }}</span>
+      </div>
       <div class="profile-info">
-        <div class="info-item">
-          <span class="label">Name:</span>
-          <span class="value">{{ currentUser?.name || 'Demo User' }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">Email:</span>
-          <span class="value">{{ currentUser?.email || 'demo@watchios.com' }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">ID Verified:</span>
-          <span class="value" [class.status-verified]="currentUser?.idVerified">
-            {{ currentUser?.idVerified ? '✓ Verified' : 'Not Verified' }}
-          </span>
-        </div>
-        <div class="info-item">
-          <span class="label">Member Since:</span>
-          <span class="value">{{ currentUser?.createdAt ? (currentUser.createdAt | date:'MMMM yyyy') : 'January 2024' }}</span>
+        <h3>{{ currentUser.name }}</h3>
+        <p>{{ currentUser.email }}</p>
+        <div class="profile-stats">
+          <div class="stat">
+            <span class="stat-label">Member Since:</span>
+            <span class="stat-value">{{ getMemberSince() }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Verification:</span>
+            <span class="stat-value" [class]="currentUser.idVerified ? 'verified' : 'unverified'">
+              {{ currentUser.idVerified ? '✓ Verified' : '⚠ Unverified' }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <app-data-manager></app-data-manager>
-
-    <div class="settings-section">
-      <h2>Settings</h2>
-      <div class="settings-list">
-        <div class="setting-item">
-          <span>Notifications</span>
-          <button class="toggle-btn">On</button>
+  <!-- Activity Summary -->
+  <div class="activity-summary">
+    <h2>Activity Summary</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <h3>{{ userStats.listings }}</h3>
+          <p>Active Listings</p>
         </div>
-        <div class="setting-item">
-          <span>Email Updates</span>
-          <button class="toggle-btn">On</button>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>{{ userStats.bids }}</h3>
+          <p>Bids Received</p>
         </div>
-        <div class="setting-item">
-          <span>Two-Factor Auth</span>
-          <button class="toggle-btn off">Off</button>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🤝</div>
+        <div class="stat-content">
+          <h3>{{ userStats.sales }}</h3>
+          <p>Completed Sales</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-content">
+          <h3>{{ userStats.messages }}</h3>
+          <p>Unread Messages</p>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="sign-out-section">
-      <button class="sign-out-btn" (click)="signOut()">
-        Sign Out
-      </button>
+  <!-- Recent Orders/Transactions -->
+  <div class="orders-section">
+    <h2>Recent Orders</h2>
+    <div class="orders-list" *ngIf="recentOrders.length > 0">
+      <div class="order-item" *ngFor="let order of recentOrders">
+        <div class="order-header">
+          <h4>{{ order.title }}</h4>
+          <span class="order-status" [class]="order.status">{{ order.status }}</span>
+        </div>
+        <div class="order-details">
+          <p><strong>Price:</strong> ${{ order.price.toLocaleString() }}</p>
+          <p><strong>Date:</strong> {{ order.date | date:'medium' }}</p>
+          <p><strong>Order ID:</strong> {{ order.id }}</p>
+        </div>
+        <div class="order-actions">
+          <button class="btn-secondary" (click)="viewOrderDetails(order.id)">
+            View Details
+          </button>
+        </div>
+      </div>
     </div>
+    <div class="empty-state" *ngIf="recentOrders.length === 0">
+      <div class="empty-icon">📦</div>
+      <h3>No orders yet</h3>
+      <p>Your completed transactions will appear here.</p>
+    </div>
+  </div>
+
+  <!-- Important Records -->
+  <div class="records-section">
+    <h2>Important Records</h2>
+    <div class="records-grid">
+      <div class="record-card">
+        <div class="record-icon">📄</div>
+        <div class="record-content">
+          <h4>Government ID</h4>
+          <p>{{ currentUser?.governmentIdUrl ? '✓ Uploaded' : '⚠ Required for transactions' }}</p>
+          <button class="btn-secondary" (click)="uploadGovernmentId()">
+            {{ currentUser?.governmentIdUrl ? 'Update ID' : 'Upload ID' }}
+          </button>
+        </div>
+      </div>
+      <div class="record-card">
+        <div class="record-icon">🔒</div>
+        <div class="record-content">
+          <h4>Privacy Policy</h4>
+          <p>{{ currentUser?.policySigned ? '✓ Accepted' : '⚠ Not accepted' }}</p>
+          <button class="btn-secondary" (click)="viewPrivacyPolicy()">
+            View Policy
+          </button>
+        </div>
+      </div>
+      <div class="record-card">
+        <div class="record-icon">🍪</div>
+        <div class="record-content">
+          <h4>Cookie Policy</h4>
+          <p>{{ currentUser?.disclaimerSigned ? '✓ Accepted' : '⚠ Not accepted' }}</p>
+          <button class="btn-secondary" (click)="viewCookiePolicy()">
+            View Policy
+          </button>
+        </div>
+      </div>
+      <div class="record-card">
+        <div class="record-icon">📋</div>
+        <div class="record-content">
+          <h4>Terms & Conditions</h4>
+          <p>{{ currentUser?.termsSigned ? '✓ Accepted' : '⚠ Not accepted' }}</p>
+          <button class="btn-secondary" (click)="viewTermsConditions()">
+            View Terms
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="activity-section">
+    <h2>Recent Activity</h2>
+    <div class="activity-list" *ngIf="recentActivity.length > 0">
+      <div class="activity-item" *ngFor="let activity of recentActivity">
+        <div class="activity-icon" [class]="activity.type">
+          <span>{{ getActivityIcon(activity.type) }}</span>
+        </div>
+        <div class="activity-content">
+          <h4>{{ activity.title }}</h4>
+          <p>{{ activity.description }}</p>
+          <span class="activity-time">{{ getTimeAgo(activity.timestamp) }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state" *ngIf="recentActivity.length === 0">
+      <div class="empty-icon">📊</div>
+      <h3>No recent activity</h3>
+      <p>Your recent actions will appear here.</p>
+    </div>
+  </div>
+
+  <!-- Data Management -->
+  <app-data-manager></app-data-manager>
+
+  <!-- Account Actions -->
+  <div class="account-actions">
+    <button class="btn-danger" (click)="logout()">
+      Sign Out
+    </button>
   </div>
 </div>
