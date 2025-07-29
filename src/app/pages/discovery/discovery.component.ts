@@ -114,9 +114,45 @@ export class DiscoveryComponent implements OnInit {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
+      minute: '2-digit'
     });
+  }
+
+  shareListing(listing: Listing) {
+    const shareText = `⌚ ${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
+      `📅 Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
+      `⏰ Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
+      `Check out this watch on Watch iOS!`;
+
+    // Try to use Web Share API first (mobile devices)
+    if (navigator.share) {
+      navigator.share({
+        title: listing.title,
+        text: shareText,
+        url: window.location.href
+      }).catch((error) => {
+        console.log('Error sharing:', error);
+        this.fallbackShare(shareText);
+      });
+    } else {
+      // Fallback to clipboard copy
+      this.fallbackShare(shareText);
+    }
+  }
+
+  private fallbackShare(shareText: string) {
+    // Copy to clipboard
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareText).then(() => {
+        alert('Listing details copied to clipboard! 📋');
+      }).catch(() => {
+        // Final fallback - show in alert
+        alert(`Share this listing:\n\n${shareText}`);
+      });
+    } else {
+      // Final fallback - show in alert
+      alert(`Share this listing:\n\n${shareText}`);
+    }
   }
 
   private loadListings() {

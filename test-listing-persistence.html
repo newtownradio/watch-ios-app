@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listing Persistence Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; border: none; border-radius: 3px; cursor: pointer; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Listing Persistence Test</h1>
+    
+    <div class="test-section info">
+        <h3>Test Overview</h3>
+        <p>This page tests the listing persistence functionality between the Sell and Discovery components.</p>
+    </div>
+
+    <div class="test-section">
+        <h3>1. Clear Data</h3>
+        <button class="btn-danger" onclick="clearData()">Clear All Data</button>
+        <button class="btn-primary" onclick="checkData()">Check Current Data</button>
+        <div id="data-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Create Test Listing</h3>
+        <button class="btn-success" onclick="createTestListing()">Create Test Listing</button>
+        <div id="create-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Verify Listing Persistence</h3>
+        <button class="btn-primary" onclick="verifyPersistence()">Verify Persistence</button>
+        <div id="persistence-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Test Date Handling</h3>
+        <button class="btn-primary" onclick="testDateHandling()">Test Date Handling</button>
+        <div id="date-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Current Listings</h3>
+        <button class="btn-primary" onclick="showListings()">Show All Listings</button>
+        <div id="listings-display"></div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'watch_ios_listings';
+
+        function clearData() {
+            localStorage.clear();
+            document.getElementById('data-status').innerHTML = 
+                '<div class="success">✅ All data cleared successfully</div>';
+        }
+
+        function checkData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            const listings = data ? JSON.parse(data) : [];
+            
+            document.getElementById('data-status').innerHTML = `
+                <div class="info">
+                    <strong>Current Data:</strong><br>
+                    📊 Total listings: ${listings.length}<br>
+                    💾 Storage key: ${STORAGE_KEY}<br>
+                    ${listings.length > 0 ? '📋 Sample: ' + listings[0].title : '📭 No listings found'}
+                </div>
+            `;
+        }
+
+        function createTestListing() {
+            const testListing = {
+                id: 'test-' + Date.now(),
+                sellerId: 'seller1',
+                sellerName: 'John Seller',
+                title: 'Test Watch Listing',
+                description: 'This is a test listing to verify persistence',
+                brand: 'Rolex',
+                model: 'Submariner',
+                year: 2020,
+                condition: 'excellent',
+                startingPrice: 5000,
+                currentPrice: 5000,
+                imageUrl: 'test.jpg',
+                createdAt: new Date(),
+                endTime: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48 hours from now
+                status: 'active',
+                bids: [],
+                counteroffers: [],
+                hasMadeCounteroffer: false
+            };
+
+            const existingData = localStorage.getItem(STORAGE_KEY);
+            const listings = existingData ? JSON.parse(existingData) : [];
+            listings.push(testListing);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(listings));
+
+            document.getElementById('create-status').innerHTML = `
+                <div class="success">
+                    ✅ Test listing created successfully!<br>
+                    📝 Title: ${testListing.title}<br>
+                    💰 Price: $${testListing.currentPrice}<br>
+                    ⏰ End Time: ${testListing.endTime.toLocaleString()}
+                </div>
+            `;
+        }
+
+        function verifyPersistence() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (!data) {
+                document.getElementById('persistence-status').innerHTML = 
+                    '<div class="error">❌ No data found in localStorage</div>';
+                return;
+            }
+
+            const listings = JSON.parse(data);
+            const userListings = listings.filter(l => l.sellerId === 'seller1');
+            
+            if (userListings.length > 0) {
+                document.getElementById('persistence-status').innerHTML = `
+                    <div class="success">
+                        ✅ Persistence working correctly!<br>
+                        📊 Found ${userListings.length} user-created listing(s)<br>
+                        📝 Latest: ${userListings[userListings.length - 1].title}
+                    </div>
+                `;
+            } else {
+                document.getElementById('persistence-status').innerHTML = 
+                    '<div class="error">❌ No user-created listings found</div>';
+            }
+        }
+
+        function testDateHandling() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (!data) {
+                document.getElementById('date-status').innerHTML = 
+                    '<div class="error">❌ No data to test</div>';
+                return;
+            }
+
+            const listings = JSON.parse(data);
+            const now = new Date();
+            let dateIssues = [];
+
+            listings.forEach((listing, index) => {
+                const createdAt = new Date(listing.createdAt);
+                const endTime = new Date(listing.endTime);
+                
+                if (isNaN(createdAt.getTime())) {
+                    dateIssues.push(`Listing ${index}: Invalid createdAt date`);
+                }
+                if (isNaN(endTime.getTime())) {
+                    dateIssues.push(`Listing ${index}: Invalid endTime date`);
+                }
+                if (endTime <= now) {
+                    dateIssues.push(`Listing ${index}: End time is in the past`);
+                }
+            });
+
+            if (dateIssues.length === 0) {
+                document.getElementById('date-status').innerHTML = `
+                    <div class="success">
+                        ✅ Date handling working correctly!<br>
+                        📅 All ${listings.length} listings have valid dates<br>
+                        ⏰ All end times are in the future
+                    </div>
+                `;
+            } else {
+                document.getElementById('date-status').innerHTML = `
+                    <div class="error">
+                        ❌ Date issues found:<br>
+                        ${dateIssues.map(issue => `• ${issue}`).join('<br>')}
+                    </div>
+                `;
+            }
+        }
+
+        function showListings() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            const listings = data ? JSON.parse(data) : [];
+            
+            const display = listings.map((listing, index) => `
+                <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 3px;">
+                    <strong>${index + 1}. ${listing.title}</strong><br>
+                    💰 Price: $${listing.currentPrice}<br>
+                    👤 Seller: ${listing.sellerName} (${listing.sellerId})<br>
+                    📅 Created: ${new Date(listing.createdAt).toLocaleString()}<br>
+                    ⏰ Ends: ${new Date(listing.endTime).toLocaleString()}<br>
+                    🏷️ Status: ${listing.status}
+                </div>
+            `).join('');
+
+            document.getElementById('listings-display').innerHTML = `
+                <div class="info">
+                    <strong>📊 Total Listings: ${listings.length}</strong><br>
+                    ${display || '<em>No listings found</em>'}
+                </div>
+            `;
+        }
+
+        // Auto-run initial check
+        window.onload = function() {
+            checkData();
+        };
+    </script>
+</body>
+</html>

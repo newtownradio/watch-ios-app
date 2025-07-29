@@ -12,8 +12,13 @@
 
     <!-- AI Pricing Assistant Section -->
     <div class="pricing-assistant">
-      <h3>🤖 AI Pricing Assistant</h3>
+      <h3>⌚ AI Pricing Assistant</h3>
       <p>Get accurate pricing based on market data and similar items</p>
+      
+      <!-- Simple Debug -->
+      <div style="background: #f0f0f0; padding: 5px; margin: 5px 0; font-size: 10px;">
+        Brands: {{ availableBrands.length }} | Models: {{ availableModels.length }}
+      </div>
       
       <div class="pricing-form">
         <div class="form-row">
@@ -101,7 +106,7 @@
   <div class="pricing-modal" *ngIf="showPricingAssistant">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>🤖 AI Pricing Recommendation</h3>
+        <h3>⌚ AI Pricing Recommendation</h3>
         <button class="close-btn" (click)="closePricingAssistant()">×</button>
       </div>
       
@@ -207,6 +212,9 @@
         <h3>{{ listing.title }}</h3>
         <div class="header-actions">
           <span class="status" [class]="listing.status">{{ listing.status }}</span>
+          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
+            📤 Share
+          </button>
           <button class="delete-btn" (click)="deleteListing(listing.id)" title="Delete listing">
             🗑️
           </button>

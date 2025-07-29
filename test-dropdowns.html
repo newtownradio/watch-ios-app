@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        select { padding: 8px; margin: 5px; min-width: 200px; }
+        .result { margin-top: 10px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Dropdown Functionality Test</h1>
+    
+    <div class="test-section">
+        <h3>Brand Selection Test</h3>
+        <label for="brand">Brand:</label>
+        <select id="brand" onchange="onBrandChange()">
+            <option value="">Select Brand</option>
+            <option value="Rolex">Rolex</option>
+            <option value="Omega">Omega</option>
+            <option value="Cartier">Cartier</option>
+            <option value="Tudor">Tudor</option>
+            <option value="Seiko">Seiko</option>
+            <option value="Tag Heuer">Tag Heuer</option>
+            <option value="Breitling">Breitling</option>
+            <option value="IWC">IWC</option>
+            <option value="Panerai">Panerai</option>
+            <option value="Audemars Piguet">Audemars Piguet</option>
+            <option value="Patek Philippe">Patek Philippe</option>
+            <option value="Vacheron Constantin">Vacheron Constantin</option>
+            <option value="Longines">Longines</option>
+            <option value="Tissot">Tissot</option>
+            <option value="Hamilton">Hamilton</option>
+            <option value="Mido">Mido</option>
+            <option value="Swatch">Swatch</option>
+            <option value="Casio">Casio</option>
+            <option value="Citizen">Citizen</option>
+            <option value="Bulova">Bulova</option>
+            <option value="Timex">Timex</option>
+        </select>
+        
+        <br><br>
+        <label for="model">Model:</label>
+        <select id="model" disabled>
+            <option value="">Select Model</option>
+        </select>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const brandModels = {
+            'Rolex': ['Submariner', 'Datejust', 'Daytona', 'GMT-Master', 'Explorer', 'Milgauss', 'Yacht-Master', 'Sea-Dweller', 'Air-King', 'Cellini', 'Oyster Perpetual'],
+            'Omega': ['Speedmaster', 'Seamaster', 'Constellation', 'De Ville', 'Speedmaster Professional', 'Aqua Terra', 'Planet Ocean', 'Railmaster', 'Seamaster Diver 300M'],
+            'Cartier': ['Santos', 'Tank', 'Ballon Bleu', 'Pasha', 'Roadster', 'Calibre', 'Drive', 'Ronde', 'Baignoire', 'Crash', 'Tortue'],
+            'Tudor': ['Black Bay', 'Pelagos', 'Ranger', 'GMT', 'Chronograph', 'Royal', 'Submariner', 'Heritage', 'Black Bay 58', 'Black Bay GMT'],
+            'Seiko': ['Prospex', 'Presage', 'Astron', 'Premier', '5 Sports', 'Grand Seiko', 'King Seiko', 'Credor', 'Alpinist', 'Monster'],
+            'Tag Heuer': ['Carrera', 'Monaco', 'Aquaracer', 'Link', 'Formula 1', 'Autavia', 'Connected', 'Monza', 'Silverstone', 'Professional'],
+            'Breitling': ['Navitimer', 'Chronomat', 'Superocean', 'Avenger', 'Transocean', 'Premier', 'Chronoliner', 'Aerospace', 'Emergency', 'Montbrillant', 'Datora'],
+            'IWC': ['Portugieser', 'Pilot', 'Ingenieur', 'Aquatimer', 'Da Vinci', 'Portofino', 'Vintage Collection', 'Le Petit Prince', 'Spitfire', 'Top Gun'],
+            'Panerai': ['Luminor', 'Radiomir', 'Submersible', 'Luminor Due', 'Luminor Marina', 'Radiomir 1940', 'Luminor 1950', 'Luminor GMT', 'Luminor Chrono'],
+            'Audemars Piguet': ['Royal Oak', 'Royal Oak Offshore', 'Millenary', 'Jules Audemars', 'Classique', 'Code 11.59', 'Royal Oak Concept', 'Tradition'],
+            'Patek Philippe': ['Calatrava', 'Nautilus', 'Aquanaut', 'Grand Complications', 'Complications', 'Golden Ellipse', 'Gondolo', 'Twenty-4'],
+            'Vacheron Constantin': ['Overseas', 'Fiftysix', 'Traditionnelle', 'Patrimony', 'Métiers d\'Art', 'Historiques', 'Malte', 'Harmony'],
+            'Longines': ['Conquest', 'Heritage', 'Master Collection', 'DolceVita', 'La Grande Classique', 'HydroConquest', 'Elegant', 'Presence'],
+            'Tissot': ['T-Touch', 'T-Classic', 'T-Sport', 'T-Lady', 'T-Gold', 'Le Locle', 'Couturier', 'Tradition', 'Chemin des Tourelles'],
+            'Hamilton': ['Khaki', 'Jazzmaster', 'Ventura', 'American Classic', 'Broadway', 'Pilot', 'Railroad', 'Frogman', 'Pan Europ'],
+            'Mido': ['Baroncelli', 'Commander', 'Multifort', 'Ocean Star', 'All Dial', 'Rainflower', 'Belluna', 'Helmsman'],
+            'Swatch': ['Originals', 'Irony', 'Skin', 'Scuba', 'Chrono', 'Touch', 'Sistem51', 'Flik Flak', 'Swatch Club'],
+            'Casio': ['G-Shock', 'Pro Trek', 'Edifice', 'Baby-G', 'Sheen', 'Pathfinder', 'Gulfman', 'Riseman', 'Mudman'],
+            'Citizen': ['Eco-Drive', 'Promaster', 'Corso', 'Satellite Wave', 'Chronomaster', 'Exceed', 'Campanola', 'Attesa'],
+            'Bulova': ['Precisionist', 'Marine Star', 'Curv', 'Accutron', 'Classic', 'Automatic', 'Quartz', 'Special Edition'],
+            'Timex': ['Expedition', 'Weekender', 'Ironman', 'Easy Reader', 'Waterbury', 'Fairfield', 'South Street', 'Marlin']
+        };
+
+        function onBrandChange() {
+            const brandSelect = document.getElementById('brand');
+            const modelSelect = document.getElementById('model');
+            const resultDiv = document.getElementById('result');
+            
+            const selectedBrand = brandSelect.value;
+            
+            // Clear model dropdown
+            modelSelect.innerHTML = '<option value="">Select Model</option>';
+            
+            if (selectedBrand) {
+                // Enable model dropdown
+                modelSelect.disabled = false;
+                
+                // Add models for selected brand
+                const models = brandModels[selectedBrand] || [];
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
+                });
+                
+                resultDiv.innerHTML = `<strong>✅ Brand "${selectedBrand}" selected</strong><br>Available models: ${models.length}`;
+            } else {
+                // Disable model dropdown
+                modelSelect.disabled = true;
+                resultDiv.innerHTML = '<strong>⚠️ Please select a brand first</strong>';
+            }
+        }
+
+        // Test the functionality
+        console.log('Dropdown test page loaded');
+        console.log('Available brands:', Object.keys(brandModels));
+        console.log('Total brands:', Object.keys(brandModels).length);
+    </script>
+</body>
+</html>

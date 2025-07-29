@@ -76,7 +76,7 @@
   <div class="products-grid">
     <div class="product-card" *ngFor="let listing of filteredListings">
       <div class="product-image">
-        <img [src]="listing.imageUrl || 'assets/placeholder-watch.jpg'" [alt]="listing.title">
+        <img [src]="listing.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPldhdGNoPC90ZXh0Pjwvc3ZnPg=='" [alt]="listing.title">
         <button class="favorite-btn" (click)="toggleFavorite(listing.id)">
           {{ isFavorited(listing.id) ? '❤️' : '🤍' }}
         </button>
@@ -113,6 +113,9 @@
             Ends: {{ getListingEndTime(listing.endTime) }}
           </span>
         </div>
+        <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
+          📤 Share
+        </button>
       </div>
     </div>
   </div>

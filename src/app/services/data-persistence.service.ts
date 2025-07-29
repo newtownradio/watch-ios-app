@@ -84,7 +84,18 @@ export class DataPersistenceService {
    * Save listings to localStorage
    */
   private saveListings(listings: Listing[]): void {
-    localStorage.setItem(this.LISTINGS_KEY, JSON.stringify(listings));
+    try {
+      localStorage.setItem(this.LISTINGS_KEY, JSON.stringify(listings));
+    } catch (error) {
+      console.error('localStorage quota exceeded, clearing old data and retrying...');
+      // Clear old data and retry
+      this.clearAllData();
+      try {
+        localStorage.setItem(this.LISTINGS_KEY, JSON.stringify(listings));
+      } catch (retryError) {
+        console.error('Failed to save listings even after clearing data:', retryError);
+      }
+    }
   }
 
   // ===== FAVORITES MANAGEMENT =====
@@ -140,7 +151,11 @@ export class DataPersistenceService {
    */
   private saveUserFavorites(userId: string, favorites: string[]): void {
     const key = `${this.FAVORITES_KEY}_${userId}`;
-    localStorage.setItem(key, JSON.stringify(favorites));
+    try {
+      localStorage.setItem(key, JSON.stringify(favorites));
+    } catch (error) {
+      console.error('localStorage quota exceeded for favorites:', error);
+    }
   }
 
   // ===== WATCHES MANAGEMENT =====
@@ -185,16 +200,19 @@ export class DataPersistenceService {
    * Delete a watch
    */
   deleteWatch(watchId: string): void {
-    const watches = this.getAllWatches();
-    const filtered = watches.filter(w => w.id !== watchId);
-    this.saveWatches(filtered);
+    const watches = this.getAllWatches().filter(watch => watch.id !== watchId);
+    this.saveWatches(watches);
   }
 
   /**
    * Save watches to localStorage
    */
   private saveWatches(watches: Watch[]): void {
-    localStorage.setItem(this.WATCHES_KEY, JSON.stringify(watches));
+    try {
+      localStorage.setItem(this.WATCHES_KEY, JSON.stringify(watches));
+    } catch (error) {
+      console.error('localStorage quota exceeded for watches:', error);
+    }
   }
 
   // ===== USERS MANAGEMENT =====
@@ -232,7 +250,11 @@ export class DataPersistenceService {
    * Save users to localStorage
    */
   private saveUsers(users: User[]): void {
-    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+    try {
+      localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+    } catch (error) {
+      console.error('localStorage quota exceeded for users:', error);
+    }
   }
 
   // ===== UTILITY METHODS =====

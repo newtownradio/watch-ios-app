@@ -236,11 +236,26 @@ export class AiPricingService {
    * Get available brands for pricing analysis
    */
   getAvailableBrands(): string[] {
+    console.log('=== getAvailableBrands called ===');
     const brands = new Set<string>();
+    
+    // Get brands from market data
     Object.values(this.marketData).forEach(data => {
       brands.add(data.brand);
     });
-    return Array.from(brands).sort();
+    
+    // Add all brands from additional models
+    const additionalBrands = [
+      'Rolex', 'Omega', 'Cartier', 'Tudor', 'Seiko', 'Tag Heuer', 'Breitling', 'IWC', 'Panerai',
+      'Audemars Piguet', 'Patek Philippe', 'Vacheron Constantin', 'Longines', 'Tissot', 'Hamilton',
+      'Mido', 'Swatch', 'Casio', 'Citizen', 'Bulova', 'Timex'
+    ];
+    
+    additionalBrands.forEach(brand => brands.add(brand));
+    
+    const result = Array.from(brands).sort();
+    console.log('Returning brands:', result);
+    return result;
   }
 
   /**

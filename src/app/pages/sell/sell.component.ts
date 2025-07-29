@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
@@ -9,6 +9,7 @@ import { AiPricingService, PricingRecommendation } from '../../services/ai-prici
   selector: 'app-sell',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  providers: [DataPersistenceService, AiPricingService],
   templateUrl: './sell.component.html',
   styleUrl: './sell.component.scss'
 })
@@ -40,16 +41,27 @@ export class SellComponent implements OnInit {
 
   constructor(
     private dataService: DataPersistenceService,
-    private aiPricingService: AiPricingService
+    private aiPricingService: AiPricingService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    console.log('=== ngOnInit ===');
+    console.log('aiPricingService exists:', !!this.aiPricingService);
     this.loadActiveListings();
     this.loadAvailableBrands();
   }
 
   loadAvailableBrands() {
-    this.availableBrands = this.aiPricingService.getAvailableBrands();
+    console.log('=== loadAvailableBrands ===');
+    try {
+      this.availableBrands = this.aiPricingService.getAvailableBrands();
+      console.log('Brands loaded:', this.availableBrands);
+      console.log('Brand count:', this.availableBrands.length);
+    } catch (error) {
+      console.error('Error loading brands:', error);
+    }
+    this.cdr.detectChanges();
   }
 
   onBrandChange() {
@@ -60,6 +72,8 @@ export class SellComponent implements OnInit {
       this.availableModels = [];
       this.form.model = '';
     }
+    
+    this.cdr.detectChanges();
   }
 
   getModelCount(): number {
@@ -67,18 +81,12 @@ export class SellComponent implements OnInit {
   }
 
   getPricingRecommendation() {
-    console.log('getPricingRecommendation called');
-    console.log('Form brand:', this.form.brand);
-    console.log('Form model:', this.form.model);
-    
     if (!this.form.brand || !this.form.model) {
       alert('Please select a brand and model for pricing analysis');
       return;
     }
 
     try {
-      console.log('Getting pricing recommendation for:', this.form.brand, this.form.model);
-      
       this.pricingRecommendation = this.aiPricingService.getPricingRecommendation(
         this.form.brand,
         this.form.model,
@@ -87,13 +95,10 @@ export class SellComponent implements OnInit {
         this.form.originalPrice
       );
 
-      console.log('Pricing recommendation:', this.pricingRecommendation);
-
       // Auto-fill the suggested price
       this.form.startingPrice = this.pricingRecommendation.suggestedPrice;
       this.showPricingAssistant = true;
       
-      console.log('Modal should be visible:', this.showPricingAssistant);
     } catch (error) {
       console.error('Error getting pricing recommendation:', error);
       alert('Error getting pricing recommendation. Please try again.');
@@ -113,9 +118,6 @@ export class SellComponent implements OnInit {
   }
 
   submitForm() {
-    console.log('Submit form called');
-    console.log('Form data:', this.form);
-    
     // Check if form has required data
     if (!this.form.title || this.form.title.trim() === '') {
       alert('Please enter a title for your item');
@@ -142,7 +144,7 @@ export class SellComponent implements OnInit {
       condition: this.form.condition,
       startingPrice: this.form.startingPrice,
       currentPrice: this.form.startingPrice,
-      imageUrl: 'placeholder.jpg',
+      imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==',
       createdAt: startTime,
       endTime: endTime,
       status: 'active',
@@ -150,8 +152,6 @@ export class SellComponent implements OnInit {
       counteroffers: [],
       hasMadeCounteroffer: false
     };
-
-    console.log('Creating new listing:', newListing);
 
     try {
       // Save to persistent storage
@@ -194,10 +194,10 @@ export class SellComponent implements OnInit {
     // Get listings from persistent storage
     this.activeListings = this.dataService.getListingsBySeller('seller1');
     
-    // If no listings exist, create some demo data
-    if (this.activeListings.length === 0) {
-      this.createDemoListings();
-    }
+    // Temporarily disable demo listings to prevent localStorage quota issues
+    // if (this.activeListings.length === 0) {
+    //   this.createDemoListings();
+    // }
 
     // Set highest bid for each listing
     this.activeListings.forEach(listing => {
@@ -219,7 +219,7 @@ export class SellComponent implements OnInit {
         description: 'Classic dive watch in excellent condition',
         startingPrice: 8500,
         currentPrice: 9000,
-        imageUrl: 'placeholder.jpg',
+        imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==',
         createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
         endTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
         status: 'active',
@@ -390,5 +390,42 @@ export class SellComponent implements OnInit {
 
   getPendingCounteroffers(listing: Listing): Counteroffer[] {
     return listing.counteroffers.filter(co => co.status === 'pending');
+  }
+
+  shareListing(listing: Listing) {
+    const shareText = `⌚ ${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
+      `📅 Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
+      `⏰ Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
+      `Check out this watch on Watch iOS!`;
+
+    // Try to use Web Share API first (mobile devices)
+    if (navigator.share) {
+      navigator.share({
+        title: listing.title,
+        text: shareText,
+        url: window.location.href
+      }).catch((error) => {
+        console.log('Error sharing:', error);
+        this.fallbackShare(shareText);
+      });
+    } else {
+      // Fallback to clipboard copy
+      this.fallbackShare(shareText);
+    }
+  }
+
+  private fallbackShare(shareText: string) {
+    // Copy to clipboard
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareText).then(() => {
+        alert('Listing details copied to clipboard! 📋');
+      }).catch(() => {
+        // Final fallback - show in alert
+        alert(`Share this listing:\n\n${shareText}`);
+      });
+    } else {
+      // Final fallback - show in alert
+      alert(`Share this listing:\n\n${shareText}`);
+    }
   }
 }
