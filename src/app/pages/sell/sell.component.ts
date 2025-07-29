@@ -22,7 +22,11 @@ export class SellComponent implements OnInit {
     model: '',
     year: undefined as number | undefined,
     condition: 'excellent' as 'excellent' | 'very-good' | 'good' | 'fair',
-    originalPrice: undefined as number | undefined
+    originalPrice: undefined as number | undefined,
+    imageUrl: '',
+    scheduleType: 'immediate' as 'immediate' | 'scheduled',
+    scheduleDate: '',
+    scheduleTime: ''
   };
 
   activeListings: Listing[] = [];
@@ -128,9 +132,32 @@ export class SellComponent implements OnInit {
       alert('Please enter a valid starting price greater than 0');
       return;
     }
+
+    // Validate scheduled listing
+    if (this.form.scheduleType === 'scheduled') {
+      if (!this.form.scheduleDate || !this.form.scheduleTime) {
+        alert('Please select both date and time for scheduled listing');
+        return;
+      }
+      
+      const scheduledDateTime = new Date(`${this.form.scheduleDate}T${this.form.scheduleTime}`);
+      const now = new Date();
+      
+      if (scheduledDateTime <= now) {
+        alert('Scheduled date and time must be in the future');
+        return;
+      }
+    }
     
-    const startTime = new Date();
-    const endTime = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hours from now
+    // Determine start time based on schedule type
+    let startTime: Date;
+    if (this.form.scheduleType === 'scheduled') {
+      startTime = new Date(`${this.form.scheduleDate}T${this.form.scheduleTime}`);
+    } else {
+      startTime = new Date();
+    }
+    
+    const endTime = new Date(startTime.getTime() + 48 * 60 * 60 * 1000); // 48 hours from start
     
     const newListing: Listing = {
       id: this.dataService.generateId(),
@@ -144,10 +171,10 @@ export class SellComponent implements OnInit {
       condition: this.form.condition,
       startingPrice: this.form.startingPrice,
       currentPrice: this.form.startingPrice,
-      imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==',
+      imageUrl: this.form.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==',
       createdAt: startTime,
       endTime: endTime,
-      status: 'active',
+      status: this.form.scheduleType === 'scheduled' ? 'scheduled' : 'active',
       bids: [],
       counteroffers: [],
       hasMadeCounteroffer: false
@@ -169,13 +196,23 @@ export class SellComponent implements OnInit {
         model: '',
         year: undefined,
         condition: 'excellent',
-        originalPrice: undefined
+        originalPrice: undefined,
+        imageUrl: '',
+        scheduleType: 'immediate',
+        scheduleDate: '',
+        scheduleTime: ''
       };
       
       // Show success message with times
       const startTimeStr = this.getListingStartTime(startTime);
       const endTimeStr = this.getListingEndTime(endTime);
-      alert(`Item listed successfully!\n\nStart: ${startTimeStr}\nEnd: ${endTimeStr}\n\nBidding window is 48 hours.`);
+      const wasScheduled = this.form.scheduleType === 'scheduled';
+      
+      if (wasScheduled) {
+        alert(`Item scheduled successfully!\n\nGoes live: ${startTimeStr}\nEnds: ${endTimeStr}\n\nBidding window is 48 hours.`);
+      } else {
+        alert(`Item listed successfully!\n\nStart: ${startTimeStr}\nEnd: ${endTimeStr}\n\nBidding window is 48 hours.`);
+      }
     } catch (error) {
       console.error('Error saving listing:', error);
       alert('Error saving listing. Please try again.');
@@ -427,5 +464,48 @@ export class SellComponent implements OnInit {
       // Final fallback - show in alert
       alert(`Share this listing:\n\n${shareText}`);
     }
+  }
+
+  // Image upload methods
+  triggerFileInput() {
+    const fileInput = document.getElementById('product-image') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      // Check file type - only JPG and PNG allowed
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please select a JPG or PNG image file');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.form.imageUrl = e.target.result;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage() {
+    this.form.imageUrl = '';
+    this.cdr.detectChanges();
+  }
+
+  getMinDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
   }
 }

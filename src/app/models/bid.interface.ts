@@ -36,7 +36,7 @@ export interface Listing {
   imageUrl: string;
   createdAt: Date;
   endTime: Date; // 48 hours from creation
-  status: 'active' | 'expired' | 'sold';
+  status: 'active' | 'expired' | 'sold' | 'scheduled';
   bids: Bid[];
   highestBid?: Bid;
   counteroffers: Counteroffer[];

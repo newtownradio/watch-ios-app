@@ -31,7 +31,14 @@ export class DiscoveryComponent implements OnInit {
   }
 
   get filteredListings(): Listing[] {
+    const now = new Date();
+    
     return this.listings.filter(listing => {
+      // Filter out scheduled listings that haven't gone live yet
+      if (listing.status === 'scheduled' && listing.createdAt > now) {
+        return false;
+      }
+      
       const matchesSearch = !this.searchTerm || 
         listing.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         listing.sellerName.toLowerCase().includes(this.searchTerm.toLowerCase());

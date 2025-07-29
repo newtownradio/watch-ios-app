@@ -302,23 +302,161 @@ export class DataPersistenceService {
   }
 
   /**
-   * Export all data (for backup)
+   * Export all data as CSV (for backup and analysis)
    */
   exportAllData(): string {
-    const data = {
-      listings: this.getAllListings(),
-      watches: this.getAllWatches(),
-      users: this.getAllUsers(),
-      favorites: {} as { [userId: string]: string[] }
-    };
+    const listings = this.getAllListings();
+    const watches = this.getAllWatches();
+    const users = this.getAllUsers();
+    
+    let csvContent = '';
+    
+    // Export listings as CSV
+    if (listings.length > 0) {
+      csvContent += '=== LISTINGS ===\n';
+      csvContent += this.listingsToCSV(listings);
+      csvContent += '\n\n';
+    }
+    
+    // Export watches as CSV
+    if (watches.length > 0) {
+      csvContent += '=== WATCHES ===\n';
+      csvContent += this.watchesToCSV(watches);
+      csvContent += '\n\n';
+    }
+    
+    // Export users as CSV
+    if (users.length > 0) {
+      csvContent += '=== USERS ===\n';
+      csvContent += this.usersToCSV(users);
+      csvContent += '\n\n';
+    }
+    
+    // Export favorites as CSV
+    const allFavorites = this.getAllFavorites();
+    if (allFavorites.length > 0) {
+      csvContent += '=== FAVORITES ===\n';
+      csvContent += this.favoritesToCSV(allFavorites);
+    }
+    
+    return csvContent;
+  }
 
-    // Add favorites for each user
+  /**
+   * Convert listings to CSV format
+   */
+  private listingsToCSV(listings: Listing[]): string {
+    if (listings.length === 0) return '';
+    
+    const headers = [
+      'ID', 'Seller ID', 'Seller Name', 'Title', 'Description', 'Brand', 'Model', 
+      'Year', 'Condition', 'Starting Price', 'Current Price', 'Image URL', 
+      'Created At', 'End Time', 'Status', 'Bids Count', 'Counteroffers Count'
+    ];
+    
+    const rows = listings.map(listing => [
+      listing.id,
+      listing.sellerId,
+      listing.sellerName,
+      `"${listing.title.replace(/"/g, '""')}"`,
+      `"${listing.description.replace(/"/g, '""')}"`,
+      listing.brand || '',
+      listing.model || '',
+      listing.year || '',
+      listing.condition || '',
+      listing.startingPrice,
+      listing.currentPrice,
+      listing.imageUrl,
+      listing.createdAt.toISOString(),
+      listing.endTime.toISOString(),
+      listing.status,
+      listing.bids.length,
+      listing.counteroffers.length
+    ]);
+    
+    return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+  }
+
+  /**
+   * Convert watches to CSV format
+   */
+  private watchesToCSV(watches: Watch[]): string {
+    if (watches.length === 0) return '';
+    
+    const headers = [
+      'ID', 'Title', 'Brand', 'Model', 'Year', 'Condition', 'Description', 
+      'Seller ID', 'Asking Price', 'Verification Status', 'Created At', 'Updated At'
+    ];
+    
+    const rows = watches.map(watch => [
+      watch.id,
+      `"${watch.title.replace(/"/g, '""')}"`,
+      watch.brand,
+      watch.model,
+      watch.year || '',
+      watch.condition,
+      `"${watch.description.replace(/"/g, '""')}"`,
+      watch.sellerId,
+      watch.askingPrice,
+      watch.verificationStatus,
+      watch.createdAt.toISOString(),
+      watch.updatedAt.toISOString()
+    ]);
+    
+    return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+  }
+
+  /**
+   * Convert users to CSV format
+   */
+  private usersToCSV(users: User[]): string {
+    if (users.length === 0) return '';
+    
+    const headers = [
+      'ID', 'Name', 'Email', 'ID Verified', 'Disclaimer Signed', 
+      'Policy Signed', 'Verification Date'
+    ];
+    
+    const rows = users.map(user => [
+      user.id,
+      `"${user.name.replace(/"/g, '""')}"`,
+      user.email,
+      user.idVerified,
+      user.disclaimerSigned,
+      user.policySigned,
+      user.verificationDate ? user.verificationDate.toISOString() : ''
+    ]);
+    
+    return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+  }
+
+  /**
+   * Get all favorites data
+   */
+  private getAllFavorites(): Array<{userId: string, listingId: string}> {
     const allUsers = this.getAllUsers();
+    const favorites: Array<{userId: string, listingId: string}> = [];
+    
     allUsers.forEach(user => {
-      data.favorites[user.id] = this.getUserFavorites(user.id);
+      const userFavorites = this.getUserFavorites(user.id);
+      userFavorites.forEach(listingId => {
+        favorites.push({ userId: user.id, listingId });
+      });
     });
+    
+    return favorites;
+  }
 
-    return JSON.stringify(data, null, 2);
+  /**
+   * Convert favorites to CSV format
+   */
+  private favoritesToCSV(favorites: Array<{userId: string, listingId: string}>): string {
+    if (favorites.length === 0) return '';
+    
+    const headers = ['User ID', 'Listing ID'];
+    const rows = favorites.map(fav => [fav.userId, fav.listingId]);
+    
+    return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
   }
 
   /**

@@ -10,6 +10,31 @@
       <input type="text" [(ngModel)]="form.title" placeholder="e.g., Rolex Submariner" id="title">
     </div>
 
+    <div class="form-group">
+      <label for="product-image">Product Image</label>
+      <div class="image-upload-container">
+        <div class="image-preview" *ngIf="form.imageUrl">
+          <img [src]="form.imageUrl" alt="Product preview" class="preview-image">
+          <button type="button" class="remove-image-btn" (click)="removeImage()">×</button>
+        </div>
+        <div class="upload-area" *ngIf="!form.imageUrl" (click)="triggerFileInput()">
+          <div class="upload-content">
+            <span class="upload-icon">📷</span>
+            <p>Click to upload a photo of your watch</p>
+            <small>JPG or PNG up to 5MB</small>
+          </div>
+        </div>
+        <input 
+          type="file" 
+          #fileInput
+          (change)="onFileSelected($event)"
+          accept="image/jpeg,image/jpg,image/png"
+          style="display: none;"
+          id="product-image">
+      </div>
+      <small class="form-help">Upload a clear photo of your watch for better visibility</small>
+    </div>
+
     <!-- AI Pricing Assistant Section -->
     <div class="pricing-assistant">
       <h3>⌚ AI Pricing Assistant</h3>
@@ -85,6 +110,34 @@
     <div class="form-group">
       <label for="description">Description</label>
       <textarea [(ngModel)]="form.description" placeholder="Describe your item..." id="description"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="schedule-listing">Schedule Listing</label>
+      <div class="schedule-options">
+        <div class="schedule-option">
+          <input type="radio" [(ngModel)]="form.scheduleType" value="immediate" id="immediate" name="schedule">
+          <label for="immediate">List immediately</label>
+        </div>
+        <div class="schedule-option">
+          <input type="radio" [(ngModel)]="form.scheduleType" value="scheduled" id="scheduled" name="schedule">
+          <label for="scheduled">Schedule for later</label>
+        </div>
+      </div>
+      
+      <div class="schedule-datetime" *ngIf="form.scheduleType === 'scheduled'">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="schedule-date">Date</label>
+            <input type="date" [(ngModel)]="form.scheduleDate" id="schedule-date" [min]="getMinDate()">
+          </div>
+          <div class="form-group">
+            <label for="schedule-time">Time</label>
+            <input type="time" [(ngModel)]="form.scheduleTime" id="schedule-time">
+          </div>
+        </div>
+        <small class="form-help">Your listing will go live at the scheduled date and time</small>
+      </div>
     </div>
 
     <div class="sale-window-info">

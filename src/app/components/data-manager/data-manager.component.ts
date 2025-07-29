@@ -36,13 +36,21 @@ import { DataPersistenceService } from '../../services/data-persistence.service'
       </div>
 
       <div class="export-result" *ngIf="exportedData">
-        <h4>Exported Data (Copy this JSON):</h4>
+        <h4>Exported Data (CSV Format):</h4>
         <textarea 
           [value]="exportedData" 
           readonly 
-          rows="10"
+          rows="15"
           class="export-textarea"
         ></textarea>
+        <div class="export-actions">
+          <button class="copy-btn" (click)="copyToClipboard()">
+            📋 Copy to Clipboard
+          </button>
+          <button class="download-btn" (click)="downloadCSV()">
+            💾 Download CSV
+          </button>
+        </div>
       </div>
     </div>
   `,
@@ -141,6 +149,50 @@ import { DataPersistenceService } from '../../services/data-persistence.service'
       resize: vertical;
       color: #374151;
     }
+
+    .export-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .copy-btn,
+    .download-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .copy-btn {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .copy-btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .download-btn {
+      background: #10b981;
+      color: white;
+    }
+
+    .download-btn:hover {
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    }
   `]
 })
 export class DataManagerComponent implements OnInit {
@@ -164,5 +216,29 @@ export class DataManagerComponent implements OnInit {
 
   exportData() {
     this.exportedData = this.dataService.exportAllData();
+  }
+
+  copyToClipboard() {
+    if (this.exportedData) {
+      navigator.clipboard.writeText(this.exportedData).then(() => {
+        alert('CSV data copied to clipboard! 📋');
+      }).catch(() => {
+        alert('Failed to copy to clipboard. Please copy manually from the textarea.');
+      });
+    }
+  }
+
+  downloadCSV() {
+    if (this.exportedData) {
+      const blob = new Blob([this.exportedData], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `watch-ios-data-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }
   }
 }
