@@ -11,6 +11,7 @@ export class DataPersistenceService {
   private readonly FAVORITES_KEY = 'watch_ios_favorites';
   private readonly USERS_KEY = 'watch_ios_users';
   private readonly WATCHES_KEY = 'watch_ios_watches';
+  private readonly CURRENT_USER_KEY = 'watch_ios_current_user';
 
   constructor() { }
 
@@ -487,5 +488,220 @@ export class DataPersistenceService {
       console.error('Error importing data:', error);
       throw new Error('Invalid data format');
     }
+  }
+
+  // ===== AUTHENTICATION METHODS =====
+
+  /**
+   * Get current logged in user
+   */
+  getCurrentUser(): User | null {
+    try {
+      const userData = localStorage.getItem(this.CURRENT_USER_KEY);
+      if (userData) {
+        const user = JSON.parse(userData);
+        // Convert dates back to Date objects
+        if (user.createdAt) user.createdAt = new Date(user.createdAt);
+        if (user.verificationDate) user.verificationDate = new Date(user.verificationDate);
+        return user;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Set current logged in user
+   */
+  setCurrentUser(user: User): void {
+    try {
+      localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
+    } catch (error) {
+      console.error('Error setting current user:', error);
+    }
+  }
+
+  /**
+   * Logout current user
+   */
+  logout(): void {
+    localStorage.removeItem(this.CURRENT_USER_KEY);
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return this.getCurrentUser() !== null;
+  }
+
+  /**
+   * Update user verification status
+   */
+  updateUserVerification(userId: string, verified: boolean): void {
+    const users = this.getAllUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex !== -1) {
+      users[userIndex].idVerified = verified;
+      users[userIndex].verificationDate = new Date();
+      this.saveUsers(users);
+      
+      // Update current user if it's the same user
+      const currentUser = this.getCurrentUser();
+      if (currentUser && currentUser.id === userId) {
+        currentUser.idVerified = verified;
+        currentUser.verificationDate = new Date();
+        this.setCurrentUser(currentUser);
+      }
+    }
+  }
+
+  /**
+   * Validate user identity for ID upload
+   */
+  validateUserIdentity(userId: string): { isValid: boolean; message: string } {
+    const user = this.getUserById(userId);
+    if (!user) {
+      return { isValid: false, message: 'User not found' };
+    }
+
+    // Check if user has required information
+    if (!user.name || !user.email) {
+      return { 
+        isValid: false, 
+        message: 'Please complete your profile information before uploading ID' 
+      };
+    }
+
+    // Check if user is already verified
+    if (user.idVerified) {
+      return { 
+        isValid: true, 
+        message: 'User is already verified' 
+      };
+    }
+
+    return { 
+      isValid: true, 
+      message: 'User ready for ID verification' 
+    };
+  }
+
+  /**
+   * Get current user's verification status
+   */
+  getUserVerificationStatus(): { isVerified: boolean; verificationDate?: Date } {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return { isVerified: false };
+    }
+    
+    return { 
+      isVerified: currentUser.idVerified || false,
+      verificationDate: currentUser.verificationDate
+    };
+  }
+
+  /**
+   * Create test users for development/testing
+   */
+  createTestUsers(): void {
+    const existingUsers = this.getAllUsers();
+    if (existingUsers.length > 0) {
+      console.log('Test users already exist, skipping creation');
+      return;
+    }
+
+    const testUsers: User[] = [
+      {
+        id: 'test-seller-001',
+        name: 'Alex Chen',
+        email: 'alex.chen@test.com',
+        password: 'K9#mP2$vL7nQ4@xR8',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-15')
+      },
+      {
+        id: 'test-buyer-001',
+        name: 'Sarah Mitchell',
+        email: 'sarah.m@test.com',
+        password: 'H5#jN8$wK2mP6@tL9',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-20')
+      },
+      {
+        id: 'test-collector-001',
+        name: 'Marcus Rodriguez',
+        email: 'm.rodriguez@test.com',
+        password: 'F3#hL7$vN4kP9@mR2',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-25')
+      },
+      {
+        id: 'test-dealer-001',
+        name: 'Emma Thompson',
+        email: 'e.thompson@test.com',
+        password: 'D8#gK5$wL2nP7@tM4',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-30')
+      }
+    ];
+
+    testUsers.forEach(user => {
+      this.saveUser(user);
+    });
+
+    console.log('Test users created successfully');
+    console.log('Test Credentials:');
+    console.log('1. Seller: alex.chen@test.com / K9#mP2$vL7nQ4@xR8');
+    console.log('2. Buyer: sarah.m@test.com / H5#jN8$wK2mP6@tL9');
+    console.log('3. Collector: m.rodriguez@test.com / F3#hL7$vN4kP9@mR2');
+    console.log('4. Dealer: e.thompson@test.com / D8#gK5$wL2nP7@tM4');
+  }
+
+  /**
+   * Get test credentials for development
+   */
+  getTestCredentials(): string {
+    return `
+Test Credentials for Development:
+
+1. Seller Account:
+   Email: alex.chen@test.com
+   Password: K9#mP2$vL7nQ4@xR8
+   Name: Alex Chen
+
+2. Buyer Account:
+   Email: sarah.m@test.com
+   Password: H5#jN8$wK2mP6@tL9
+   Name: Sarah Mitchell
+
+3. Collector Account:
+   Email: m.rodriguez@test.com
+   Password: F3#hL7$vN4kP9@mR2
+   Name: Marcus Rodriguez
+
+4. Dealer Account:
+   Email: e.thompson@test.com
+   Password: D8#gK5$wL2nP7@tM4
+   Name: Emma Thompson
+
+Note: These are test accounts for development purposes only.
+    `;
   }
 }

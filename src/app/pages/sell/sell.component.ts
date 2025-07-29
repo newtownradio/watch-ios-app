@@ -24,6 +24,7 @@ export class SellComponent implements OnInit {
     condition: 'excellent' as 'excellent' | 'very-good' | 'good' | 'fair',
     originalPrice: undefined as number | undefined,
     imageUrl: '',
+    governmentIdUrl: '',
     scheduleType: 'immediate' as 'immediate' | 'scheduled',
     scheduleDate: '',
     scheduleTime: ''
@@ -133,6 +134,29 @@ export class SellComponent implements OnInit {
       return;
     }
 
+    // Check if Government ID is uploaded
+    if (!this.form.governmentIdUrl) {
+      alert('Please upload your government ID before listing an item');
+      return;
+    }
+
+    // Final ID verification confirmation
+    const idConfirmed = confirm(
+      'Final Legal Compliance Verification:\n\n' +
+      '• You confirm this is your own government-issued ID\n' +
+      '• The name on the ID matches your account information\n' +
+      '• You understand using someone else\'s ID is prohibited\n' +
+      '• You acknowledge this is required for legal compliance\n' +
+      '• You understand your ID information is encrypted and never shared publicly\n' +
+      '• Your ID will be verified by our security team\n\n' +
+      'Do you confirm these statements are true?'
+    );
+
+    if (!idConfirmed) {
+      alert('Please ensure you are uploading your own government ID before proceeding.');
+      return;
+    }
+
     // Validate scheduled listing
     if (this.form.scheduleType === 'scheduled') {
       if (!this.form.scheduleDate || !this.form.scheduleTime) {
@@ -198,6 +222,7 @@ export class SellComponent implements OnInit {
         condition: 'excellent',
         originalPrice: undefined,
         imageUrl: '',
+        governmentIdUrl: '',
         scheduleType: 'immediate',
         scheduleDate: '',
         scheduleTime: ''
@@ -430,9 +455,9 @@ export class SellComponent implements OnInit {
   }
 
   shareListing(listing: Listing) {
-    const shareText = `⌚ ${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
-      `📅 Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
-      `⏰ Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
+    const shareText = `${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
+      `Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
+      `Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
       `Check out this watch on Watch iOS!`;
 
     // Try to use Web Share API first (mobile devices)
@@ -455,7 +480,7 @@ export class SellComponent implements OnInit {
     // Copy to clipboard
     if (navigator.clipboard) {
       navigator.clipboard.writeText(shareText).then(() => {
-        alert('Listing details copied to clipboard! 📋');
+        alert('Listing details copied to clipboard!');
       }).catch(() => {
         // Final fallback - show in alert
         alert(`Share this listing:\n\n${shareText}`);
@@ -507,5 +532,83 @@ export class SellComponent implements OnInit {
   getMinDate(): string {
     const today = new Date();
     return today.toISOString().split('T')[0];
+  }
+
+  // Government ID upload methods
+  triggerGovernmentIdInput() {
+    const fileInput = document.getElementById('government-id') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  onGovernmentIdSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      // Check file type - only JPG and PNG allowed
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please select a JPG or PNG image file');
+        return;
+      }
+
+      // Validate user identity before proceeding
+      const currentUser = this.dataService.getCurrentUser();
+      if (!currentUser) {
+        alert('Please log in before uploading your government ID');
+        return;
+      }
+
+      const identityValidation = this.dataService.validateUserIdentity(currentUser.id);
+      if (!identityValidation.isValid) {
+        alert(identityValidation.message);
+        return;
+      }
+
+      // Check if user is already verified
+      const verificationStatus = this.dataService.getUserVerificationStatus();
+      if (verificationStatus.isVerified) {
+        alert('Your account is already verified. No need to upload ID again.');
+        return;
+      }
+
+      // Show ID validation warning
+      const confirmed = confirm(
+        'Legal Compliance & ID Verification Required:\n\n' +
+        '• Government ID upload is mandatory for legal compliance and fraud prevention\n' +
+        '• You must upload your own government-issued ID\n' +
+        '• The name on the ID must match your account information: ' + currentUser.name + '\n' +
+        '• Using someone else\'s ID is prohibited and may result in account suspension\n' +
+        '• Your ID information is encrypted and never shared publicly\n' +
+        '• Your ID will be securely verified by our security team\n' +
+        '• Verification typically takes 24-48 hours\n\n' +
+        'Do you confirm this is your own government ID?'
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.form.governmentIdUrl = e.target.result;
+        this.cdr.detectChanges();
+        
+        // Show success message
+        alert('Government ID uploaded successfully!\n\nYour ID has been encrypted and stored securely for legal compliance verification. Our security team will review your ID within 24-48 hours. You will receive an email notification once verification is complete.\n\nYour ID information is never shared publicly and is only used for verification purposes.');
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeGovernmentId() {
+    this.form.governmentIdUrl = '';
+    this.cdr.detectChanges();
   }
 }

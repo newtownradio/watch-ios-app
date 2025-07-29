@@ -187,3 +187,31 @@
   font-size: 12px;
   color: #6b7280;
 }
+
+/* Sign Out Section */
+.sign-out-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.sign-out-btn {
+  width: 100%;
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sign-out-btn:hover {
+  background: #dc2626;
+}
+
+.sign-out-btn:active {
+  background: #b91c1c;
+}

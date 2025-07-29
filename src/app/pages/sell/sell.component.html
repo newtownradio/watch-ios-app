@@ -19,7 +19,7 @@
         </div>
         <div class="upload-area" *ngIf="!form.imageUrl" (click)="triggerFileInput()">
           <div class="upload-content">
-            <span class="upload-icon">📷</span>
+            <span class="upload-icon">Photo</span>
             <p>Click to upload a photo of your watch</p>
             <small>JPG or PNG up to 5MB</small>
           </div>
@@ -35,9 +35,42 @@
       <small class="form-help">Upload a clear photo of your watch for better visibility</small>
     </div>
 
+    <!-- Government ID Upload -->
+    <div class="form-group">
+      <label for="government-id">Government ID Upload (Required for Listing)</label>
+      <div class="id-upload-container">
+        <div class="id-preview" *ngIf="form.governmentIdUrl">
+          <img [src]="form.governmentIdUrl" alt="Government ID" class="id-image">
+          <button type="button" class="remove-id-btn" (click)="removeGovernmentId()">×</button>
+        </div>
+        <div class="id-upload-area" *ngIf="!form.governmentIdUrl" (click)="triggerGovernmentIdInput()">
+          <div class="upload-content">
+            <span class="upload-icon">ID</span>
+            <p>Click to upload your government ID</p>
+            <small>JPG or PNG, max 5MB</small>
+          </div>
+        </div>
+        <input 
+          type="file" 
+          id="government-id"
+          accept="image/jpeg,image/jpg,image/png"
+          (change)="onGovernmentIdSelected($event)"
+          style="display: none;"
+        >
+      </div>
+      <small class="form-help">
+        <strong>Legal Compliance Required:</strong> Government ID upload is mandatory for legal compliance and fraud prevention. 
+        You must upload your own government-issued ID (driver's license, passport, or state ID). 
+        The name on the ID must match your account information. Using someone else's ID is prohibited and may result in account suspension.
+        <br><br>
+        <strong>Privacy Protection:</strong> Your ID information is encrypted and stored securely. It is never shared publicly 
+        and is only used for verification purposes by our security team.
+      </small>
+    </div>
+
     <!-- AI Pricing Assistant Section -->
     <div class="pricing-assistant">
-      <h3>⌚ AI Pricing Assistant</h3>
+      <h3>AI Pricing Assistant</h3>
       <p>Get accurate pricing based on market data and similar items</p>
       
       <!-- Simple Debug -->
@@ -97,7 +130,7 @@
         </div>
 
         <button class="pricing-btn" (click)="getPricingRecommendation()" type="button" [disabled]="!form.brand || !form.model">
-          🧠 Get AI Pricing Recommendation
+          Get AI Pricing Recommendation
         </button>
       </div>
     </div>
@@ -159,7 +192,7 @@
   <div class="pricing-modal" *ngIf="showPricingAssistant">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>⌚ AI Pricing Recommendation</h3>
+        <h3>AI Pricing Recommendation</h3>
         <button class="close-btn" (click)="closePricingAssistant()">×</button>
       </div>
       

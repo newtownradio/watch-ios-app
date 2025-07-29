@@ -1,13 +1,13 @@
 <div class="app-container">
   <!-- Header -->
-  <header class="header">
+  <header class="header" *ngIf="!isSplashPage()">
     <div class="header-content">
-      <a routerLink="/discovery" class="logo">
+      <a routerLink="/discovery" class="logo" *ngIf="!isAuthPage()">
         <div class="logo-circle">
           <span>w</span>
         </div>
       </a>
-      <button class="hamburger-btn" (click)="toggleMenu()" type="button">
+      <button class="hamburger-btn" (click)="toggleMenu()" type="button" *ngIf="!isAuthPage()">
         <div class="hamburger-lines">
           <span></span>
           <span></span>
@@ -26,27 +26,17 @@
     
     <nav class="menu-links">
       <a routerLink="/discovery" (click)="onMenuLinkClick()" class="menu-link">
-        <span class="menu-icon">🔍</span>
+        <span class="menu-icon">Browse</span>
         <span class="menu-text">Discovery</span>
       </a>
       
       <a routerLink="/sell" (click)="onMenuLinkClick()" class="menu-link">
-        <span class="menu-icon">💰</span>
+        <span class="menu-icon">Sell</span>
         <span class="menu-text">Sell</span>
       </a>
       
-      <a routerLink="/messages" (click)="onMenuLinkClick()" class="menu-link">
-        <span class="menu-icon">💬</span>
-        <span class="menu-text">Messages</span>
-      </a>
-      
-      <a routerLink="/notifications" (click)="onMenuLinkClick()" class="menu-link">
-        <span class="menu-icon">🔔</span>
-        <span class="menu-text">Notifications</span>
-      </a>
-      
       <a routerLink="/account" (click)="onMenuLinkClick()" class="menu-link">
-        <span class="menu-icon">👤</span>
+        <span class="menu-icon">Account</span>
         <span class="menu-text">Account</span>
       </a>
     </nav>

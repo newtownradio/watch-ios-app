@@ -44,12 +44,12 @@ import { DataPersistenceService } from '../../services/data-persistence.service'
           class="export-textarea"
         ></textarea>
         <div class="export-actions">
-          <button class="copy-btn" (click)="copyToClipboard()">
-            📋 Copy to Clipboard
-          </button>
-          <button class="download-btn" (click)="downloadCSV()">
-            💾 Download CSV
-          </button>
+                        <button class="copy-btn" (click)="copyToClipboard()">
+                Copy to Clipboard
+              </button>
+              <button class="download-btn" (click)="downloadCSV()">
+                Download CSV
+              </button>
         </div>
       </div>
     </div>
@@ -221,7 +221,7 @@ export class DataManagerComponent implements OnInit {
   copyToClipboard() {
     if (this.exportedData) {
       navigator.clipboard.writeText(this.exportedData).then(() => {
-        alert('CSV data copied to clipboard! 📋');
+        alert('CSV data copied to clipboard!');
       }).catch(() => {
         alert('Failed to copy to clipboard. Please copy manually from the textarea.');
       });

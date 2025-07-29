@@ -9,6 +9,8 @@ html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* Enable touch events */
 }
 
 body {
@@ -22,12 +24,15 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation; /* Enable touch events */
+  -webkit-user-select: none; /* Prevent text selection during scroll */
+  user-select: none;
 }
 
 /* Touch improvements */
 button, a {
-  -webkit-user-select: none;
-  user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -48,4 +53,29 @@ input, textarea {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   height: 100%;
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  html {
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow-y: auto;
+  }
+  
+  body {
+    height: 100vh;
+    height: -webkit-fill-available;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    touch-action: manipulation;
+  }
+  
+  /* Ensure app-root doesn't block scroll */
+  app-root {
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow-y: auto;
+    touch-action: manipulation;
+  }
 }

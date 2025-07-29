@@ -3,10 +3,28 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.newtownradio.watchios',
   appName: 'watch-ios',
-  webDir: 'dist',
+  webDir: 'dist/watch-ios/browser',
   ios: {
     contentInset: 'automatic',
-    scrollEnabled: true
+    scrollEnabled: true,
+    backgroundColor: '#ffffff',
+    allowsLinkPreview: false,
+    limitsNavigationsToAppBoundDomains: true,
+    webViewAllowsBackForwardNavigationGestures: true,
+    webViewAllowsLinkPreview: false,
+    webViewAllowsInlineMediaPlayback: true,
+    webViewMediaPlaybackRequiresUserAction: false,
+    webViewAllowsBackForwardNavigationGestures: true,
+    webViewAllowsLinkPreview: false,
+    webViewAllowsInlineMediaPlayback: true,
+    webViewMediaPlaybackRequiresUserAction: false,
+    webViewAllowsBackForwardNavigationGestures: true,
+    webViewAllowsLinkPreview: false,
+    webViewAllowsInlineMediaPlayback: true,
+    webViewMediaPlaybackRequiresUserAction: false
+  },
+  server: {
+    androidScheme: 'https'
   }
 };
 

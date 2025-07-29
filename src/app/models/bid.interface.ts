@@ -56,10 +56,14 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password: string; // Added for authentication
   idVerified: boolean;
   disclaimerSigned: boolean;
   policySigned: boolean;
+  termsSigned?: boolean; // Added for terms agreement
+  governmentIdUrl?: string; // Added for government ID upload
   verificationDate?: Date;
+  createdAt?: Date; // Added for user creation tracking
 }
 
 export interface Watch {

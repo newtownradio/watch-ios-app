@@ -10,7 +10,7 @@ import { AiPricingService, PricingRecommendation } from '../../services/ai-prici
   template: `
     <div class="ai-pricing-assistant">
       <div class="assistant-header">
-        <h3>🤖 AI Pricing Assistant</h3>
+        <h3>AI Pricing Assistant</h3>
         <p>Get market-based pricing recommendations for your watch</p>
       </div>
 
@@ -70,7 +70,7 @@ import { AiPricingService, PricingRecommendation } from '../../services/ai-prici
           (click)="analyzePricing()"
           [disabled]="!selectedBrand || !selectedModel"
         >
-          🧠 Analyze Market & Get Recommendation
+          Analyze Market & Get Recommendation
         </button>
       </div>
 

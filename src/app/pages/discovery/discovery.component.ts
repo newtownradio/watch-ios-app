@@ -126,9 +126,9 @@ export class DiscoveryComponent implements OnInit {
   }
 
   shareListing(listing: Listing) {
-    const shareText = `⌚ ${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
-      `📅 Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
-      `⏰ Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
+    const shareText = `${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
+      `Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
+      `Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
       `Check out this watch on Watch iOS!`;
 
     // Try to use Web Share API first (mobile devices)
@@ -151,7 +151,7 @@ export class DiscoveryComponent implements OnInit {
     // Copy to clipboard
     if (navigator.clipboard) {
       navigator.clipboard.writeText(shareText).then(() => {
-        alert('Listing details copied to clipboard! 📋');
+        alert('Listing details copied to clipboard!');
       }).catch(() => {
         // Final fallback - show in alert
         alert(`Share this listing:\n\n${shareText}`);
@@ -266,6 +266,70 @@ export class DiscoveryComponent implements OnInit {
         description: 'Chronograph with racing heritage',
         startingPrice: 2800,
         currentPrice: 2800,
+        imageUrl: '',
+        createdAt: new Date(),
+        endTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+        status: 'active',
+        bids: [],
+        counteroffers: [],
+        hasMadeCounteroffer: false
+      },
+      {
+        id: this.dataService.generateId(),
+        sellerId: 'seller-7',
+        sellerName: 'LuxuryWatches',
+        title: 'Patek Philippe Calatrava',
+        description: 'Elegant dress watch in mint condition',
+        startingPrice: 15000,
+        currentPrice: 15000,
+        imageUrl: '',
+        createdAt: new Date(),
+        endTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+        status: 'active',
+        bids: [],
+        counteroffers: [],
+        hasMadeCounteroffer: false
+      },
+      {
+        id: this.dataService.generateId(),
+        sellerId: 'seller-8',
+        sellerName: 'VintageLuxury',
+        title: 'Audemars Piguet Royal Oak',
+        description: 'Iconic sports watch with original papers',
+        startingPrice: 25000,
+        currentPrice: 25000,
+        imageUrl: '',
+        createdAt: new Date(),
+        endTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+        status: 'active',
+        bids: [],
+        counteroffers: [],
+        hasMadeCounteroffer: false
+      },
+      {
+        id: this.dataService.generateId(),
+        sellerId: 'seller-9',
+        sellerName: 'SwissTime',
+        title: 'IWC Portugieser',
+        description: 'Elegant chronograph with blue dial',
+        startingPrice: 8500,
+        currentPrice: 8500,
+        imageUrl: '',
+        createdAt: new Date(),
+        endTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+        status: 'active',
+        bids: [],
+        counteroffers: [],
+        hasMadeCounteroffer: false
+      },
+      {
+        id: this.dataService.generateId(),
+        sellerId: 'seller-10',
+        sellerName: 'JapaneseWatches',
+        title: 'Grand Seiko Snowflake',
+        description: 'Spring Drive movement with unique dial',
+        startingPrice: 5200,
+        currentPrice: 5200,
         imageUrl: '',
         createdAt: new Date(),
         endTime: new Date(Date.now() + 48 * 60 * 60 * 1000),

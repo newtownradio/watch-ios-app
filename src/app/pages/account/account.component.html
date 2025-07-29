@@ -10,19 +10,21 @@
       <div class="profile-info">
         <div class="info-item">
           <span class="label">Name:</span>
-          <span class="value">Demo User</span>
+          <span class="value">{{ currentUser?.name || 'Demo User' }}</span>
         </div>
         <div class="info-item">
           <span class="label">Email:</span>
-          <span class="value">demo&#64;watchios.com</span>
+          <span class="value">{{ currentUser?.email || 'demo@watchios.com' }}</span>
         </div>
         <div class="info-item">
           <span class="label">ID Verified:</span>
-          <span class="value status-verified">✓ Verified</span>
+          <span class="value" [class.status-verified]="currentUser?.idVerified">
+            {{ currentUser?.idVerified ? '✓ Verified' : 'Not Verified' }}
+          </span>
         </div>
         <div class="info-item">
           <span class="label">Member Since:</span>
-          <span class="value">January 2024</span>
+          <span class="value">{{ currentUser?.createdAt ? (currentUser.createdAt | date:'MMMM yyyy') : 'January 2024' }}</span>
         </div>
       </div>
     </div>
@@ -45,6 +47,12 @@
           <button class="toggle-btn off">Off</button>
         </div>
       </div>
+    </div>
+
+    <div class="sign-out-section">
+      <button class="sign-out-btn" (click)="signOut()">
+        Sign Out
+      </button>
     </div>
   </div>
 </div>
