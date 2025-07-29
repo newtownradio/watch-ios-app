@@ -1,0 +1,68 @@
+<div class="app-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a routerLink="/discovery" class="logo">
+        <div class="logo-circle">
+          <span>w</span>
+        </div>
+      </a>
+      <button class="menu-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
+        <div class="menu-lines">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <!-- Menu Sidebar -->
+  <div class="menu-sidebar" [class.open]="isMenuOpen">
+    <div class="sidebar-header">
+      <h2>Menu</h2>
+      <button class="close-btn" (click)="closeMenu()">
+        <span>×</span>
+      </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a routerLink="/discovery" routerLinkActive="active" (click)="closeMenu()" class="nav-item">
+        <div class="nav-icon">🔍</div>
+        <span>Discovery</span>
+      </a>
+      
+      <a routerLink="/sell" routerLinkActive="active" (click)="closeMenu()" class="nav-item">
+        <div class="nav-icon">💰</div>
+        <span>Sell</span>
+      </a>
+      
+      <a routerLink="/messages" routerLinkActive="active" (click)="closeMenu()" class="nav-item">
+        <div class="nav-icon">💬</div>
+        <span>Messages</span>
+      </a>
+      
+      <a routerLink="/notifications" routerLinkActive="active" (click)="closeMenu()" class="nav-item">
+        <div class="nav-icon">🔔</div>
+        <span>Notifications</span>
+      </a>
+      
+      <a routerLink="/account" routerLinkActive="active" (click)="closeMenu()" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>Account</span>
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <p>Watch iOS v1.0</p>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  <div class="menu-backdrop" [class.open]="isMenuOpen" (click)="closeMenu()"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

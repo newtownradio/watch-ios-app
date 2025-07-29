@@ -1,0 +1,142 @@
+<div class="sell-page">
+  <div class="page-header">
+    <h1>Sell</h1>
+    <p>List your item for bidding - 48-hour sale window</p>
+  </div>
+
+  <div class="sell-form">
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" [(ngModel)]="form.title" placeholder="e.g., Rolex Submariner">
+    </div>
+
+    <div class="form-group">
+      <label>Starting Price</label>
+      <input type="number" [(ngModel)]="form.startingPrice" placeholder="0">
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea [(ngModel)]="form.description" placeholder="Describe your item..."></textarea>
+    </div>
+
+    <div class="sale-window-info">
+      <h3>Sale Window</h3>
+      <p>Your item will be available for bidding for 48 hours</p>
+      <ul>
+        <li>Bidders can place offers during this time</li>
+        <li>You'll receive notifications for new bids</li>
+        <li>You have 48 hours to accept or decline the highest bid</li>
+        <li>You can make 1 counteroffer per listing</li>
+        <li>If accepted, a smart contract will be created</li>
+      </ul>
+    </div>
+
+    <button class="submit-btn" (click)="submitForm()">List Item for Bidding</button>
+  </div>
+
+  <!-- Counteroffer Form Modal -->
+  <div class="counteroffer-modal" *ngIf="showCounterofferForm">
+    <div class="modal-content">
+      <h3>Make Counteroffer</h3>
+      <p>You can make 1 counteroffer per listing. Buyer has 48 hours to respond.</p>
+      
+      <div class="form-group">
+        <label>Counteroffer Amount</label>
+        <input type="number" [(ngModel)]="counterofferForm.amount" placeholder="0">
+      </div>
+      
+      <div class="form-group">
+        <label>Message (Optional)</label>
+        <textarea [(ngModel)]="counterofferForm.message" placeholder="Add a message to the buyer..."></textarea>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="cancelCounteroffer()">Cancel</button>
+        <button class="submit-btn" (click)="submitCounteroffer()">Send Counteroffer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Listings Section -->
+  <div class="active-listings" *ngIf="activeListings.length > 0">
+    <h2>Your Active Listings</h2>
+    
+    <div class="listing-card" *ngFor="let listing of activeListings">
+      <div class="listing-header">
+        <h3>{{ listing.title }}</h3>
+        <span class="status" [class]="listing.status">{{ listing.status }}</span>
+      </div>
+      
+      <div class="listing-details">
+        <p class="description">{{ listing.description }}</p>
+        <p class="price">Starting: ${{ listing.startingPrice.toLocaleString() }}</p>
+        <p class="current-price" *ngIf="listing.highestBid">
+          Highest Bid: ${{ listing.highestBid.amount.toLocaleString() }}
+        </p>
+      </div>
+
+      <div class="sale-window">
+        <p class="time-remaining">
+          <strong>Time Remaining:</strong> {{ getTimeRemaining(listing.endTime) }}
+        </p>
+        <p class="bid-count">
+          <strong>Bids Received:</strong> {{ listing.bids.length }}
+        </p>
+        <p class="counteroffer-status" *ngIf="listing.hasMadeCounteroffer">
+          <strong>Counteroffer Made:</strong> Yes (1/1 used)
+        </p>
+      </div>
+
+      <!-- Pending Bids Section -->
+      <div class="pending-bids" *ngIf="hasPendingBids(listing)">
+        <h4>Pending Bids</h4>
+        <div class="bid-item" *ngFor="let bid of getPendingBids(listing)">
+          <div class="bid-details">
+            <p><strong>Bidder:</strong> {{ bid.bidderName }}</p>
+            <p><strong>Amount:</strong> ${{ bid.amount.toLocaleString() }}</p>
+            <p><strong>Time:</strong> {{ bid.timestamp | date:'short' }}</p>
+          </div>
+          
+          <div class="bid-actions">
+            <button class="accept-btn" (click)="acceptBid(listing.id, bid.id)">
+              Accept
+            </button>
+            <button class="decline-btn" (click)="declineBid(listing.id, bid.id)">
+              Decline
+            </button>
+            <button class="counteroffer-btn" 
+                    (click)="makeCounteroffer(listing.id, bid.id)"
+                    *ngIf="!listing.hasMadeCounteroffer">
+              Make Counteroffer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Counteroffers Section -->
+      <div class="counteroffers" *ngIf="getPendingCounteroffers(listing).length > 0">
+        <h4>Pending Counteroffers</h4>
+        <div class="counteroffer-item" *ngFor="let counteroffer of getPendingCounteroffers(listing)">
+          <div class="counteroffer-details">
+            <p><strong>Your Counteroffer:</strong> ${{ counteroffer.amount.toLocaleString() }}</p>
+            <p><strong>Sent:</strong> {{ counteroffer.timestamp | date:'short' }}</p>
+            <p *ngIf="counteroffer.message"><strong>Message:</strong> {{ counteroffer.message }}</p>
+            <p class="status">Waiting for buyer response...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expired Notice -->
+      <div class="expired-notice" *ngIf="listing.status === 'expired'">
+        <p>Sale window expired. No bids were accepted.</p>
+      </div>
+
+      <!-- Sold Notice -->
+      <div class="sold-notice" *ngIf="listing.status === 'sold' && listing.highestBid">
+        <p>Item sold to {{ listing.highestBid.bidderName }} for ${{ listing.highestBid.amount.toLocaleString() }}</p>
+        <p>Smart contract created. Shipping costs will be split.</p>
+      </div>
+    </div>
+  </div>
+</div>

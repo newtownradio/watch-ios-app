@@ -1,0 +1,363 @@
+.sell-page {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.page-header p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.sell-form {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.form-group textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.sale-window-info {
+  background: #f3f4f6;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.sale-window-info h3 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.sale-window-info p {
+  margin: 0 0 12px 0;
+  color: #6b7280;
+}
+
+.sale-window-info ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #6b7280;
+}
+
+.sale-window-info li {
+  margin-bottom: 4px;
+}
+
+.submit-btn {
+  width: 100%;
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: #1e40af;
+}
+
+/* Counteroffer Modal */
+.counteroffer-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+}
+
+.modal-content p {
+  margin: 0 0 20px 0;
+  color: #6b7280;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  flex: 1;
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background: #4b5563;
+}
+
+/* Active Listings */
+.active-listings {
+  margin-top: 30px;
+}
+
+.active-listings h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.listing-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.listing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.listing-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status.active {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status.expired {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status.sold {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.listing-details {
+  margin-bottom: 16px;
+}
+
+.listing-details p {
+  margin: 0 0 8px 0;
+  color: #6b7280;
+}
+
+.listing-details .price,
+.listing-details .current-price {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.sale-window {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.sale-window p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.sale-window p:last-child {
+  margin-bottom: 0;
+}
+
+/* Pending Bids */
+.pending-bids {
+  margin-bottom: 20px;
+}
+
+.pending-bids h4 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.bid-item {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.bid-details p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.bid-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.accept-btn,
+.decline-btn,
+.counteroffer-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
+  min-width: 80px;
+}
+
+.accept-btn {
+  background: #16a34a;
+  color: white;
+}
+
+.accept-btn:hover {
+  background: #15803d;
+}
+
+.decline-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.decline-btn:hover {
+  background: #b91c1c;
+}
+
+.counteroffer-btn {
+  background: #f59e0b;
+  color: white;
+}
+
+.counteroffer-btn:hover {
+  background: #d97706;
+}
+
+/* Counteroffers */
+.counteroffers {
+  margin-bottom: 20px;
+}
+
+.counteroffers h4 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.counteroffer-item {
+  background: #fef3c7;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 4px solid #f59e0b;
+}
+
+.counteroffer-details p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.counteroffer-details .status {
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+/* Notices */
+.expired-notice,
+.sold-notice {
+  background: #f3f4f6;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.expired-notice p,
+.sold-notice p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.sold-notice {
+  background: #dcfce7;
+  border-left: 4px solid #16a34a;
+}

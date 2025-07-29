@@ -1,0 +1,84 @@
+<div class="discovery-page">
+  <div class="page-header">
+    <h1>Discovery</h1>
+    <p>Find your perfect timepiece</p>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="search-section">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        placeholder="Search watches, sellers..."
+        class="search-input"
+      >
+    </div>
+
+    <div class="filters">
+      <div class="price-range">
+        <label>Price Range:</label>
+        <div class="price-inputs">
+          <input 
+            type="number" 
+            [(ngModel)]="minPrice" 
+            placeholder="Min"
+            class="price-input"
+          >
+          <span>-</span>
+          <input 
+            type="number" 
+            [(ngModel)]="maxPrice" 
+            placeholder="Max"
+            class="price-input"
+          >
+        </div>
+      </div>
+
+      <div class="favorites-filter">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="showFavoritesOnly"
+            class="checkbox"
+          >
+          <span>Favorites only</span>
+        </label>
+      </div>
+
+      <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- Results Count -->
+  <div class="results-info">
+    <p>{{ filteredProducts.length }} items found</p>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="products-grid">
+    <div class="product-card" *ngFor="let product of filteredProducts">
+      <div class="product-image">
+        <img [src]="product.image" [alt]="product.title">
+        <button class="favorite-btn" (click)="toggleFavorite(product.id)">
+          {{ isFavorited(product.id) ? '❤️' : '🤍' }}
+        </button>
+      </div>
+      <div class="product-info">
+        <h3>{{ product.title }}</h3>
+        <p class="price">${{ product.price.toLocaleString() }}</p>
+        <p class="description">{{ product.description }}</p>
+        <div class="seller">
+          <span>{{ product.seller }}</span>
+          <span>⭐ {{ product.rating }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Results Message -->
+  <div class="no-results" *ngIf="filteredProducts.length === 0">
+    <p>No products found matching your criteria</p>
+    <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
+  </div>
+</div>
