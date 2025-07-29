@@ -12,18 +12,20 @@
         [(ngModel)]="searchTerm" 
         placeholder="Search watches, sellers..."
         class="search-input"
+        id="search-input"
       >
     </div>
 
     <div class="filters">
       <div class="price-range">
-        <label>Price Range:</label>
+        <label for="min-price">Price Range:</label>
         <div class="price-inputs">
           <input 
             type="number" 
             [(ngModel)]="minPrice" 
             placeholder="Min"
             class="price-input"
+            id="min-price"
           >
           <span>-</span>
           <input 
@@ -31,16 +33,18 @@
             [(ngModel)]="maxPrice" 
             placeholder="Max"
             class="price-input"
+            id="max-price"
           >
         </div>
       </div>
 
       <div class="favorites-filter">
-        <label class="checkbox-label">
+        <label class="checkbox-label" for="favorites-only">
           <input 
             type="checkbox" 
             [(ngModel)]="showFavoritesOnly"
             class="checkbox"
+            id="favorites-only"
           >
           <span>Favorites only</span>
         </label>

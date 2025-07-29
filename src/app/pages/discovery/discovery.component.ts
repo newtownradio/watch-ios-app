@@ -60,10 +60,10 @@ export class DiscoveryComponent {
   ];
 
   favorites: string[] = [];
-  searchTerm: string = '';
-  minPrice: number = 0;
-  maxPrice: number = 10000;
-  showFavoritesOnly: boolean = false;
+  searchTerm = '';
+  minPrice = 0;
+  maxPrice = 10000;
+  showFavoritesOnly = false;
 
   get filteredProducts(): Product[] {
     return this.products.filter(product => {

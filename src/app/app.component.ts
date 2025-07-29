@@ -1,6 +1,5 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
-import { ScrollService } from './services/scroll.service';
 
 @Component({
   selector: 'app-root',
@@ -12,11 +11,8 @@ import { ScrollService } from './services/scroll.service';
 export class AppComponent implements OnInit {
   isMenuOpen = false;
 
-  constructor(private scrollService: ScrollService) {}
-
   ngOnInit() {
-    // Enable smooth scrolling for iOS
-    this.scrollService.enableSmoothScrolling();
+    // Component initialization
   }
 
   @HostListener('document:keydown.escape')
@@ -28,31 +24,9 @@ export class AppComponent implements OnInit {
 
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
-    this.updateBodyScroll();
   }
 
   closeMenu() {
     this.isMenuOpen = false;
-    this.updateBodyScroll();
-  }
-
-  private updateBodyScroll() {
-    if (this.isMenuOpen) {
-      // Don't disable body scroll - let main content scroll naturally
-      // Just prevent background interaction
-      document.body.style.pointerEvents = 'none';
-    } else {
-      document.body.style.pointerEvents = '';
-    }
-  }
-
-  // Method to scroll to top
-  scrollToTop() {
-    this.scrollService.scrollToTop();
-  }
-
-  // Method to scroll to element
-  scrollToElement(elementId: string) {
-    this.scrollService.scrollToElement(elementId);
   }
 }

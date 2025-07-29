@@ -7,8 +7,6 @@
 html {
   height: 100%;
   overflow-x: hidden;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
 }
 
 body {
@@ -20,7 +18,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
   overflow-x: hidden;
-  position: relative;
 }
 
 /* iOS specific improvements */
@@ -49,34 +46,9 @@ input, textarea {
   user-select: text;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
-
 /* Prevent horizontal scroll on all elements */
 * {
   max-width: 100%;
-}
-
-/* iOS momentum scrolling */
-.scroll-container {
-  -webkit-overflow-scrolling: touch;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 /* Prevent zoom on double tap */
