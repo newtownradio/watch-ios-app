@@ -7,13 +7,19 @@
   <!-- Search and Filters -->
   <div class="search-section">
     <div class="search-bar">
-      <input 
-        type="text" 
-        [(ngModel)]="searchTerm" 
-        placeholder="Search watches, sellers..."
-        class="search-input"
-        id="search-input"
-      >
+      <div class="search-input-group">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Search watches, sellers..."
+          class="search-input"
+          id="search-input"
+          (keyup.enter)="performSearch()"
+        >
+        <button class="search-btn" (click)="performSearch()" type="button">
+          🔍
+        </button>
+      </div>
     </div>
 
     <div class="filters">
@@ -50,39 +56,70 @@
         </label>
       </div>
 
-      <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
+      <div class="filter-buttons">
+        <button class="search-filters-btn" (click)="performSearch()" type="button">
+          Search
+        </button>
+        <button class="clear-btn" (click)="clearFilters()" type="button">
+          Clear Filters
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Results Count -->
   <div class="results-info">
-    <p>{{ filteredProducts.length }} items found</p>
+    <p>{{ filteredListings.length }} items found</p>
   </div>
 
-  <!-- Products Grid -->
+  <!-- Listings Grid -->
   <div class="products-grid">
-    <div class="product-card" *ngFor="let product of filteredProducts">
+    <div class="product-card" *ngFor="let listing of filteredListings">
       <div class="product-image">
-        <img [src]="product.image" [alt]="product.title">
-        <button class="favorite-btn" (click)="toggleFavorite(product.id)">
-          {{ isFavorited(product.id) ? '❤️' : '🤍' }}
+        <img [src]="listing.imageUrl || 'assets/placeholder-watch.jpg'" [alt]="listing.title">
+        <button class="favorite-btn" (click)="toggleFavorite(listing.id)">
+          {{ isFavorited(listing.id) ? '❤️' : '🤍' }}
         </button>
       </div>
       <div class="product-info">
-        <h3>{{ product.title }}</h3>
-        <p class="price">${{ product.price.toLocaleString() }}</p>
-        <p class="description">{{ product.description }}</p>
+        <h3>{{ listing.title }}</h3>
+        <p class="price">${{ listing.currentPrice.toLocaleString() }}</p>
+        <p class="description">{{ listing.description }}</p>
+        <div class="watch-details" *ngIf="listing.brand || listing.model">
+          <span class="brand-model" *ngIf="listing.brand && listing.model">
+            {{ listing.brand }} {{ listing.model }}
+          </span>
+          <span class="condition" *ngIf="listing.condition">
+            Condition: {{ listing.condition }}
+          </span>
+        </div>
         <div class="seller">
-          <span>{{ product.seller }}</span>
-          <span>⭐ {{ product.rating }}</span>
+          <span>{{ listing.sellerName }}</span>
+          <span>⭐ 4.8</span>
+        </div>
+        <div class="listing-details">
+          <span class="time-remaining">
+            {{ getTimeRemaining(listing.endTime) }} left
+          </span>
+          <span class="bids-count" *ngIf="listing.bids.length > 0">
+            {{ listing.bids.length }} bid{{ listing.bids.length > 1 ? 's' : '' }}
+          </span>
+        </div>
+        <div class="listing-times">
+          <span class="posted-time">
+            Posted: {{ getListingStartTime(listing.createdAt) }}
+          </span>
+          <span class="ends-time">
+            Ends: {{ getListingEndTime(listing.endTime) }}
+          </span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- No Results Message -->
-  <div class="no-results" *ngIf="filteredProducts.length === 0">
-    <p>No products found matching your criteria</p>
+  <div class="no-results" *ngIf="filteredListings.length === 0">
+    <p>No listings found matching your criteria</p>
     <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
   </div>
 </div>

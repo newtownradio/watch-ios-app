@@ -28,12 +28,114 @@
   padding: 24px;
 }
 
+/* Profile Section */
 .profile-section {
-  display: flex;
-  align-items: center;
   margin-bottom: 30px;
 }
 
+.profile-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.value {
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-verified {
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* Settings Section */
+.settings-section {
+  margin-top: 30px;
+}
+
+.settings-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item span {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.toggle-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #059669;
+}
+
+.toggle-btn.off {
+  background: #6b7280;
+}
+
+.toggle-btn.off:hover {
+  background: #4b5563;
+}
+
+/* Legacy styles for compatibility */
 .avatar {
   width: 64px;
   height: 64px;

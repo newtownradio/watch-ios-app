@@ -1,17 +1,17 @@
 /* App Container */
 .app-container {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: white;
-  position: relative;
+  overflow: hidden;
 }
 
 /* Header */
 .header {
   background: #1e3a8a;
   padding: 12px 16px;
-  padding-top: 45px;
+  padding-top: 20px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -25,6 +25,7 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 44px;
 }
 
 /* Logo */
@@ -60,8 +61,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-  z-index: 101;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .hamburger-lines {
@@ -70,7 +71,6 @@
   gap: 4px;
   width: 24px;
   height: 18px;
-  position: relative;
 }
 
 .hamburger-lines span {
@@ -78,77 +78,54 @@
   height: 3px;
   background: white;
   border-radius: 2px;
-  transition: all 0.3s ease;
   display: block;
 }
 
-/* Side Menu */
-.side-menu {
+/* Menu - Mobile style for all screen sizes */
+.menu {
   position: fixed;
   top: 0;
-  right: -300px;
-  width: 300px;
+  right: -100vw;
+  width: 100vw;
   height: 100vh;
   background: white;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  z-index: 2000;
   transition: right 0.3s ease;
   display: flex;
   flex-direction: column;
 }
 
-.side-menu.open {
+.menu.open {
   right: 0;
 }
 
-/* Menu Header */
-.menu-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
-  flex-shrink: 0;
-}
-
-.menu-close {
-  background: #ef4444;
+/* Menu Close Button */
+.menu-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
   border: none;
-  font-size: 20px;
-  color: white;
+  font-size: 32px;
+  color: #374151;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-  min-width: 40px;
-  min-height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2001;
 }
 
-.menu-close:hover {
-  background: #dc2626;
-  transform: scale(1.05);
+.menu-close-btn:hover {
+  color: #1e3a8a;
 }
 
-.menu-close:active {
-  background: #b91c1c;
-  transform: scale(0.95);
-}
-
-.menu-close span {
-  display: block;
-  line-height: 1;
-  font-weight: bold;
-}
-
-/* Menu Links */
+/* Menu Links - Mobile style for all screen sizes */
 .menu-links {
   flex: 1;
-  padding: 20px 0;
+  padding: 80px 0 30px 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -156,15 +133,14 @@
 .menu-link {
   display: flex;
   align-items: center;
-  padding: 16px 20px;
+  padding: 24px;
   text-decoration: none;
   color: #374151;
   font-weight: 500;
-  font-size: 16px;
-  transition: all 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
+  font-size: 20px;
   border-left: 3px solid transparent;
-  min-height: 44px;
+  min-height: 70px;
+  transition: all 0.2s ease;
 }
 
 .menu-link:hover {
@@ -173,14 +149,10 @@
   border-left-color: #1e3a8a;
 }
 
-.menu-link:active {
-  background: #e5e7eb;
-}
-
 .menu-icon {
-  margin-right: 12px;
-  font-size: 18px;
-  width: 24px;
+  margin-right: 16px;
+  font-size: 22px;
+  width: 32px;
   text-align: center;
 }
 
@@ -188,22 +160,21 @@
   flex: 1;
 }
 
-/* Menu Overlay */
-.menu-overlay {
+/* Overlay */
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: 1999;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  -webkit-tap-highlight-color: transparent;
 }
 
-.menu-overlay.open {
+.overlay.open {
   opacity: 1;
   visibility: visible;
 }
@@ -217,25 +188,13 @@
   position: relative;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .side-menu {
-    width: 100vw;
-    right: -100vw;
+/* iOS specific fixes - simplified to prevent conflicts */
+@supports (-webkit-touch-callout: none) {
+  .app-container {
+    height: 100vh;
   }
   
-  .menu-link {
-    padding: 20px;
-    font-size: 18px;
-    min-height: 50px;
-  }
-  
-  .menu-icon {
-    font-size: 20px;
-    width: 28px;
-  }
-  
-  .menu-header {
-    padding: 20px;
+  .header {
+    padding-top: 12px;
   }
 }

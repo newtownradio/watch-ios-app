@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
+import { DataPersistenceService } from '../../services/data-persistence.service';
+import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
 
 @Component({
   selector: 'app-sell',
@@ -10,11 +12,16 @@ import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
   templateUrl: './sell.component.html',
   styleUrl: './sell.component.scss'
 })
-export class SellComponent {
+export class SellComponent implements OnInit {
   form = {
     title: '',
     startingPrice: 0,
-    description: ''
+    description: '',
+    brand: '',
+    model: '',
+    year: undefined as number | undefined,
+    condition: 'excellent' as 'excellent' | 'very-good' | 'good' | 'fair',
+    originalPrice: undefined as number | undefined
   };
 
   activeListings: Listing[] = [];
@@ -25,43 +32,187 @@ export class SellComponent {
     message: ''
   };
 
-  constructor() {
-    // Initialize with sample data
+  // AI Pricing
+  showPricingAssistant = false;
+  pricingRecommendation: PricingRecommendation | null = null;
+  availableBrands: string[] = [];
+  availableModels: string[] = [];
+
+  constructor(
+    private dataService: DataPersistenceService,
+    private aiPricingService: AiPricingService
+  ) {}
+
+  ngOnInit() {
     this.loadActiveListings();
+    this.loadAvailableBrands();
+  }
+
+  loadAvailableBrands() {
+    this.availableBrands = this.aiPricingService.getAvailableBrands();
+  }
+
+  onBrandChange() {
+    if (this.form.brand) {
+      this.availableModels = this.aiPricingService.getModelsForBrand(this.form.brand);
+      this.form.model = '';
+    } else {
+      this.availableModels = [];
+      this.form.model = '';
+    }
+  }
+
+  getModelCount(): number {
+    return this.availableModels.length;
+  }
+
+  getPricingRecommendation() {
+    console.log('getPricingRecommendation called');
+    console.log('Form brand:', this.form.brand);
+    console.log('Form model:', this.form.model);
+    
+    if (!this.form.brand || !this.form.model) {
+      alert('Please select a brand and model for pricing analysis');
+      return;
+    }
+
+    try {
+      console.log('Getting pricing recommendation for:', this.form.brand, this.form.model);
+      
+      this.pricingRecommendation = this.aiPricingService.getPricingRecommendation(
+        this.form.brand,
+        this.form.model,
+        this.form.year,
+        this.form.condition,
+        this.form.originalPrice
+      );
+
+      console.log('Pricing recommendation:', this.pricingRecommendation);
+
+      // Auto-fill the suggested price
+      this.form.startingPrice = this.pricingRecommendation.suggestedPrice;
+      this.showPricingAssistant = true;
+      
+      console.log('Modal should be visible:', this.showPricingAssistant);
+    } catch (error) {
+      console.error('Error getting pricing recommendation:', error);
+      alert('Error getting pricing recommendation. Please try again.');
+    }
+  }
+
+  applyPricingRecommendation() {
+    if (this.pricingRecommendation) {
+      this.form.startingPrice = this.pricingRecommendation.suggestedPrice;
+      this.showPricingAssistant = false;
+    }
+  }
+
+  closePricingAssistant() {
+    this.showPricingAssistant = false;
+    this.pricingRecommendation = null;
   }
 
   submitForm() {
-    if (this.form.title && this.form.startingPrice > 0) {
-      const newListing: Listing = {
-        id: Date.now().toString(),
-        sellerId: 'seller1',
-        sellerName: 'John Seller',
-        title: this.form.title,
-        description: this.form.description,
-        startingPrice: this.form.startingPrice,
-        currentPrice: this.form.startingPrice,
-        imageUrl: 'placeholder.jpg',
-        createdAt: new Date(),
-        endTime: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48 hours from now
-        status: 'active',
-        bids: [],
-        counteroffers: [],
-        hasMadeCounteroffer: false
-      };
+    console.log('Submit form called');
+    console.log('Form data:', this.form);
+    
+    // Check if form has required data
+    if (!this.form.title || this.form.title.trim() === '') {
+      alert('Please enter a title for your item');
+      return;
+    }
+    
+    if (!this.form.startingPrice || this.form.startingPrice <= 0) {
+      alert('Please enter a valid starting price greater than 0');
+      return;
+    }
+    
+    const startTime = new Date();
+    const endTime = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hours from now
+    
+    const newListing: Listing = {
+      id: this.dataService.generateId(),
+      sellerId: 'seller1',
+      sellerName: 'John Seller',
+      title: this.form.title.trim(),
+      description: this.form.description || '',
+      brand: this.form.brand || undefined,
+      model: this.form.model || undefined,
+      year: this.form.year,
+      condition: this.form.condition,
+      startingPrice: this.form.startingPrice,
+      currentPrice: this.form.startingPrice,
+      imageUrl: 'placeholder.jpg',
+      createdAt: startTime,
+      endTime: endTime,
+      status: 'active',
+      bids: [],
+      counteroffers: [],
+      hasMadeCounteroffer: false
+    };
 
-      this.activeListings.unshift(newListing);
-      this.form = { title: '', startingPrice: 0, description: '' };
-      alert('Item listed successfully! Bidding window is 48 hours.');
-    } else {
-      alert('Please fill in all required fields');
+    console.log('Creating new listing:', newListing);
+
+    try {
+      // Save to persistent storage
+      this.dataService.saveListing(newListing);
+      
+      // Reload listings
+      this.loadActiveListings();
+      
+      // Reset form
+      this.form = { 
+        title: '', 
+        startingPrice: 0, 
+        description: '',
+        brand: '',
+        model: '',
+        year: undefined,
+        condition: 'excellent',
+        originalPrice: undefined
+      };
+      
+      // Show success message with times
+      const startTimeStr = this.getListingStartTime(startTime);
+      const endTimeStr = this.getListingEndTime(endTime);
+      alert(`Item listed successfully!\n\nStart: ${startTimeStr}\nEnd: ${endTimeStr}\n\nBidding window is 48 hours.`);
+    } catch (error) {
+      console.error('Error saving listing:', error);
+      alert('Error saving listing. Please try again.');
+    }
+  }
+
+  deleteListing(listingId: string) {
+    if (confirm('Are you sure you want to delete this listing?')) {
+      this.dataService.deleteListing(listingId);
+      this.loadActiveListings();
+      alert('Listing deleted successfully!');
     }
   }
 
   loadActiveListings() {
-    // Sample data
-    this.activeListings = [
+    // Get listings from persistent storage
+    this.activeListings = this.dataService.getListingsBySeller('seller1');
+    
+    // If no listings exist, create some demo data
+    if (this.activeListings.length === 0) {
+      this.createDemoListings();
+    }
+
+    // Set highest bid for each listing
+    this.activeListings.forEach(listing => {
+      if (listing.bids.length > 0) {
+        listing.highestBid = listing.bids.reduce((highest, current) => 
+          current.amount > highest.amount ? current : highest
+        );
+      }
+    });
+  }
+
+  private createDemoListings() {
+    const demoListings: Listing[] = [
       {
-        id: '1',
+        id: this.dataService.generateId(),
         sellerId: 'seller1',
         sellerName: 'John Seller',
         title: 'Rolex Submariner',
@@ -88,14 +239,13 @@ export class SellComponent {
       }
     ];
 
-    // Set highest bid
-    this.activeListings.forEach(listing => {
-      if (listing.bids.length > 0) {
-        listing.highestBid = listing.bids.reduce((highest, current) => 
-          current.amount > highest.amount ? current : highest
-        );
-      }
+    // Save demo listings
+    demoListings.forEach(listing => {
+      this.dataService.saveListing(listing);
     });
+
+    // Reload listings
+    this.loadActiveListings();
   }
 
   getTimeRemaining(endTime: Date): string {
@@ -105,11 +255,40 @@ export class SellComponent {
     if (timeLeft <= 0) {
       return 'Expired';
     }
-
+    
     const hours = Math.floor(timeLeft / (1000 * 60 * 60));
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     
-    return `${hours}h ${minutes}m remaining`;
+    if (hours > 24) {
+      const days = Math.floor(hours / 24);
+      return `${days}d ${hours % 24}h`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
+  }
+
+  getListingStartTime(createdAt: Date): string {
+    return createdAt.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+
+  getListingEndTime(endTime: Date): string {
+    return endTime.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
   }
 
   getPendingBids(listing: Listing): Bid[] {

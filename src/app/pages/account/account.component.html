@@ -1,30 +1,49 @@
 <div class="account-page">
   <div class="page-header">
     <h1>Account</h1>
-    <p>Your profile</p>
+    <p>Manage your profile and data</p>
   </div>
 
   <div class="account-content">
     <div class="profile-section">
-      <div class="avatar">JD</div>
+      <h2>Profile</h2>
       <div class="profile-info">
-        <h2>John Doe</h2>
-        <p>john.doe&#64;email.com</p>
+        <div class="info-item">
+          <span class="label">Name:</span>
+          <span class="value">Demo User</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Email:</span>
+          <span class="value">demo&#64;watchios.com</span>
+        </div>
+        <div class="info-item">
+          <span class="label">ID Verified:</span>
+          <span class="value status-verified">✓ Verified</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Member Since:</span>
+          <span class="value">January 2024</span>
+        </div>
       </div>
     </div>
 
-    <div class="stats-section">
-      <div class="stat-item">
-        <span class="stat-number">12</span>
-        <span class="stat-label">Items Listed</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">8</span>
-        <span class="stat-label">Items Sold</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">4.9</span>
-        <span class="stat-label">Rating</span>
+    <app-data-manager></app-data-manager>
+
+    <div class="settings-section">
+      <h2>Settings</h2>
+      <div class="settings-list">
+        <div class="setting-item">
+          <span>Notifications</span>
+          <button class="toggle-btn">On</button>
+        </div>
+        <div class="setting-item">
+          <span>Email Updates</span>
+          <button class="toggle-btn">On</button>
+        </div>
+        <div class="setting-item">
+          <span>Two-Factor Auth</span>
+          <button class="toggle-btn off">Off</button>
+        </div>
       </div>
     </div>
   </div>

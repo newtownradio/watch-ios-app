@@ -10,9 +10,71 @@
       <input type="text" [(ngModel)]="form.title" placeholder="e.g., Rolex Submariner" id="title">
     </div>
 
+    <!-- AI Pricing Assistant Section -->
+    <div class="pricing-assistant">
+      <h3>🤖 AI Pricing Assistant</h3>
+      <p>Get accurate pricing based on market data and similar items</p>
+      
+      <div class="pricing-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="brand">Brand *</label>
+            <select [(ngModel)]="form.brand" (change)="onBrandChange()" id="brand" required>
+              <option value="">Select Brand</option>
+              <option *ngFor="let brand of availableBrands" [value]="brand">
+                {{ brand }}
+              </option>
+            </select>
+            <small class="form-help">Choose the watch brand for accurate pricing</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="model">Model *</label>
+            <select [(ngModel)]="form.model" id="model" [disabled]="!form.brand" required>
+              <option value="">Select Model</option>
+              <option *ngFor="let model of availableModels" [value]="model">
+                {{ model }}
+              </option>
+            </select>
+            <small class="form-help" *ngIf="!form.brand">Select a brand first</small>
+            <small class="form-help" *ngIf="form.brand">{{ getModelCount() }} models available</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="year">Year (Optional)</label>
+            <input type="number" [(ngModel)]="form.year" placeholder="e.g., 2020" id="year" min="1900" max="2024">
+            <small class="form-help">Year of manufacture for more accurate pricing</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="condition">Condition *</label>
+            <select [(ngModel)]="form.condition" id="condition" required>
+              <option value="excellent">Excellent - Like new</option>
+              <option value="very-good">Very Good - Minor wear</option>
+              <option value="good">Good - Some wear</option>
+              <option value="fair">Fair - Significant wear</option>
+            </select>
+            <small class="form-help">Condition affects pricing significantly</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="original-price">Original Price (Optional)</label>
+          <input type="number" [(ngModel)]="form.originalPrice" placeholder="What you paid originally" id="original-price" min="0">
+          <small class="form-help">Helps AI provide more accurate pricing</small>
+        </div>
+
+        <button class="pricing-btn" (click)="getPricingRecommendation()" type="button" [disabled]="!form.brand || !form.model">
+          🧠 Get AI Pricing Recommendation
+        </button>
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="starting-price">Starting Price</label>
-      <input type="number" [(ngModel)]="form.startingPrice" placeholder="0" id="starting-price">
+      <input type="number" [(ngModel)]="form.startingPrice" placeholder="0" id="starting-price" min="0">
     </div>
 
     <div class="form-group">
@@ -32,7 +94,85 @@
       </ul>
     </div>
 
-    <button class="submit-btn" (click)="submitForm()">List Item for Bidding</button>
+    <button class="submit-btn" (click)="submitForm()" type="button">List Item for Bidding</button>
+  </div>
+
+  <!-- Pricing Recommendation Modal -->
+  <div class="pricing-modal" *ngIf="showPricingAssistant">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🤖 AI Pricing Recommendation</h3>
+        <button class="close-btn" (click)="closePricingAssistant()">×</button>
+      </div>
+      
+      <div class="pricing-details" *ngIf="pricingRecommendation">
+        <div class="price-highlight">
+          <h4>Suggested Price</h4>
+          <div class="suggested-price">${{ pricingRecommendation.suggestedPrice.toLocaleString() }}</div>
+          <div class="confidence">Confidence: {{ (pricingRecommendation.confidence * 100).toFixed(0) }}%</div>
+        </div>
+
+        <div class="market-insights">
+          <h4>Market Insights</h4>
+          <div class="insight-item">
+            <span class="label">Brand:</span>
+            <span class="value">{{ pricingRecommendation.marketInsights.brand }} {{ pricingRecommendation.marketInsights.model }}</span>
+          </div>
+          <div class="insight-item">
+            <span class="label">Market Trend:</span>
+            <span class="value trend-{{ pricingRecommendation.marketInsights.marketTrend }}">
+              {{ pricingRecommendation.marketInsights.marketTrend }}
+            </span>
+          </div>
+          <div class="insight-item">
+            <span class="label">Demand Level:</span>
+            <span class="value demand-{{ pricingRecommendation.marketInsights.demandLevel }}">
+              {{ pricingRecommendation.marketInsights.demandLevel }}
+            </span>
+          </div>
+          <div class="insight-item">
+            <span class="label">Recent Sales:</span>
+            <span class="value">{{ pricingRecommendation.marketInsights.recentSales }} similar watches</span>
+          </div>
+          <div class="insight-item">
+            <span class="label">Avg Days on Market:</span>
+            <span class="value">{{ pricingRecommendation.marketInsights.daysOnMarket }} days</span>
+          </div>
+        </div>
+
+        <div class="price-factors">
+          <h4>Price Factors</h4>
+          <div class="factor-item">
+            <span class="label">Condition Multiplier:</span>
+            <span class="value">{{ (pricingRecommendation.priceFactors.conditionMultiplier * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="factor-item">
+            <span class="label">Brand Value:</span>
+            <span class="value">{{ (pricingRecommendation.priceFactors.brandValue * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="factor-item">
+            <span class="label">Market Demand:</span>
+            <span class="value">{{ (pricingRecommendation.priceFactors.marketDemand * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="factor-item">
+            <span class="label">Seasonal Adjustment:</span>
+            <span class="value">{{ (pricingRecommendation.priceFactors.seasonalAdjustment * 100).toFixed(0) }}%</span>
+          </div>
+        </div>
+
+        <div class="reasoning">
+          <h4>AI Reasoning</h4>
+          <ul class="reasoning-list">
+            <li *ngFor="let reason of pricingRecommendation.reasoning">{{ reason }}</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="closePricingAssistant()">Cancel</button>
+        <button class="apply-btn" (click)="applyPricingRecommendation()">Apply Suggested Price</button>
+      </div>
+    </div>
   </div>
 
   <!-- Counteroffer Form Modal -->
@@ -65,7 +205,12 @@
     <div class="listing-card" *ngFor="let listing of activeListings">
       <div class="listing-header">
         <h3>{{ listing.title }}</h3>
-        <span class="status" [class]="listing.status">{{ listing.status }}</span>
+        <div class="header-actions">
+          <span class="status" [class]="listing.status">{{ listing.status }}</span>
+          <button class="delete-btn" (click)="deleteListing(listing.id)" title="Delete listing">
+            🗑️
+          </button>
+        </div>
       </div>
       
       <div class="listing-details">
@@ -77,9 +222,17 @@
       </div>
 
       <div class="sale-window">
-        <p class="time-remaining">
-          <strong>Time Remaining:</strong> {{ getTimeRemaining(listing.endTime) }}
-        </p>
+        <div class="time-info">
+          <p class="start-time">
+            <strong>Listed:</strong> {{ getListingStartTime(listing.createdAt) }}
+          </p>
+          <p class="end-time">
+            <strong>Ends:</strong> {{ getListingEndTime(listing.endTime) }}
+          </p>
+          <p class="time-remaining">
+            <strong>Time Remaining:</strong> {{ getTimeRemaining(listing.endTime) }}
+          </p>
+        </div>
         <p class="bid-count">
           <strong>Bids Received:</strong> {{ listing.bids.length }}
         </p>

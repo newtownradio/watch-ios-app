@@ -7,6 +7,8 @@
 html {
   height: 100%;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 body {
@@ -18,26 +20,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
   overflow-x: hidden;
-}
-
-/* iOS specific improvements */
-@supports (-webkit-touch-callout: none) {
-  html {
-    height: -webkit-fill-available;
-  }
-  
-  body {
-    min-height: -webkit-fill-available;
-    height: -webkit-fill-available;
-  }
+  -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
 /* Touch improvements */
 button, a {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* Allow text selection in inputs */
@@ -51,7 +43,9 @@ input, textarea {
   max-width: 100%;
 }
 
-/* Prevent zoom on double tap */
-* {
-  touch-action: manipulation;
+/* Ensure proper scroll behavior */
+.scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
 }

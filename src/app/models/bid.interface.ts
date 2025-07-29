@@ -27,6 +27,10 @@ export interface Listing {
   sellerName: string;
   title: string;
   description: string;
+  brand?: string; // Brand of the watch
+  model?: string; // Model of the watch
+  year?: number; // Year of manufacture
+  condition?: 'excellent' | 'very-good' | 'good' | 'fair'; // Condition of the watch
   startingPrice: number;
   currentPrice: number;
   imageUrl: string;
@@ -45,4 +49,81 @@ export interface SaleWindow {
   endTime: Date;
   duration: number; // in hours
   remainingTime: number; // in milliseconds
+}
+
+// New interfaces for enhanced transaction flow
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  idVerified: boolean;
+  disclaimerSigned: boolean;
+  policySigned: boolean;
+  verificationDate?: Date;
+}
+
+export interface Watch {
+  id: string;
+  title: string;
+  brand: string;
+  model: string;
+  year?: number;
+  condition: 'excellent' | 'very-good' | 'good' | 'fair';
+  description: string;
+  sellerId: string;
+  askingPrice: number;
+  images: string[];
+  verificationStatus: 'pending' | 'verified' | 'failed';
+  verificationDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Offer {
+  id: string;
+  watchId: string;
+  buyerId: string;
+  sellerId: string;
+  amount: number;
+  status: 'pending' | 'accepted' | 'rejected' | 'countered' | 'expired';
+  createdAt: Date;
+  expiresAt: Date;
+  message?: string;
+}
+
+export interface Transaction {
+  id: string;
+  watchId: string;
+  buyerId: string;
+  sellerId: string;
+  finalPrice: number;
+  shippingCost: number;
+  verificationCost: number;
+  commissionFee: number;
+  insuranceCost: number;
+  totalAmount: number;
+  status: 'pending' | 'shipped-to-verifier' | 'verifying' | 'shipped-to-buyer' | 'completed' | 'disputed' | 'cancelled';
+  verificationPartner: string;
+  trackingNumber?: string;
+  verificationDate?: Date;
+  buyerConfirmationDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PricingBreakdown {
+  itemPrice: number;
+  shippingCost: number;
+  verificationCost: number;
+  commissionFee: number;
+  insuranceCost: number;
+  totalAmount: number;
+}
+
+export interface VerificationPartner {
+  id: string;
+  name: string;
+  cost: number;
+  turnaroundTime: string;
+  description: string;
 }
