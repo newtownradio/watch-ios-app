@@ -93,7 +93,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.dataService.logout();
     this.isAuthenticated = false;
     this.currentUser = null;
-    this.router.navigate(['/']);
+    // Immediately redirect to splash and force reload to bypass auth checks
+    window.location.href = '/';
   }
 
   toggleMenu() {

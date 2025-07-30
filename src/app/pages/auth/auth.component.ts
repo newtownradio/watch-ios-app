@@ -1035,8 +1035,8 @@ export class AuthComponent implements OnInit {
 
   logout() {
     this.dataService.logout();
-    // Navigate to splash screen (starting point) instead of reloading
-    this.router.navigate(['/']);
+    // Immediately redirect to splash and force reload to bypass auth checks
+    window.location.href = '/';
   }
 
 

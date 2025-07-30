@@ -564,7 +564,7 @@ import { Router } from '@angular/router';
     }
 
     .get-started-section {
-      background: #667eea;
+      background: #1e3a8a;
       color: white;
       padding: 80px 40px;
       text-align: center;
