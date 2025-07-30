@@ -87,6 +87,9 @@
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
+  transition: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   
   @media (max-width: 480px) {
     min-width: 40px;
@@ -134,6 +137,8 @@
   transition: right 0.3s ease;
   display: flex;
   flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .menu.open {
@@ -156,6 +161,9 @@
   align-items: center;
   justify-content: center;
   z-index: 2001;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   
   @media (max-width: 768px) {
     top: 16px;
@@ -174,8 +182,17 @@
   }
 }
 
-.menu-close-btn:hover {
-  color: #1e3a8a;
+/* Only show hover on devices that support it */
+@media (hover: hover) {
+  .menu-close-btn:hover {
+    color: #1e3a8a;
+  }
+}
+
+/* Focus state for accessibility */
+.menu-close-btn:focus {
+  outline: 2px solid #1e3a8a;
+  outline-offset: 2px;
 }
 
 /* Menu Links - Mobile style for all screen sizes */
@@ -205,6 +222,8 @@
   border-left: 3px solid transparent;
   min-height: 70px;
   transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   
   @media (max-width: 768px) {
     padding: 20px;
@@ -219,10 +238,26 @@
   }
 }
 
-.menu-link:hover {
+/* Only show hover on devices that support it */
+@media (hover: hover) {
+  .menu-link:hover {
+    background: #f3f4f6;
+    color: #1e3a8a;
+    border-left-color: #1e3a8a;
+  }
+}
+
+/* Active state for touch devices */
+.menu-link:active {
   background: #f3f4f6;
   color: #1e3a8a;
   border-left-color: #1e3a8a;
+}
+
+/* Focus state for accessibility */
+.menu-link:focus {
+  outline: 2px solid #1e3a8a;
+  outline-offset: 2px;
 }
 
 .menu-text {

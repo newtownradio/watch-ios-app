@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataPersistenceService } from '../../services/data-persistence.service';
+import { EmailService } from '../../services/email.service';
 import { User } from '../../models/bid.interface';
 
 @Component({
@@ -794,7 +795,8 @@ export class AuthComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private dataService: DataPersistenceService
+    private dataService: DataPersistenceService,
+    private emailService: EmailService
   ) {}
 
     ngOnInit() {
@@ -804,6 +806,9 @@ export class AuthComponent implements OnInit {
         this.activeTab = 'register';
       }
     });
+
+    // Create test users if they don't exist
+    this.dataService.createTestUsers();
 
     // Don't auto-redirect - let users see the auth page
     // Users can manually navigate to discovery if they're already logged in
@@ -816,9 +821,6 @@ export class AuthComponent implements OnInit {
   }
 
   login() {
-    // Force create test users for debugging
-    this.dataService.createTestUsers();
-    
     const users = this.dataService.getAllUsers();
     console.log('Available users:', users.map(u => ({ email: u.email, hasPassword: !!u.password })));
     
@@ -869,11 +871,59 @@ export class AuthComponent implements OnInit {
     this.router.navigate(['/discovery']);
   }
 
-  forgotPassword() {
-    // Simulate sending verification code
-    alert(`A 6-digit verification code has been sent to ${this.forgotPasswordData.email}. Please check your email.`);
-    this.resetPasswordData.email = this.forgotPasswordData.email;
-    this.setActiveTab('reset-password');
+  async forgotPassword() {
+    if (!this.forgotPasswordData.email) {
+      alert('Please enter your email address.');
+      return;
+    }
+
+    // Create test users if none exist or if the specific user doesn't exist
+    const users = this.dataService.getAllUsers();
+    console.log('Initial users count:', users.length);
+    console.log('Initial users:', users.map(u => u.email));
+    
+    const targetUser = users.find(u => u.email === this.forgotPasswordData.email);
+    if (users.length === 0 || !targetUser) {
+      console.log('Creating test users...');
+      this.dataService.createTestUsers();
+    }
+
+    // Check if user exists
+    const updatedUsers = this.dataService.getAllUsers();
+    console.log('Updated users count:', updatedUsers.length);
+    console.log('Updated users:', updatedUsers.map(u => u.email));
+    console.log('Looking for email:', this.forgotPasswordData.email);
+    
+    const user = updatedUsers.find(u => u.email === this.forgotPasswordData.email);
+    console.log('Found user:', user);
+    
+    if (!user) {
+      alert('No account found with this email address.');
+      return;
+    }
+
+    try {
+      // Generate verification code and expiration
+      const code = this.emailService.generateVerificationCode();
+      const expiresAt = this.emailService.generateExpirationTime();
+      
+      // Save password reset data
+      this.dataService.savePasswordReset(this.forgotPasswordData.email, code, expiresAt);
+      
+      // Send email
+      const emailSent = await this.emailService.sendPasswordResetEmail(this.forgotPasswordData.email, code);
+      
+      if (emailSent) {
+        alert(`A 6-digit verification code has been sent to ${this.forgotPasswordData.email}. Please check your email.`);
+        this.resetPasswordData.email = this.forgotPasswordData.email;
+        this.setActiveTab('reset-password');
+      } else {
+        alert('Failed to send email. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Password reset error:', error);
+      alert('An error occurred. Please try again later.');
+    }
   }
 
   resetPassword() {
@@ -882,9 +932,57 @@ export class AuthComponent implements OnInit {
       return;
     }
 
-    // Simulate password reset
-    alert('Password reset successfully! You can now sign in with your new password.');
-    this.setActiveTab('login');
+    if (!this.resetPasswordData.code) {
+      alert('Please enter the verification code.');
+      return;
+    }
+
+    // Verify the code
+    const resetData = this.dataService.getPasswordReset(this.resetPasswordData.email);
+    
+    if (!resetData) {
+      alert('Invalid or expired verification code. Please request a new one.');
+      return;
+    }
+
+    if (resetData.code !== this.resetPasswordData.code) {
+      alert('Invalid verification code. Please check and try again.');
+      return;
+    }
+
+    // Update user password
+    const users = this.dataService.getAllUsers();
+    const user = users.find(u => u.email === this.resetPasswordData.email);
+    
+    console.log('Resetting password for user:', user?.email);
+    console.log('New password:', this.resetPasswordData.password);
+    
+    if (user) {
+      user.password = this.resetPasswordData.password;
+      console.log('Updated user password to:', user.password);
+      this.dataService.saveUser(user);
+      
+      // Verify the password was saved
+      const updatedUsers = this.dataService.getAllUsers();
+      const updatedUser = updatedUsers.find(u => u.email === this.resetPasswordData.email);
+      console.log('Password after save:', updatedUser?.password);
+      
+      // Clear the password reset data
+      this.dataService.clearPasswordReset(this.resetPasswordData.email);
+      
+      alert('Password reset successfully! You can now sign in with your new password.');
+      this.setActiveTab('login');
+      
+      // Reset the form
+      this.resetPasswordData = {
+        email: '',
+        code: '',
+        password: '',
+        confirmPassword: ''
+      };
+    } else {
+      alert('User not found. Please try again.');
+    }
   }
 
 

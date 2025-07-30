@@ -14,6 +14,7 @@ export class DataPersistenceService {
   private readonly CURRENT_USER_KEY = 'watch_ios_current_user';
   private readonly MESSAGES_KEY = 'watch_ios_messages';
   private readonly NOTIFICATIONS_KEY = 'watch_ios_notifications';
+  private readonly PASSWORD_RESET_KEY = 'watch_ios_password_resets';
 
   // ===== LISTINGS MANAGEMENT =====
 
@@ -629,13 +630,50 @@ export class DataPersistenceService {
    * Create test users for development
    */
   createTestUsers(): void {
-    // Always create test users for development
-    // const existingUsers = this.getAllUsers();
-    // if (existingUsers.length > 0) {
-    //   return;
-    // }
+    // Check if test users already exist
+    const existingUsers = this.getAllUsers();
+    const testEmails = ['test@example.com', 'user1@example.com', 'user2@example.com', 'alex.chen@test.com', 'sarah.m@test.com', 'm.rodriguez@test.com', 'e.thompson@test.com'];
+    
+    // Only create test users if none of the test emails exist
+    const hasTestUsers = testEmails.some(email => existingUsers.some(user => user.email === email));
+    if (hasTestUsers) {
+      return;
+    }
 
     const testUsers: User[] = [
+      {
+        id: 'test-user-001',
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'TestPass123!',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-15')
+      },
+      {
+        id: 'test-user-002',
+        name: 'User One',
+        email: 'user1@example.com',
+        password: 'UserPass123!',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-20')
+      },
+      {
+        id: 'test-user-003',
+        name: 'User Two',
+        email: 'user2@example.com',
+        password: 'UserPass456!',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-25')
+      },
       {
         id: 'test-seller-001',
         name: 'Alex Chen',
@@ -694,22 +732,37 @@ export class DataPersistenceService {
     return `
 Test Credentials for Development:
 
-1. Seller Account:
+1. Test User:
+   Email: test@example.com
+   Password: TestPass123!
+   Name: Test User
+
+2. User One:
+   Email: user1@example.com
+   Password: UserPass123!
+   Name: User One
+
+3. User Two:
+   Email: user2@example.com
+   Password: UserPass456!
+   Name: User Two
+
+4. Seller Account:
    Email: alex.chen@test.com
    Password: TestPass123!
    Name: Alex Chen
 
-2. Buyer Account:
+5. Buyer Account:
    Email: sarah.m@test.com
    Password: TestPass456!
    Name: Sarah Mitchell
 
-3. Collector Account:
+6. Collector Account:
    Email: m.rodriguez@test.com
    Password: TestPass789!
    Name: Marcus Rodriguez
 
-4. Dealer Account:
+7. Dealer Account:
    Email: e.thompson@test.com
    Password: TestPass012!
    Name: Emma Thompson
@@ -947,5 +1000,63 @@ Note: These are test accounts for development purposes only.
     };
 
     this.saveNotification(notification);
+  }
+
+  // ===== PASSWORD RESET MANAGEMENT =====
+  
+  /**
+   * Save password reset data
+   */
+  savePasswordReset(email: string, code: string, expiresAt: Date): void {
+    try {
+      const resets = this.getPasswordResets();
+      resets[email] = { code, expiresAt };
+      localStorage.setItem(this.PASSWORD_RESET_KEY, JSON.stringify(resets));
+    } catch (error) {
+      console.error('Error saving password reset:', error);
+    }
+  }
+
+  /**
+   * Get password reset data for an email
+   */
+  getPasswordReset(email: string): { code: string; expiresAt: Date } | null {
+    try {
+      const resets = this.getPasswordResets();
+      const reset = resets[email];
+      if (reset && new Date() < new Date(reset.expiresAt)) {
+        return reset;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting password reset:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clear password reset data for an email
+   */
+  clearPasswordReset(email: string): void {
+    try {
+      const resets = this.getPasswordResets();
+      delete resets[email];
+      localStorage.setItem(this.PASSWORD_RESET_KEY, JSON.stringify(resets));
+    } catch (error) {
+      console.error('Error clearing password reset:', error);
+    }
+  }
+
+  /**
+   * Get all password resets
+   */
+  private getPasswordResets(): { [email: string]: { code: string; expiresAt: Date } } {
+    try {
+      const data = localStorage.getItem(this.PASSWORD_RESET_KEY);
+      return data ? JSON.parse(data) : {};
+    } catch (error) {
+      console.error('Error getting password resets:', error);
+      return {};
+    }
   }
 }

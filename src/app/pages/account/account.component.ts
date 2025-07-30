@@ -148,6 +148,7 @@ export class AccountComponent implements OnInit {
 
   logout() {
     this.dataService.logout();
-    window.location.reload();
+    // Immediately redirect to splash and force reload to bypass auth checks
+    window.location.href = '/';
   }
 }

@@ -83,6 +83,21 @@ export class MessagesComponent implements OnInit {
     this.showCompose = false;
   }
 
+  openCompose(): void {
+    console.log('Opening compose form...');
+    this.showCompose = true;
+    this.selectedMessage = null;
+    // Reset compose form
+    this.composeData = {
+      to: '',
+      subject: '',
+      content: ''
+    };
+    this.selectedUsers = [];
+    this.searchTerm = '';
+    this.filteredUsers = [];
+  }
+
   selectMessage(message: Message): void {
     this.selectedMessage = message;
     this.showCompose = false;
@@ -118,18 +133,27 @@ export class MessagesComponent implements OnInit {
   }
 
   sendMessage(): void {
+    console.log('Send message called');
+    console.log('Selected users:', this.selectedUsers);
+    console.log('Compose data:', this.composeData);
+    console.log('Current user:', this.currentUser);
+    
     if (this.selectedUsers.length === 0 || !this.composeData.subject || !this.composeData.content) {
+      console.log('Validation failed - missing data');
       alert('Please select a recipient and fill in all fields');
       return;
     }
 
     if (!this.currentUser) {
+      console.log('No current user');
       alert('Please log in to send messages');
       return;
     }
 
     // Send message to the selected user
     const recipientUser = this.selectedUsers[0];
+    console.log('Recipient user:', recipientUser);
+    
     const newMessage: Message = {
       id: this.dataService.generateId(),
       senderId: this.currentUser!.id,
@@ -142,6 +166,7 @@ export class MessagesComponent implements OnInit {
       type: 'general'
     };
 
+    console.log('New message:', newMessage);
     this.dataService.saveMessage(newMessage);
     this.loadData();
     
