@@ -816,7 +816,11 @@ export class AuthComponent implements OnInit {
   }
 
   login() {
+    // Force create test users for debugging
+    this.dataService.createTestUsers();
+    
     const users = this.dataService.getAllUsers();
+    console.log('Available users:', users.map(u => ({ email: u.email, hasPassword: !!u.password })));
     
     // Find user by email and password
     const user = users.find(u => u.email === this.loginData.email && u.password === this.loginData.password);
@@ -825,6 +829,8 @@ export class AuthComponent implements OnInit {
       this.dataService.setCurrentUser(user);
       this.router.navigate(['/discovery']);
     } else {
+      console.log('Login failed for:', this.loginData.email);
+      console.log('Available emails:', users.map(u => u.email));
       alert('Invalid email or password. Please try again.');
     }
   }

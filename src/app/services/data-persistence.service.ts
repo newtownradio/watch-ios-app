@@ -629,11 +629,11 @@ export class DataPersistenceService {
    * Create test users for development
    */
   createTestUsers(): void {
-    const existingUsers = this.getAllUsers();
-    
-    if (existingUsers.length > 0) {
-      return;
-    }
+    // Always create test users for development
+    // const existingUsers = this.getAllUsers();
+    // if (existingUsers.length > 0) {
+    //   return;
+    // }
 
     const testUsers: User[] = [
       {
