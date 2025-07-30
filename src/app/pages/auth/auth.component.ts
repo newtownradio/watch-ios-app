@@ -1035,8 +1035,8 @@ export class AuthComponent implements OnInit {
 
   logout() {
     this.dataService.logout();
-    // Refresh the page to show login form
-    window.location.reload();
+    // Navigate to splash screen (starting point) instead of reloading
+    this.router.navigate(['/']);
   }
 
 
