@@ -606,6 +606,10 @@ import { Router } from '@angular/router';
           margin-bottom: 20px;
         }
       }
+
+      .cta-btn {
+        border: 2px solid white;
+      }
     }
   `]
 })
