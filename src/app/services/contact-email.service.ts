@@ -19,51 +19,41 @@ export interface EmailResponse {
   providedIn: 'root'
 })
 export class ContactEmailService {
-  private readonly API_ENDPOINT = 'https://your-cloudflare-worker.your-domain.workers.dev/contact';
+  // Cloudflare Worker URL - update this after deployment
+  private readonly WORKER_URL = 'https://email-service.perplexity-proxy.workers.dev';
 
   constructor() {}
 
   async sendContactEmail(formData: ContactFormData): Promise<EmailResponse> {
     try {
-      const emailPayload = {
-        to: '[RECIPIENT_EMAIL]', // Configure this in your Cloudflare Worker
-        from: formData.email,
-        subject: `[${formData.reason.toUpperCase()}] ${formData.subject}`,
-        message: formData.message,
-        userInfo: {
-          name: formData.userName || 'Anonymous',
-          email: formData.email,
-          userId: formData.userId || 'anonymous'
-        },
-        timestamp: new Date().toISOString()
-      };
-
-      const response = await fetch(this.API_ENDPOINT, {
+      const response = await fetch(`${this.WORKER_URL}/send-contact-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer [YOUR_API_KEY]' // Configure this in your Cloudflare Worker
         },
-        body: JSON.stringify(emailPayload)
+        body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.ok) {
+        const result = await response.json();
+        return {
+          success: true,
+          message: result.message || 'Your message has been sent successfully. We will get back to you within 24 hours.'
+        };
+      } else {
+        const error = await response.text();
+        return {
+          success: false,
+          message: 'Failed to send message. Please try again.',
+          error: error
+        };
       }
-
-      const result = await response.json();
-      
-      return {
-        success: true,
-        message: 'Your message has been sent successfully. We will get back to you within 24 hours.'
-      };
-
-    } catch (error) {
-      console.error('Email sending failed:', error);
+    } catch (error: any) {
+      console.error('Contact email error:', error);
       return {
         success: false,
-        message: 'Failed to send message. Please try again later.',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        message: 'Failed to send message. Please try again.',
+        error: error.message
       };
     }
   }
@@ -74,7 +64,7 @@ export class ContactEmailService {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     console.log('Contact form submission (development mode):', {
-      to: '[RECIPIENT_EMAIL]',
+      to: '[CONFIGURE_RECIPIENT_EMAIL]',
       from: formData.email,
       subject: `[${formData.reason.toUpperCase()}] ${formData.subject}`,
       message: formData.message,
