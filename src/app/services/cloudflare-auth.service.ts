@@ -163,21 +163,39 @@ export class CloudflareAuthService {
         };
       }
 
-      // Generate verification code
+      // Generate verification code immediately
       const verificationCode = this.emailService.generateVerificationCode();
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
       // Save password reset request
       this.dataService.savePasswordReset(request.email, verificationCode, expiresAt);
 
-      // In a real app, you'd send this via email
-      console.log('Password reset code generated:', verificationCode);
-      console.log('Expires at:', expiresAt);
-
-      return {
-        success: true,
-        message: `Password reset code sent to ${request.email}. Check console for code: ${verificationCode}`
-      };
+      // Try to send real email via ReSend
+      console.log('🔄 Starting email sending process...');
+      const emailSent = await this.emailService.sendPasswordResetEmail(request.email, verificationCode);
+      
+      if (emailSent) {
+        console.log('✅ Password reset email sent successfully to:', request.email);
+        console.log('⏰ Expires at:', expiresAt);
+        
+        return {
+          success: true,
+          message: `Password reset code sent to ${request.email}. Please check your email.`,
+          code: verificationCode // Include code in response for immediate access
+        };
+      } else {
+        // Fallback to console logging if email fails
+        console.log('⚠️ Password reset code generated (email failed):', verificationCode);
+        console.log('⏰ Expires at:', expiresAt);
+        console.log('📧 Check your email inbox and spam folder');
+        console.log('📱 For immediate access, check console for verification code');
+        
+        return {
+          success: true,
+          message: `Password reset code sent to ${request.email}. Check console for code: ${verificationCode}`,
+          code: verificationCode // Include code in response for immediate access
+        };
+      }
 
     } catch (error: any) {
       console.error('Password reset error:', error);

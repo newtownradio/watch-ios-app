@@ -787,10 +787,11 @@ Note: These are test accounts for development purposes only.
    */
   createTestUserForPasswordReset(): void {
     const testUser: User = {
-      id: 'test-user-password-reset',
-      email: 'test@passwordreset.com',
+      id: 'test-user-id',
       name: 'Test User',
-      idVerified: false,
+      email: 'test@example.com',
+      password: 'testpassword123',
+      idVerified: true,
       disclaimerSigned: true,
       policySigned: true,
       termsSigned: true,
@@ -798,16 +799,15 @@ Note: These are test accounts for development purposes only.
       updatedAt: new Date()
     };
 
-    // Save the test user
-    this.saveUser(testUser);
+    // Save test user locally
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const userExists = existingUsers.find((u: User) => u.email === testUser.email);
     
-    console.log('Test user created for password reset testing:');
-    console.log('Email: test@passwordreset.com');
-    console.log('Password: testpassword123');
-    console.log('User ID:', testUser.id);
-    
-    // Also create a Firebase account with known credentials
-    // This will be handled by the auth component
+    if (!userExists) {
+      existingUsers.push(testUser);
+      localStorage.setItem('users', JSON.stringify(existingUsers));
+      console.log('Test user created for password reset testing');
+    }
   }
 
   // ===== MESSAGING METHODS =====
@@ -1096,7 +1096,7 @@ Note: These are test accounts for development purposes only.
   /**
    * Get all password resets
    */
-  private getPasswordResets(): { [email: string]: { code: string; expiresAt: Date } } {
+  private getPasswordResets(): Record<string, { code: string; expiresAt: Date }> {
     try {
       const data = localStorage.getItem(this.PASSWORD_RESET_KEY);
       return data ? JSON.parse(data) : {};

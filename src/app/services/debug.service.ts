@@ -4,164 +4,129 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class DebugService {
-  private debugMode = true; // Set to false in production
+  private isDebugMode = true; // Set to false for production
 
-  constructor() {
-    if (this.debugMode) {
-      this.log('Debug service initialized');
-    }
-  }
-
-  log(message: string, data?: any): void {
-    if (this.debugMode) {
+  log(message: string, data?: any) {
+    if (this.isDebugMode) {
       console.log(`[DEBUG] ${message}`, data || '');
     }
   }
 
-  error(message: string, error?: any): void {
-    if (this.debugMode) {
-      console.error(`[DEBUG ERROR] ${message}`, error || '');
+  error(message: string, error?: any) {
+    if (this.isDebugMode) {
+      console.error(`[ERROR] ${message}`, error || '');
     }
   }
 
-  warn(message: string, data?: any): void {
-    if (this.debugMode) {
-      console.warn(`[DEBUG WARN] ${message}`, data || '');
+  warn(message: string, data?: any) {
+    if (this.isDebugMode) {
+      console.warn(`[WARN] ${message}`, data || '');
     }
   }
 
-  // Test Firebase connectivity
-  async testFirebaseConnectivity(): Promise<boolean> {
+  // Test network connectivity
+  async testNetworkConnectivity(): Promise<boolean> {
     try {
-      this.log('Testing Firebase connectivity...');
+      this.log('Testing network connectivity...');
       
-      // Test basic network connectivity
-      const networkTest = await fetch('https://www.google.com', {
-        method: 'HEAD',
-        mode: 'no-cors'
+      const response = await fetch('https://httpbin.org/get', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-      
-      this.log('Basic network connectivity: OK');
-      
-      // Test Firebase-specific endpoints
-      const firebaseTest = await fetch('https://firebase.google.com', {
-        method: 'HEAD',
-        mode: 'no-cors'
-      });
-      
-      this.log('Firebase connectivity: OK');
-      return true;
+
+      if (response.ok) {
+        this.log('Network connectivity: OK');
+        return true;
+      } else {
+        this.error('Network connectivity test failed');
+        return false;
+      }
     } catch (error) {
-      this.error('Firebase connectivity test failed', error);
+      this.error('Network connectivity test failed', error);
       return false;
     }
   }
 
-  // Test specific service endpoints
-  async testServiceEndpoint(url: string): Promise<{ success: boolean; responseTime: number; error?: string }> {
-    const startTime = Date.now();
-    
+  // Test ReSend API connectivity
+  async testReSendConnectivity(): Promise<boolean> {
     try {
-      this.log(`Testing endpoint: ${url}`);
+      this.log('Testing ReSend API connectivity...');
       
-      const response = await fetch(url, {
-        method: 'HEAD',
-        mode: 'no-cors'
+      const response = await fetch('https://api.resend.com/domains', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer re_XfDN7Ek7_KDHYmDEMUQhD5SFS98phG7gP',
+          'Content-Type': 'application/json'
+        }
       });
-      
-      const responseTime = Date.now() - startTime;
-      this.log(`Endpoint test successful: ${url} (${responseTime}ms)`);
-      
-      return {
-        success: true,
-        responseTime
-      };
+
+      if (response.ok) {
+        this.log('ReSend API connectivity: OK');
+        return true;
+      } else {
+        this.error('ReSend API connectivity test failed');
+        return false;
+      }
     } catch (error) {
-      const responseTime = Date.now() - startTime;
-      this.error(`Endpoint test failed: ${url}`, error);
-      
-      return {
-        success: false,
-        responseTime,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
+      this.error('ReSend API connectivity test failed', error);
+      return false;
     }
   }
 
-  // Get system information for debugging
+  // Test local storage
+  testLocalStorage(): boolean {
+    try {
+      this.log('Testing local storage...');
+      
+      const testKey = 'debug_test';
+      const testValue = 'test_value';
+      
+      localStorage.setItem(testKey, testValue);
+      const retrievedValue = localStorage.getItem(testKey);
+      localStorage.removeItem(testKey);
+      
+      if (retrievedValue === testValue) {
+        this.log('Local storage: OK');
+        return true;
+      } else {
+        this.error('Local storage test failed');
+        return false;
+      }
+    } catch (error) {
+      this.error('Local storage test failed', error);
+      return false;
+    }
+  }
+
+  // Get system information
   getSystemInfo(): any {
-    return {
+    const info = {
       userAgent: navigator.userAgent,
       platform: navigator.platform,
       language: navigator.language,
       cookieEnabled: navigator.cookieEnabled,
       onLine: navigator.onLine,
-      connection: (navigator as any).connection ? {
-        effectiveType: (navigator as any).connection.effectiveType,
-        downlink: (navigator as any).connection.downlink,
-        rtt: (navigator as any).connection.rtt
-      } : 'Not available',
-      screen: {
-        width: screen.width,
-        height: screen.height,
-        availWidth: screen.availWidth,
-        availHeight: screen.availHeight
-      },
-      window: {
-        innerWidth: window.innerWidth,
-        innerHeight: window.innerHeight,
-        outerWidth: window.outerWidth,
-        outerHeight: window.outerHeight
-      },
-      location: {
-        href: window.location.href,
-        protocol: window.location.protocol,
-        host: window.location.host,
-        pathname: window.location.pathname
-      }
+      timestamp: new Date().toISOString()
     };
+    
+    this.log('System info:', info);
+    return info;
   }
 
-  // Log system information
-  logSystemInfo(): void {
-    if (this.debugMode) {
-      const systemInfo = this.getSystemInfo();
-      this.log('System Information', systemInfo);
-    }
-  }
-
-  // Test localStorage and sessionStorage
-  testStorage(): { localStorage: boolean; sessionStorage: boolean; quotaExceeded: boolean } {
-    const result = {
-      localStorage: false,
-      sessionStorage: false,
-      quotaExceeded: false
+  // Test all services
+  async runAllTests(): Promise<any> {
+    this.log('Running all debug tests...');
+    
+    const results = {
+      network: await this.testNetworkConnectivity(),
+      resend: await this.testReSendConnectivity(),
+      localStorage: this.testLocalStorage(),
+      systemInfo: this.getSystemInfo()
     };
-
-    try {
-      // Test localStorage
-      const testKey = '__debug_test__';
-      localStorage.setItem(testKey, 'test');
-      localStorage.removeItem(testKey);
-      result.localStorage = true;
-    } catch (error) {
-      this.error('localStorage test failed', error);
-      if (error instanceof Error && error.name === 'QuotaExceededError') {
-        result.quotaExceeded = true;
-      }
-    }
-
-    try {
-      // Test sessionStorage
-      const testKey = '__debug_test__';
-      sessionStorage.setItem(testKey, 'test');
-      sessionStorage.removeItem(testKey);
-      result.sessionStorage = true;
-    } catch (error) {
-      this.error('sessionStorage test failed', error);
-    }
-
-    this.log('Storage test results', result);
-    return result;
+    
+    this.log('All test results:', results);
+    return results;
   }
 } 

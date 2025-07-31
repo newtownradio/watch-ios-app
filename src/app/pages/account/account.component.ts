@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { DataManagerComponent } from '../../components/data-manager/data-manager.component';
+import { ContactEmailService, ContactFormData } from '../../services/contact-email.service';
 import { Listing, Bid, User, Message, Notification } from '../../models/bid.interface';
 
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [CommonModule, DataManagerComponent],
+  imports: [CommonModule, FormsModule, DataManagerComponent],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss'
 })
@@ -21,14 +23,28 @@ export class AccountComponent implements OnInit {
   };
   recentOrders: any[] = [];
   recentActivity: any[] = [];
+  
+  // Contact form properties
+  contactForm = {
+    reason: '',
+    subject: '',
+    message: '',
+    email: ''
+  };
+  isSubmitting = false;
+  contactFormStatus: { type: 'success' | 'error'; message: string } | null = null;
 
-  constructor(private dataService: DataPersistenceService) {}
+  constructor(
+    private dataService: DataPersistenceService,
+    private contactEmailService: ContactEmailService
+  ) {}
 
   ngOnInit() {
     this.currentUser = this.dataService.getCurrentUser();
     this.loadUserStats();
     this.loadRecentOrders();
     this.loadRecentActivity();
+    this.initializeContactForm();
   }
 
   loadUserStats() {
@@ -150,5 +166,91 @@ export class AccountComponent implements OnInit {
     this.dataService.logout();
     // Immediately redirect to splash and force reload to bypass auth checks
     window.location.href = '/';
+  }
+
+  // Contact form methods
+  initializeContactForm() {
+    if (this.currentUser) {
+      this.contactForm.email = this.currentUser.email;
+    }
+  }
+
+  isContactFormValid(): boolean {
+    return !!(
+      this.contactForm.reason &&
+      this.contactForm.subject &&
+      this.contactForm.message &&
+      this.contactForm.email &&
+      this.contactForm.email.includes('@')
+    );
+  }
+
+  async submitContactForm() {
+    if (!this.isContactFormValid()) {
+      this.contactFormStatus = {
+        type: 'error',
+        message: 'Please fill in all required fields correctly.'
+      };
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.contactFormStatus = null;
+
+    try {
+      // Prepare contact form data
+      const contactData: ContactFormData = {
+        reason: this.contactForm.reason,
+        subject: this.contactForm.subject,
+        message: this.contactForm.message,
+        email: this.contactForm.email,
+        userName: this.currentUser?.name,
+        userId: this.currentUser?.id
+      };
+
+      // Store the contact form submission locally
+      const contactSubmission = {
+        id: Date.now().toString(),
+        ...this.contactForm,
+        timestamp: new Date(),
+        userId: this.currentUser?.id || 'anonymous'
+      };
+      
+      // Save to local storage
+      const existingSubmissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+      existingSubmissions.push(contactSubmission);
+      localStorage.setItem('contactSubmissions', JSON.stringify(existingSubmissions));
+
+      // Send email using the email service
+      const emailResponse = await this.contactEmailService.sendContactEmailFallback(contactData);
+
+      if (emailResponse.success) {
+        this.contactFormStatus = {
+          type: 'success',
+          message: emailResponse.message
+        };
+
+        // Reset form
+        this.contactForm = {
+          reason: '',
+          subject: '',
+          message: '',
+          email: this.currentUser?.email || ''
+        };
+      } else {
+        this.contactFormStatus = {
+          type: 'error',
+          message: emailResponse.message
+        };
+      }
+
+    } catch (error) {
+      this.contactFormStatus = {
+        type: 'error',
+        message: 'Failed to send message. Please try again.'
+      };
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 }

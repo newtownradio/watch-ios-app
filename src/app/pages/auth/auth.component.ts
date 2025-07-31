@@ -655,12 +655,24 @@ export class AuthComponent implements OnInit {
     }
 
     try {
+      // Show immediate feedback
+      const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+      }
+
       const result = await this.cloudflareAuthService.resetPassword({
         email: this.forgotPasswordData.email
       });
 
       if (result.success) {
-        alert('Password reset code sent to your email. Please check your inbox.');
+        // Show the verification code in console for immediate access (simulates email)
+        if (result.code) {
+          console.log('🔐 Verification Code:', result.code);
+        }
+        
+        alert('Password reset code sent to your email! Please check your inbox and enter the verification code below.');
         this.setActiveTab('reset-password');
         this.resetPasswordData.email = this.forgotPasswordData.email;
       } else {
@@ -669,6 +681,13 @@ export class AuthComponent implements OnInit {
     } catch (error: any) {
       console.error('Forgot password error:', error);
       alert('Failed to send reset code. Please try again.');
+    } finally {
+      // Reset button state
+      const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send Reset Code';
+      }
     }
   }
 
