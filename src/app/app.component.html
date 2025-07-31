@@ -1,4 +1,51 @@
 <div class="app-container">
+  <!-- Header -->
+  <header class="header" *ngIf="!isSplashPage()">
+    <div class="header-content">
+      <a routerLink="/discovery" class="logo" *ngIf="!isAuthPage()">
+        <div class="logo-circle">
+          <span>w</span>
+        </div>
+      </a>
+      <button class="hamburger-btn" (click)="toggleMenu()" type="button" *ngIf="!isAuthPage()">
+        <div class="hamburger-lines">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <!-- Menu -->
+  <div class="menu" [class.open]="isMenuOpen">
+    <!-- Close Button -->
+    <button class="menu-close-btn" (click)="closeMenu()" type="button" aria-label="Close menu">
+      <span>×</span>
+    </button>
+    
+    <nav class="menu-links">
+      <a routerLink="/discovery" (click)="onMenuLinkClick()" class="menu-link">
+        <span class="menu-text">Discovery</span>
+      </a>
+      
+      <a routerLink="/sell" (click)="onMenuLinkClick()" class="menu-link">
+        <span class="menu-text">Sell</span>
+      </a>
+      
+      <a routerLink="/messages" (click)="onMenuLinkClick()" class="menu-link">
+        <span class="menu-text">Messages</span>
+      </a>
+      
+      <a routerLink="/account" (click)="onMenuLinkClick()" class="menu-link">
+        <span class="menu-text">Account</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" [class.open]="isMenuOpen" (click)="onOverlayClick()" tabindex="0" role="button" aria-label="Close menu"></div>
+
   <!-- Main Content -->
   <main class="main-content">
     <router-outlet></router-outlet>

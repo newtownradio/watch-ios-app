@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 import { NetworkStatusService } from './services/network-status.service';
 import { DebugService } from './services/debug.service';
 
@@ -16,6 +16,10 @@ export class AppComponent implements OnInit {
 
   private networkStatusService = inject(NetworkStatusService);
   private debugService = inject(DebugService);
+  private router = inject(Router);
+
+  // Navigation state
+  isMenuOpen = false;
 
   ngOnInit() {
     // Test network connectivity on app start
@@ -30,5 +34,30 @@ export class AppComponent implements OnInit {
 
     // Log system information
     this.debugService.getSystemInfo();
+  }
+
+  // Navigation methods
+  isSplashPage(): boolean {
+    return this.router.url === '/' || this.router.url === '';
+  }
+
+  isAuthPage(): boolean {
+    return this.router.url.includes('/auth');
+  }
+
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen = false;
+  }
+
+  onMenuLinkClick(): void {
+    this.closeMenu();
+  }
+
+  onOverlayClick(): void {
+    this.closeMenu();
   }
 }
