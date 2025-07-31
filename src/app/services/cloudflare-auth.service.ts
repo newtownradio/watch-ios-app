@@ -343,4 +343,56 @@ export class CloudflareAuthService {
       return false;
     }
   }
+
+  /**
+   * Create demo account for App Store reviewers
+   */
+  async createDemoAccount(): Promise<CloudflareAuthResponse> {
+    try {
+      const demoEmail = 'demo@watchios.com';
+      const demoPassword = 'Demo123!';
+      const demoName = 'Demo User';
+
+      // Check if demo user already exists
+      const existingUser = this.findUserByEmail(demoEmail);
+      if (existingUser) {
+        return {
+          success: true,
+          message: 'Demo account already exists. You can login with demo@watchios.com / Demo123!',
+          data: existingUser
+        };
+      }
+
+      // Create demo user
+      const demoUser: CloudflareUser = {
+        id: this.generateUserId(),
+        email: demoEmail,
+        name: demoName,
+        idVerified: true, // Pre-verified for demo
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Save demo user locally
+      this.dataService.saveUser(demoUser as User);
+      this.savePasswordLocally(demoEmail, demoPassword);
+
+      console.log('Demo account created successfully:', demoUser.id);
+      return {
+        success: true,
+        message: 'Demo account created! Login with demo@watchios.com / Demo123!',
+        data: demoUser
+      };
+
+    } catch (error: any) {
+      console.error('Demo account creation error:', error);
+      return {
+        success: false,
+        message: 'Failed to create demo account. Please try again.'
+      };
+    }
+  }
 } 

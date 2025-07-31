@@ -11,7 +11,7 @@ export interface PasswordResetData {
 })
 export class EmailService {
   private readonly FROM_EMAIL = 'noreply@watch.style';
-  private readonly APP_NAME = 'Watch iOS';
+  private readonly APP_NAME = 'Watch Style iOS';
   private readonly RESEND_API_KEY = 're_AJ5NGsJ8_BZqPFHVCrSgb27uEvzwfYg7a';
 
     async sendPasswordResetEmail(email: string, code: string): Promise<boolean> {

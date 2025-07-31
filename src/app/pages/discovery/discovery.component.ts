@@ -128,7 +128,7 @@ export class DiscoveryComponent implements OnInit {
     const shareText = `${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
       `Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
       `Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
-      `Check out this watch on Watch iOS!`;
+      `Check out this watch on Watch Style iOS!`;
 
     // Try to use Web Share API first (mobile devices)
     if (navigator.share) {

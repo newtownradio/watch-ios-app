@@ -1,4 +1,4 @@
-// Cloudflare Worker for Watch iOS Authentication
+// Cloudflare Worker for Watch Style iOS Authentication
 // Deploy this to your Cloudflare Workers account
 
 export default {

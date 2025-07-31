@@ -39,93 +39,22 @@
       <button type="submit" class="submit-btn">Login</button>
     </form>
     
-    <!-- Test Login Button -->
-    <div class="test-login-section">
-      <p class="test-login-info">For testing purposes:</p>
-      <button 
-        type="button" 
-        class="test-login-btn"
-        (click)="testLogin()">
-        Test Login (Bypass Firebase)
-      </button>
-      <p class="test-login-details">
-        This logs you in directly without Firebase authentication
-      </p>
-    </div>
-    
-    <!-- Debug Cloudflare Button -->
-    <div class="debug-section">
-      <p class="debug-info">For debugging Cloudflare:</p>
-      <button 
-        type="button" 
-        class="debug-btn"
-        (click)="debugCloudflareState()">
-        Debug Cloudflare State
-      </button>
-      <p class="debug-details">
-        Check Cloudflare connection and user existence
-      </p>
-    </div>
-    
-    <!-- Verify Credentials Button -->
-    <div class="verify-section">
-      <p class="verify-info">Verify Cloudflare credentials:</p>
-      <button 
-        type="button" 
-        class="verify-btn"
-        (click)="verifyCloudflareCredentials()">
-        Verify Test User Credentials
-      </button>
-      <p class="verify-details">
-        Check if test@passwordreset.com exists and test login
-      </p>
-    </div>
-    
-    <!-- Cloudflare Status Button -->
-    <div class="status-section">
-      <p class="status-info">Check Cloudflare initialization:</p>
-      <button 
-        type="button" 
-        class="status-btn"
-        (click)="checkCloudflareStatus()">
-        Check Cloudflare Status
-      </button>
-      <p class="status-details">
-        Diagnose Cloudflare connectivity issues
-      </p>
-    </div>
-    
-    <!-- Full Diagnostic Button -->
-    <div class="diagnostic-section">
-      <p class="diagnostic-info">Test all components:</p>
-      <button 
-        type="button" 
-        class="diagnostic-btn"
-        (click)="runFullDiagnostic()">
-        Run Full Diagnostic
-      </button>
-      <p class="diagnostic-details">
-        Test Cloudflare, Data, Email, Network, and Storage
-      </p>
-    </div>
-    
-    <!-- Cloudflare Test Button -->
-    <div class="cloudflare-section">
-      <p class="cloudflare-info">Test Cloudflare connectivity:</p>
-      <button 
-        type="button" 
-        class="cloudflare-btn"
-        (click)="testCloudflareConnectivity()">
-        Test Cloudflare
-      </button>
-      <p class="cloudflare-details">
-        Check if Cloudflare is blocking Firebase requests
-      </p>
-    </div>
-    
     <p class="forgot-password">
       <a (click)="setActiveTab('forgot')">Forgot Password?</a>
     </p>
+    
+    <!-- Demo Account for App Store Reviewers -->
+    <div class="demo-account-section">
+      <p class="demo-label">For App Store Reviewers:</p>
+      <button type="button" class="demo-btn" (click)="createDemoAccount()">
+        Create Demo Account
+      </button>
+      <p class="demo-credentials">
+        <strong>Demo Login:</strong><br>
+        Email: demo@watchios.com<br>
+        Password: Demo123!
+      </p>
+    </div>
   </div>
 
   <!-- Register Form -->
@@ -222,20 +151,6 @@
       </div>
       <button type="submit" class="submit-btn">Send Reset Code</button>
     </form>
-    
-    <!-- Test User Creation -->
-    <div class="test-user-section">
-      <p class="test-user-info">For testing purposes:</p>
-      <button 
-        type="button" 
-        class="test-btn"
-        (click)="createTestUserForPasswordReset()">
-        Create Test User
-      </button>
-      <p class="test-user-details">
-        This creates a test user with email: <strong>test@passwordreset.com</strong>
-      </p>
-    </div>
     
     <p class="back-to-login">
       <a (click)="setActiveTab('login')">Back to Login</a>

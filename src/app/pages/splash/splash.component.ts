@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
           <div class="logo">
             <h1>Watch</h1>
           </div>
-          <p class="hero-subtitle">The trusted marketplace for luxury timepieces</p>
+          <p class="hero-subtitle">The trusted marketplace for Pre-Owned Luxury Timepieces</p>
           <p class="hero-description">
             Buy and sell authentic watches with AI-powered pricing, secure verification, and trusted shipping.
           </p>
@@ -31,7 +31,7 @@ import { Router } from '@angular/router';
 
       <!-- How It Works Section -->
       <div class="how-it-works" id="how-it-works">
-        <h2>How Watch iOS Works</h2>
+                  <h2>How Watch Style iOS Works</h2>
         
         <!-- For Sellers -->
         <div class="process-section">
