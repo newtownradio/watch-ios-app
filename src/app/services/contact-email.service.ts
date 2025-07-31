@@ -63,18 +63,6 @@ export class ContactEmailService {
     // Simulate email sending for development
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    console.log('Contact form submission (development mode):', {
-      to: '[CONFIGURE_RECIPIENT_EMAIL]',
-      from: formData.email,
-      subject: `[${formData.reason.toUpperCase()}] ${formData.subject}`,
-      message: formData.message,
-      userInfo: {
-        name: formData.userName || 'Anonymous',
-        email: formData.email,
-        userId: formData.userId || 'anonymous'
-      }
-    });
-
     return {
       success: true,
       message: 'Your message has been sent successfully. We will get back to you within 24 hours.'

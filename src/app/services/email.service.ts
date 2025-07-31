@@ -17,9 +17,6 @@ export class EmailService {
 
   async sendPasswordResetEmail(email: string, code: string): Promise<boolean> {
     try {
-      console.log('📧 Attempting to send password reset email to:', email);
-      console.log('🔑 Verification code:', code);
-      
       const response = await fetch(`${this.WORKER_URL}/send-password-reset`, {
         method: 'POST',
         headers: {
@@ -30,32 +27,16 @@ export class EmailService {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Email sent successfully via Cloudflare Worker:', result);
         return true;
       } else {
         const error = await response.text();
-        console.error('❌ Failed to send email via Cloudflare Worker:', error);
         
         // Fallback to development mode
-        console.log('📧 Development mode: Simulating email success');
-        console.log('📧 Email would be sent to:', email);
-        console.log('📧 From:', this.FROM_EMAIL);
-        console.log('📧 Subject: Password Reset - Watch Style iOS');
-        console.log('📧 Verification Code:', code);
-        
         return true; // Return true for development to allow the flow to continue
       }
       
     } catch (error: any) {
-      console.error('❌ Failed to send password reset email:', error);
-      
       // Development fallback - log code to console
-      console.log('📧 Development mode: Simulating email success');
-      console.log('📧 Email would be sent to:', email);
-      console.log('📧 From:', this.FROM_EMAIL);
-      console.log('📧 Subject: Password Reset - Watch Style iOS');
-      console.log('📧 Verification Code:', code);
-      
       return true; // Return true for development to allow the flow to continue
     }
   }
