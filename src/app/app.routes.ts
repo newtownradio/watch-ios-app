@@ -5,6 +5,7 @@ import { AccountComponent } from './pages/account/account.component';
 import { SplashComponent } from './pages/splash/splash.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { MessagesComponent } from './pages/messages/messages.component';
+import { NotificationsComponent } from './pages/notifications/notifications.component';
 
 export const routes: Routes = [
   { path: '', component: SplashComponent },
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'sell', component: SellComponent },
   { path: 'account', component: AccountComponent },
   { path: 'messages', component: MessagesComponent },
+  { path: 'notifications', component: NotificationsComponent },
   { path: '**', redirectTo: '' }
 ];
