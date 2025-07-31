@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { DataPersistenceService } from './services/data-persistence.service';
 
+import { DebugService } from './services/debug.service';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -19,10 +21,20 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(
     private router: Router,
     private dataService: DataPersistenceService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private debugService: DebugService
   ) {}
 
   ngOnInit() {
+    this.debugService.log('App component initialized');
+    this.debugService.logSystemInfo();
+    this.debugService.testStorage();
+    
+    // Test Firebase connectivity on app start
+    this.debugService.testFirebaseConnectivity().then(isConnected => {
+      this.debugService.log('Firebase connectivity test result', { isConnected });
+    });
+    
     this.checkAuthentication();
   }
 

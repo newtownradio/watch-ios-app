@@ -1,69 +1,16 @@
-export interface Bid {
-  id: string;
-  itemId: string;
-  bidderId: string;
-  bidderName: string;
-  amount: number;
-  timestamp: Date;
-  status: 'pending' | 'accepted' | 'declined' | 'counteroffered' | 'counteroffer_accepted' | 'counteroffer_rejected';
-  isCounteroffer?: boolean;
-  originalBidId?: string; // Reference to original bid if this is a counteroffer
-}
-
-export interface Counteroffer {
-  id: string;
-  originalBidId: string;
-  sellerId: string;
-  sellerName: string;
-  amount: number;
-  timestamp: Date;
-  status: 'pending' | 'accepted' | 'rejected';
-  message?: string; // Optional message from seller
-}
-
-export interface Listing {
-  id: string;
-  sellerId: string;
-  sellerName: string;
-  title: string;
-  description: string;
-  brand?: string; // Brand of the watch
-  model?: string; // Model of the watch
-  year?: number; // Year of manufacture
-  condition?: 'excellent' | 'very-good' | 'good' | 'fair'; // Condition of the watch
-  startingPrice: number;
-  currentPrice: number;
-  imageUrl: string;
-  createdAt: Date;
-  endTime: Date; // 48 hours from creation
-  status: 'active' | 'expired' | 'sold' | 'scheduled';
-  bids: Bid[];
-  highestBid?: Bid;
-  counteroffers: Counteroffer[];
-  hasMadeCounteroffer: boolean; // Track if seller has already made a counteroffer
-}
-
-export interface SaleWindow {
-  listingId: string;
-  startTime: Date;
-  endTime: Date;
-  duration: number; // in hours
-  remainingTime: number; // in milliseconds
-}
-
-// New interfaces for enhanced transaction flow
 export interface User {
   id: string;
   name: string;
   email: string;
-  password: string; // Added for authentication
-  idVerified: boolean;
-  disclaimerSigned: boolean;
-  policySigned: boolean;
-  termsSigned?: boolean; // Added for terms agreement
-  governmentIdUrl?: string; // Added for government ID upload
+  password?: string;
+  idVerified?: boolean;
+  disclaimerSigned?: boolean;
+  policySigned?: boolean;
+  termsSigned?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  governmentIdUrl?: string;
   verificationDate?: Date;
-  createdAt?: Date; // Added for user creation tracking
 }
 
 export interface Message {
@@ -75,9 +22,7 @@ export interface Message {
   content: string;
   timestamp: Date;
   isRead: boolean;
-  type: 'bid' | 'counteroffer' | 'general' | 'system';
-  relatedListingId?: string;
-  relatedBidId?: string;
+  type?: string;
 }
 
 export interface Notification {
@@ -85,77 +30,81 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
-  type: 'bid' | 'counteroffer' | 'message' | 'system' | 'listing';
-  isRead: boolean;
   timestamp: Date;
-  actionUrl?: string;
+  isRead: boolean;
+  type: 'message' | 'system' | 'alert' | 'bid' | 'counteroffer' | 'listing';
   relatedListingId?: string;
   relatedBidId?: string;
-  relatedMessageId?: string;
+}
+
+export interface Bid {
+  id: string;
+  itemId: string;
+  bidderId: string;
+  bidderName: string;
+  amount: number;
+  timestamp: Date;
+  status: 'active' | 'won' | 'lost' | 'pending' | 'accepted' | 'declined' | 'counteroffered';
+}
+
+export interface Listing {
+  id: string;
+  sellerId: string;
+  sellerName: string;
+  title: string;
+  description: string;
+  price?: number;
+  startingPrice: number;
+  currentPrice: number;
+  brand?: string;
+  model?: string;
+  year?: number;
+  condition?: string;
+  originalPrice?: number;
+  images?: string[];
+  imageUrl?: string;
+  status: 'active' | 'sold' | 'expired' | 'scheduled';
+  createdAt: Date;
+  endTime: Date;
+  hasMadeCounteroffer?: boolean;
+  bids: Bid[];
+  counteroffers: Counteroffer[];
+  highestBid?: Bid;
+  governmentIdUrl?: string;
+}
+
+export interface Counteroffer {
+  id: string;
+  listingId: string;
+  bidId: string;
+  sellerId: string;
+  sellerName: string;
+  buyerId: string;
+  buyerName: string;
+  originalAmount: number;
+  counterAmount: number;
+  amount: number;
+  message?: string;
+  originalBidId?: string;
+  timestamp: Date;
+  status: 'pending' | 'accepted' | 'rejected';
 }
 
 export interface Watch {
   id: string;
-  title: string;
   brand: string;
   model: string;
-  year?: number;
-  condition: 'excellent' | 'very-good' | 'good' | 'fair';
-  description: string;
-  sellerId: string;
+  year: number;
+  condition: string;
+  price: number;
   askingPrice: number;
+  title: string;
   images: string[];
-  verificationStatus: 'pending' | 'verified' | 'failed';
-  verificationDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Offer {
-  id: string;
-  watchId: string;
-  buyerId: string;
-  sellerId: string;
-  amount: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'countered' | 'expired';
-  createdAt: Date;
-  expiresAt: Date;
-  message?: string;
-}
-
-export interface Transaction {
-  id: string;
-  watchId: string;
-  buyerId: string;
-  sellerId: string;
-  finalPrice: number;
-  shippingCost: number;
-  verificationCost: number;
-  commissionFee: number;
-  insuranceCost: number;
-  totalAmount: number;
-  status: 'pending' | 'shipped-to-verifier' | 'verifying' | 'shipped-to-buyer' | 'completed' | 'disputed' | 'cancelled';
-  verificationPartner: string;
-  trackingNumber?: string;
-  verificationDate?: Date;
-  buyerConfirmationDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface PricingBreakdown {
-  itemPrice: number;
-  shippingCost: number;
-  verificationCost: number;
-  commissionFee: number;
-  insuranceCost: number;
-  totalAmount: number;
-}
-
-export interface VerificationPartner {
-  id: string;
-  name: string;
-  cost: number;
-  turnaroundTime: string;
   description: string;
+  sellerId: string;
+  sellerName: string;
+  status: 'available' | 'sold' | 'reserved';
+  verificationStatus?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

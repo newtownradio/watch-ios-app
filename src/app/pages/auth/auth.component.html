@@ -1,0 +1,291 @@
+<div class="auth-container">
+  <div class="auth-tabs">
+    <button 
+      [class.active]="activeTab === 'login'" 
+      (click)="setActiveTab('login')"
+      class="tab-button">
+      Login
+    </button>
+    <button 
+      [class.active]="activeTab === 'register'" 
+      (click)="setActiveTab('register')"
+      class="tab-button">
+      Register
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <div *ngIf="activeTab === 'login'" class="auth-form">
+    <h2>Login</h2>
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input 
+          type="email" 
+          id="loginEmail"
+          [(ngModel)]="loginData.email" 
+          name="loginEmail"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <input 
+          type="password" 
+          id="loginPassword"
+          [(ngModel)]="loginData.password" 
+          name="loginPassword"
+          required>
+      </div>
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
+    
+    <!-- Test Login Button -->
+    <div class="test-login-section">
+      <p class="test-login-info">For testing purposes:</p>
+      <button 
+        type="button" 
+        class="test-login-btn"
+        (click)="testLogin()">
+        Test Login (Bypass Firebase)
+      </button>
+      <p class="test-login-details">
+        This logs you in directly without Firebase authentication
+      </p>
+    </div>
+    
+    <!-- Debug Cloudflare Button -->
+    <div class="debug-section">
+      <p class="debug-info">For debugging Cloudflare:</p>
+      <button 
+        type="button" 
+        class="debug-btn"
+        (click)="debugCloudflareState()">
+        Debug Cloudflare State
+      </button>
+      <p class="debug-details">
+        Check Cloudflare connection and user existence
+      </p>
+    </div>
+    
+    <!-- Verify Credentials Button -->
+    <div class="verify-section">
+      <p class="verify-info">Verify Cloudflare credentials:</p>
+      <button 
+        type="button" 
+        class="verify-btn"
+        (click)="verifyCloudflareCredentials()">
+        Verify Test User Credentials
+      </button>
+      <p class="verify-details">
+        Check if test@passwordreset.com exists and test login
+      </p>
+    </div>
+    
+    <!-- Cloudflare Status Button -->
+    <div class="status-section">
+      <p class="status-info">Check Cloudflare initialization:</p>
+      <button 
+        type="button" 
+        class="status-btn"
+        (click)="checkCloudflareStatus()">
+        Check Cloudflare Status
+      </button>
+      <p class="status-details">
+        Diagnose Cloudflare connectivity issues
+      </p>
+    </div>
+    
+    <!-- Full Diagnostic Button -->
+    <div class="diagnostic-section">
+      <p class="diagnostic-info">Test all components:</p>
+      <button 
+        type="button" 
+        class="diagnostic-btn"
+        (click)="runFullDiagnostic()">
+        Run Full Diagnostic
+      </button>
+      <p class="diagnostic-details">
+        Test Cloudflare, Data, Email, Network, and Storage
+      </p>
+    </div>
+    
+    <!-- Cloudflare Test Button -->
+    <div class="cloudflare-section">
+      <p class="cloudflare-info">Test Cloudflare connectivity:</p>
+      <button 
+        type="button" 
+        class="cloudflare-btn"
+        (click)="testCloudflareConnectivity()">
+        Test Cloudflare
+      </button>
+      <p class="cloudflare-details">
+        Check if Cloudflare is blocking Firebase requests
+      </p>
+    </div>
+    
+    <p class="forgot-password">
+      <a (click)="setActiveTab('forgot')">Forgot Password?</a>
+    </p>
+  </div>
+
+  <!-- Register Form -->
+  <div *ngIf="activeTab === 'register'" class="auth-form">
+    <h2>Register</h2>
+    <form (ngSubmit)="register()">
+      <div class="form-group">
+        <label for="registerName">Name</label>
+        <input 
+          type="text" 
+          id="registerName"
+          [(ngModel)]="registerData.name" 
+          name="registerName"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="registerEmail">Email</label>
+        <input 
+          type="email" 
+          id="registerEmail"
+          [(ngModel)]="registerData.email" 
+          name="registerEmail"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="registerPassword">Password</label>
+        <input 
+          type="password" 
+          id="registerPassword"
+          [(ngModel)]="registerData.password" 
+          name="registerPassword"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input 
+          type="password" 
+          id="confirmPassword"
+          [(ngModel)]="registerData.confirmPassword" 
+          name="confirmPassword"
+          required>
+      </div>
+      
+      <!-- Policy Agreements -->
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="registerData.privacyPolicy" 
+            name="privacyPolicy"
+            required>
+          I agree to the <a href="#" (click)="showPrivacyPolicy($event)">Privacy Policy</a>
+        </label>
+      </div>
+      
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="registerData.cookiePolicy" 
+            name="cookiePolicy"
+            required>
+          I agree to the <a href="#" (click)="showCookiePolicy($event)">Cookie Policy</a>
+        </label>
+      </div>
+      
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="registerData.termsConditions" 
+            name="termsConditions"
+            required>
+          I agree to the <a href="#" (click)="showTermsConditions($event)">Terms & Conditions</a>
+        </label>
+      </div>
+      
+      <button type="submit" class="submit-btn" [disabled]="!isRegistrationValid()">Register</button>
+    </form>
+  </div>
+
+  <!-- Forgot Password Form -->
+  <div *ngIf="activeTab === 'forgot'" class="auth-form">
+    <h2>Forgot Password</h2>
+    <form (ngSubmit)="forgotPassword()">
+      <div class="form-group">
+        <label for="forgotEmail">Email</label>
+        <input 
+          type="email" 
+          id="forgotEmail"
+          [(ngModel)]="forgotPasswordData.email" 
+          name="forgotEmail"
+          required>
+      </div>
+      <button type="submit" class="submit-btn">Send Reset Code</button>
+    </form>
+    
+    <!-- Test User Creation -->
+    <div class="test-user-section">
+      <p class="test-user-info">For testing purposes:</p>
+      <button 
+        type="button" 
+        class="test-btn"
+        (click)="createTestUserForPasswordReset()">
+        Create Test User
+      </button>
+      <p class="test-user-details">
+        This creates a test user with email: <strong>test@passwordreset.com</strong>
+      </p>
+    </div>
+    
+    <p class="back-to-login">
+      <a (click)="setActiveTab('login')">Back to Login</a>
+    </p>
+  </div>
+
+  <!-- Reset Password Form -->
+  <div *ngIf="activeTab === 'reset'" class="auth-form">
+    <h2>Reset Password</h2>
+    <form (ngSubmit)="resetPassword()">
+      <div class="form-group">
+        <label for="resetEmail">Email</label>
+        <input 
+          type="email" 
+          id="resetEmail"
+          [(ngModel)]="resetPasswordData.email" 
+          name="resetEmail"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="resetCode">Verification Code</label>
+        <input 
+          type="text" 
+          id="resetCode"
+          [(ngModel)]="resetPasswordData.code" 
+          name="resetCode"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="resetPassword">New Password</label>
+        <input 
+          type="password" 
+          id="resetPassword"
+          [(ngModel)]="resetPasswordData.password" 
+          name="resetPassword"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="resetConfirmPassword">Confirm New Password</label>
+        <input 
+          type="password" 
+          id="resetConfirmPassword"
+          [(ngModel)]="resetPasswordData.confirmPassword" 
+          name="resetConfirmPassword"
+          required>
+      </div>
+      <button type="submit" class="submit-btn">Reset Password</button>
+    </form>
+    <p class="back-to-login">
+      <a (click)="setActiveTab('login')">Back to Login</a>
+    </p>
+  </div>
+</div>

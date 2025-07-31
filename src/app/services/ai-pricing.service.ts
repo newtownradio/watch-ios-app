@@ -236,7 +236,6 @@ export class AiPricingService {
    * Get available brands for pricing analysis
    */
   getAvailableBrands(): string[] {
-    console.log('=== getAvailableBrands called ===');
     const brands = new Set<string>();
     
     // Get brands from market data
@@ -254,7 +253,6 @@ export class AiPricingService {
     additionalBrands.forEach(brand => brands.add(brand));
     
     const result = Array.from(brands).sort();
-    console.log('Returning brands:', result);
     return result;
   }
 

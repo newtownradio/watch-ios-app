@@ -632,7 +632,7 @@ export class DataPersistenceService {
   createTestUsers(): void {
     // Check if test users already exist
     const existingUsers = this.getAllUsers();
-    const testEmails = ['test@example.com', 'user1@example.com', 'user2@example.com', 'alex.chen@test.com', 'sarah.m@test.com', 'm.rodriguez@test.com', 'e.thompson@test.com'];
+    const testEmails = ['test@example.com', 'user1@example.com', 'user2@example.com', 'alex.chen@test.com', 'sarah.m@test.com', 'm.rodriguez@test.com', 'e.thompson@test.com', 'colin.ilgen@gmail.com'];
     
     // Only create test users if none of the test emails exist
     const hasTestUsers = testEmails.some(email => existingUsers.some(user => user.email === email));
@@ -717,6 +717,17 @@ export class DataPersistenceService {
         policySigned: true,
         termsSigned: true,
         createdAt: new Date('2024-01-30')
+      },
+      {
+        id: 'test-user-colin',
+        name: 'Colin Ilgen',
+        email: 'colin.ilgen@gmail.com',
+        password: 'TestPass123!',
+        idVerified: false,
+        disclaimerSigned: true,
+        policySigned: true,
+        termsSigned: true,
+        createdAt: new Date('2024-01-15')
       }
     ];
 
@@ -769,6 +780,34 @@ Test Credentials for Development:
 
 Note: These are test accounts for development purposes only.
     `;
+  }
+
+  /**
+   * Create a test user for password reset testing
+   */
+  createTestUserForPasswordReset(): void {
+    const testUser: User = {
+      id: 'test-user-password-reset',
+      email: 'test@passwordreset.com',
+      name: 'Test User',
+      idVerified: false,
+      disclaimerSigned: true,
+      policySigned: true,
+      termsSigned: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    // Save the test user
+    this.saveUser(testUser);
+    
+    console.log('Test user created for password reset testing:');
+    console.log('Email: test@passwordreset.com');
+    console.log('Password: testpassword123');
+    console.log('User ID:', testUser.id);
+    
+    // Also create a Firebase account with known credentials
+    // This will be handled by the auth component
   }
 
   // ===== MESSAGING METHODS =====
@@ -1024,8 +1063,15 @@ Note: These are test accounts for development purposes only.
     try {
       const resets = this.getPasswordResets();
       const reset = resets[email];
-      if (reset && new Date() < new Date(reset.expiresAt)) {
-        return reset;
+      if (reset) {
+        // Convert expiresAt string back to Date object
+        const expiresAt = new Date(reset.expiresAt);
+        if (new Date() < expiresAt) {
+          return {
+            code: reset.code,
+            expiresAt: expiresAt
+          };
+        }
       }
       return null;
     } catch (error) {

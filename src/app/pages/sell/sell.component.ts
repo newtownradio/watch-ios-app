@@ -51,18 +51,13 @@ export class SellComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log('=== ngOnInit ===');
-    console.log('aiPricingService exists:', !!this.aiPricingService);
     this.loadActiveListings();
     this.loadAvailableBrands();
   }
 
   loadAvailableBrands() {
-    console.log('=== loadAvailableBrands ===');
     try {
       this.availableBrands = this.aiPricingService.getAvailableBrands();
-      console.log('Brands loaded:', this.availableBrands);
-      console.log('Brand count:', this.availableBrands.length);
     } catch (error) {
       console.error('Error loading brands:', error);
     }
@@ -189,6 +184,7 @@ export class SellComponent implements OnInit {
       sellerName: 'John Seller',
       title: this.form.title.trim(),
       description: this.form.description || '',
+      price: this.form.startingPrice,
       brand: this.form.brand || undefined,
       model: this.form.model || undefined,
       year: this.form.year,
@@ -196,6 +192,7 @@ export class SellComponent implements OnInit {
       startingPrice: this.form.startingPrice,
       currentPrice: this.form.startingPrice,
       imageUrl: this.form.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==',
+      images: [],
       createdAt: startTime,
       endTime: endTime,
       status: this.form.scheduleType === 'scheduled' ? 'scheduled' : 'active',
@@ -279,9 +276,11 @@ export class SellComponent implements OnInit {
         sellerName: 'John Seller',
         title: 'Rolex Submariner',
         description: 'Classic dive watch in excellent condition',
+        price: 8500,
         startingPrice: 8500,
         currentPrice: 9000,
         imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==',
+        images: [],
         createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
         endTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
         status: 'active',
@@ -415,10 +414,16 @@ export class SellComponent implements OnInit {
       if (listing) {
         const counteroffer: Counteroffer = {
           id: Date.now().toString(),
-          originalBidId: this.selectedBidForCounteroffer.id,
+          listingId: listing.id,
+          bidId: this.selectedBidForCounteroffer.id,
           sellerId: listing.sellerId,
           sellerName: listing.sellerName,
+          buyerId: this.selectedBidForCounteroffer.bidderId,
+          buyerName: this.selectedBidForCounteroffer.bidderName,
+          originalAmount: this.selectedBidForCounteroffer.amount,
+          counterAmount: this.counterofferForm.amount,
           amount: this.counterofferForm.amount,
+          originalBidId: this.selectedBidForCounteroffer.id,
           timestamp: new Date(),
           status: 'pending',
           message: this.counterofferForm.message
@@ -467,7 +472,7 @@ export class SellComponent implements OnInit {
         text: shareText,
         url: window.location.href
       }).catch((error) => {
-        console.log('Error sharing:', error);
+        console.error('Error sharing:', error);
         this.fallbackShare(shareText);
       });
     } else {

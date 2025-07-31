@@ -127,23 +127,23 @@ export class AccountComponent implements OnInit {
   }
 
   viewOrderDetails(orderId: string) {
-    console.log('View order details:', orderId);
+    // TODO: Implement order details view
   }
 
   uploadGovernmentId() {
-    console.log('Upload government ID');
+    // TODO: Implement government ID upload
   }
 
   viewPrivacyPolicy() {
-    console.log('View privacy policy');
+    // TODO: Implement privacy policy view
   }
 
   viewCookiePolicy() {
-    console.log('View cookie policy');
+    // TODO: Implement cookie policy view
   }
 
   viewTermsConditions() {
-    console.log('View terms and conditions');
+    // TODO: Implement terms and conditions view
   }
 
   logout() {
