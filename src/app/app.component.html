@@ -3,8 +3,14 @@
   <header class="header" *ngIf="!isSplashPage()">
     <div class="header-content">
       <a routerLink="/discovery" class="logo" *ngIf="!isAuthPage()">
-        <div class="logo-circle">
-          <span>w</span>
+        <div class="logo-container">
+          <div class="watch-logo">
+            <div class="watch-face">
+              <div class="watch-hands"></div>
+              <div class="watch-markers"></div>
+            </div>
+            <div class="watch-strap"></div>
+          </div>
         </div>
       </a>
       <button class="hamburger-btn" (click)="toggleMenu()" type="button" *ngIf="!isAuthPage()">
