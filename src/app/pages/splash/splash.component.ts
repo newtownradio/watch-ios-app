@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -12,11 +12,14 @@ import { Router } from '@angular/router';
       <div class="hero-section">
         <div class="hero-content">
           <div class="logo">
-            <h1>Watch</h1>
+            <div class="logo-text">WATCH</div>
           </div>
           <p class="hero-subtitle">The trusted marketplace for Pre-Owned Luxury Timepieces</p>
           <p class="hero-description">
             Buy and sell authentic watches with AI-powered pricing, secure verification, and trusted shipping.
+          </p>
+          <p class="disclaimer">
+            We are a used watch company and do not represent the brands.
           </p>
           <div class="cta-buttons">
             <button class="cta-btn primary" (click)="navigateToAuth()">
@@ -182,20 +185,31 @@ import { Router } from '@angular/router';
       display: flex;
       align-items: center;
       justify-content: center; /* Center the logo */
-      margin-bottom: 16px; /* Reduced margin */
+      margin-bottom: 20px; /* Reduced margin */
 
-      h1 {
-        font-size: 36px; /* Slightly larger */
+      .logo-text {
+        font-size: 48px;
         font-weight: 700;
-        margin: 0;
-        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-style: italic;
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 
+          2px 2px 4px rgba(0, 0, 0, 0.3),
+          1px 1px 2px rgba(0, 0, 0, 0.2);
+        transform: skew(-5deg);
+        letter-spacing: 2px;
 
         @media (max-width: 768px) {
-          font-size: 32px;
+          font-size: 42px;
+          letter-spacing: 1.5px;
         }
 
         @media (max-width: 480px) {
-          font-size: 28px;
+          font-size: 36px;
+          letter-spacing: 1px;
         }
       }
     }
@@ -218,7 +232,7 @@ import { Router } from '@angular/router';
     .hero-description {
       font-size: 16px;
       line-height: 1.6; /* Improved line height */
-      margin-bottom: 20px; /* Reduced margin */
+      margin-bottom: 12px; /* Reduced margin */
       opacity: 0.8;
       max-width: 500px; /* Limit text width for better readability */
       margin-left: auto;
@@ -232,6 +246,27 @@ import { Router } from '@angular/router';
       @media (max-width: 480px) {
         font-size: 14px;
         line-height: 1.5;
+      }
+    }
+
+    .disclaimer {
+      font-size: 14px;
+      line-height: 1.4;
+      margin-bottom: 20px;
+      opacity: 0.7;
+      font-style: italic;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+
+      @media (max-width: 768px) {
+        font-size: 13px;
+        max-width: 100%;
+      }
+
+      @media (max-width: 480px) {
+        font-size: 12px;
+        line-height: 1.3;
       }
     }
 
@@ -614,7 +649,7 @@ import { Router } from '@angular/router';
   `]
 })
 export class SplashComponent {
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   navigateToAuth() {
     this.router.navigate(['/auth'], { queryParams: { tab: 'signup' } });
