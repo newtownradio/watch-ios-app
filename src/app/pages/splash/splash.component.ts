@@ -52,15 +52,15 @@ import { Router } from '@angular/router';
             <div class="step">
               <div class="step-number">3</div>
               <div class="step-content">
-                <h4>Secure Transaction</h4>
-                <p>When sold, we handle verification, shipping, and payment. You receive funds after delivery.</p>
+                <h4>Verification Process</h4>
+                <p>The order is sent for verification from our trusted 3rd party verification service.</p>
               </div>
             </div>
             <div class="step">
               <div class="step-number">4</div>
               <div class="step-content">
-                <h4>Verification Process</h4>
-                <p>The order is sent for verification from our trusted 3rd party verification service.</p>
+                <h4>Secure Transaction</h4>
+                <p>When sold, we handle verification, shipping, and payment. You receive funds after delivery.</p>
               </div>
             </div>
           </div>
@@ -87,15 +87,15 @@ import { Router } from '@angular/router';
             <div class="step">
               <div class="step-number">3</div>
               <div class="step-content">
-                <h4>Verified Delivery</h4>
-                <p>Watches are verified by experts, shipped securely, and delivered to your door with full insurance.</p>
+                <h4>Verification Process</h4>
+                <p>The order is sent for verification from our trusted 3rd party verification service.</p>
               </div>
             </div>
             <div class="step">
               <div class="step-number">4</div>
               <div class="step-content">
-                <h4>Verification Process</h4>
-                <p>The order is sent for verification from our trusted 3rd party verification service.</p>
+                <h4>Verified Delivery</h4>
+                <p>Watches are verified by experts, shipped securely, and delivered to your door with full insurance.</p>
               </div>
             </div>
           </div>
