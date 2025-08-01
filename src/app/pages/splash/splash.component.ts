@@ -30,7 +30,6 @@ import { Router } from '@angular/router';
       <!-- How It Works Section -->
       <div class="how-it-works" id="how-it-works">
                   <h2>How it works:</h2>
-                  <p class="verification-notice">We authenticate all orders to a 3rd party verifier.</p>
         
         <!-- For Sellers -->
         <div class="process-section">
@@ -55,6 +54,13 @@ import { Router } from '@angular/router';
               <div class="step-content">
                 <h4>Secure Transaction</h4>
                 <p>When sold, we handle verification, shipping, and payment. You receive funds after delivery.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h4>Verification Process</h4>
+                <p>The order is sent for verification from our trusted 3rd party verification service.</p>
               </div>
             </div>
           </div>
@@ -83,6 +89,13 @@ import { Router } from '@angular/router';
               <div class="step-content">
                 <h4>Verified Delivery</h4>
                 <p>Watches are verified by experts, shipped securely, and delivered to your door with full insurance.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h4>Verification Process</h4>
+                <p>The order is sent for verification from our trusted 3rd party verification service.</p>
               </div>
             </div>
           </div>
