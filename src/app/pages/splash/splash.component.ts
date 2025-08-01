@@ -16,10 +16,7 @@ import { Router } from '@angular/router';
           </div>
 
           <p class="hero-description">
-            Buy and sell authentic watches with AI-powered pricing, secure verification, and trusted shipping.
-          </p>
-          <p class="disclaimer">
-            We are a used watch company and do not represent the brands.
+            Buy and sell used watches with AI-powered pricing, secure verification, and trusted shipping.
           </p>
           <div class="cta-buttons">
             <button class="cta-btn primary" (click)="navigateToAuth()">
@@ -129,6 +126,11 @@ import { Router } from '@angular/router';
           Create Your Account
         </button>
       </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p class="footer-disclaimer">We are a used watch company and do not represent the brands.</p>
+      </div>
     </div>
   `,
   styles: [`
@@ -237,26 +239,7 @@ import { Router } from '@angular/router';
       }
     }
 
-    .disclaimer {
-      font-size: 14px;
-      line-height: 1.4;
-      margin-bottom: 20px;
-      opacity: 0.7;
-      font-style: italic;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
 
-      @media (max-width: 768px) {
-        font-size: 13px;
-        max-width: 100%;
-      }
-
-      @media (max-width: 480px) {
-        font-size: 12px;
-        line-height: 1.3;
-      }
-    }
 
     .cta-buttons {
       display: flex;
@@ -642,6 +625,42 @@ import { Router } from '@angular/router';
 
       .cta-btn {
         border: 2px solid white;
+      }
+    }
+
+    .footer {
+      background: #1e3a8a;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+      @media (max-width: 768px) {
+        padding: 30px 16px;
+      }
+
+      @media (max-width: 480px) {
+        padding: 24px 12px;
+      }
+    }
+
+    .footer-disclaimer {
+      font-size: 14px;
+      line-height: 1.4;
+      opacity: 0.7;
+      font-style: italic;
+      margin: 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+
+      @media (max-width: 768px) {
+        font-size: 13px;
+      }
+
+      @media (max-width: 480px) {
+        font-size: 12px;
+        line-height: 1.3;
       }
     }
   `]
