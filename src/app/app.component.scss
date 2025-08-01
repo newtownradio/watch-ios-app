@@ -214,11 +214,26 @@
 .menu-link {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 24px;
   text-decoration: none;
   color: #374151;
   font-weight: 500;
   font-size: 20px;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &.active {
+    color: #1e3a8a;
+    background-color: rgba(30, 58, 138, 0.05);
+    border-right: 3px solid #1e3a8a;
+  }
+
+  .active-indicator {
+    color: #1e3a8a;
+    font-size: 16px;
+    margin-left: 8px;
+  }
   border-left: 3px solid transparent;
   min-height: 70px;
   transition: all 0.2s ease;

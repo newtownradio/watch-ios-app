@@ -1,25 +1,31 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, Router } from '@angular/router';
+import { RouterOutlet, Router, RouterModule } from '@angular/router';
 import { NetworkStatusService } from './services/network-status.service';
 import { DebugService } from './services/debug.service';
+import { NavigationService, NavigationItem } from './services/navigation.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, RouterModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Watch Style iOS';
 
   private networkStatusService = inject(NetworkStatusService);
   private debugService = inject(DebugService);
   private router = inject(Router);
+  private navigationService = inject(NavigationService);
+  private destroy$ = new Subject<void>();
 
   // Navigation state
   isMenuOpen = false;
+  navigationItems: NavigationItem[] = [];
+  currentRoute = '';
 
   ngOnInit() {
     // Test network connectivity on app start
@@ -34,30 +40,67 @@ export class AppComponent implements OnInit {
 
     // Log system information
     this.debugService.getSystemInfo();
+
+    // Initialize navigation
+    this.initializeNavigation();
   }
 
-  // Navigation methods
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initializeNavigation(): void {
+    // Subscribe to menu state changes
+    this.navigationService.getMenuState()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(isOpen => {
+        this.isMenuOpen = isOpen;
+      });
+
+    // Subscribe to route changes
+    this.navigationService.getCurrentRouteObservable()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(route => {
+        this.currentRoute = route;
+        this.updateNavigationItems();
+      });
+
+    // Get initial navigation items
+    this.updateNavigationItems();
+  }
+
+  private updateNavigationItems(): void {
+    this.navigationItems = this.navigationService.getNavigationItems();
+  }
+
+  // Navigation methods using the service
   isSplashPage(): boolean {
-    return this.router.url === '/' || this.router.url === '';
+    return this.navigationService.isSplashPage();
   }
 
   isAuthPage(): boolean {
-    return this.router.url.includes('/auth');
+    return this.navigationService.isAuthPage();
   }
 
   toggleMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
+    this.navigationService.toggleMenu();
   }
 
   closeMenu(): void {
-    this.isMenuOpen = false;
+    this.navigationService.closeMenu();
   }
 
-  onMenuLinkClick(): void {
-    this.closeMenu();
+  onMenuLinkClick(path: string): void {
+    this.navigationService.navigateToAndCloseMenu(path);
   }
 
   onOverlayClick(): void {
-    this.closeMenu();
+    this.navigationService.closeMenu();
+  }
+
+  // Check if a navigation item is active
+  isNavigationItemActive(item: NavigationItem): boolean {
+    return item.isActive || false;
   }
 }
