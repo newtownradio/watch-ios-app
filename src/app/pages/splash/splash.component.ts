@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
       <div class="hero-section">
         <div class="hero-content">
           <div class="logo">
-            <div class="logo-text">WATCH</div>
+            <img src="assets/images/watch-logo.png" alt="Watch Style Logo" class="logo-image">
           </div>
 
 
@@ -198,32 +198,20 @@ import { Router } from '@angular/router';
     .logo {
       display: flex;
       align-items: center;
-      justify-content: center; /* Center the logo */
-      margin-bottom: 20px; /* Reduced margin */
+      justify-content: center;
+      margin-bottom: 20px;
 
-      .logo-text {
-        font-size: 48px;
-        font-weight: 700;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-style: italic;
-        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: 
-          2px 2px 4px rgba(0, 0, 0, 0.3),
-          1px 1px 2px rgba(0, 0, 0, 0.2);
-        transform: skew(-5deg);
-        letter-spacing: 2px;
+      .logo-image {
+        width: 120px;
+        height: auto;
+        max-width: 100%;
 
         @media (max-width: 768px) {
-          font-size: 42px;
-          letter-spacing: 1.5px;
+          width: 100px;
         }
 
         @media (max-width: 480px) {
-          font-size: 36px;
-          letter-spacing: 1px;
+          width: 80px;
         }
       }
     }
