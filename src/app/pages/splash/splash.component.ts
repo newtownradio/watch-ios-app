@@ -15,9 +15,7 @@ import { Router } from '@angular/router';
             <div class="logo-text">WATCH</div>
           </div>
 
-          <p class="hero-description">
-            Buy and sell used watches with AI-powered pricing, secure verification, and trusted shipping.
-          </p>
+
           <div class="cta-buttons">
             <button class="cta-btn primary" (click)="navigateToAuth()">
               Get Started
@@ -219,25 +217,7 @@ import { Router } from '@angular/router';
 
 
 
-    .hero-description {
-      font-size: 16px;
-      line-height: 1.6; /* Improved line height */
-      margin-bottom: 12px; /* Reduced margin */
-      opacity: 0.8;
-      max-width: 500px; /* Limit text width for better readability */
-      margin-left: auto;
-      margin-right: auto;
 
-      @media (max-width: 768px) {
-        font-size: 15px;
-        max-width: 100%;
-      }
-
-      @media (max-width: 480px) {
-        font-size: 14px;
-        line-height: 1.5;
-      }
-    }
 
 
 
