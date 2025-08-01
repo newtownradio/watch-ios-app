@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
       <div class="hero-section">
         <div class="hero-content">
           <div class="logo">
-            <img src="assets/watch-logo.png" alt="Watch Style Logo" class="logo-image">
+            <div class="logo-text">WATCH</div>
           </div>
 
 
@@ -201,17 +201,24 @@ import { Router } from '@angular/router';
       justify-content: center;
       margin-bottom: 20px;
 
-      .logo-image {
-        width: 120px;
-        height: auto;
-        max-width: 100%;
+      .logo-text {
+        font-size: 48px;
+        font-weight: 700;
+        color: #1e3a8a;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        letter-spacing: 2px;
+        font-style: italic;
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
 
         @media (max-width: 768px) {
-          width: 100px;
+          font-size: 40px;
         }
 
         @media (max-width: 480px) {
-          width: 80px;
+          font-size: 32px;
         }
       }
     }
