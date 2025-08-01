@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
           <div class="logo">
             <div class="logo-text">WATCH</div>
           </div>
-          <p class="hero-subtitle">The trusted marketplace for Pre-Owned Luxury Timepieces</p>
+
           <p class="hero-description">
             Buy and sell authentic watches with AI-powered pricing, secure verification, and trusted shipping.
           </p>
@@ -215,20 +215,7 @@ import { Router } from '@angular/router';
       }
     }
 
-    .hero-subtitle {
-      font-size: 22px; /* Slightly larger */
-      font-weight: 600;
-      margin-bottom: 8px; /* Reduced margin */
-      opacity: 0.9;
 
-      @media (max-width: 768px) {
-        font-size: 20px;
-      }
-
-      @media (max-width: 480px) {
-        font-size: 18px;
-      }
-    }
 
     .hero-description {
       font-size: 16px;
