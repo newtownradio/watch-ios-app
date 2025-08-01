@@ -34,7 +34,8 @@ import { Router } from '@angular/router';
 
       <!-- How It Works Section -->
       <div class="how-it-works" id="how-it-works">
-                  <h2>How Watch Style iOS Works</h2>
+                  <h2>How it works:</h2>
+                  <p class="verification-notice">We authenticate all orders to a 3rd party verifier.</p>
         
         <!-- For Sellers -->
         <div class="process-section">
@@ -367,16 +368,34 @@ import { Router } from '@angular/router';
       h2 {
         font-size: 36px;
         font-weight: 700;
-        margin-bottom: 40px; /* Reduced from 60px */
+        margin-bottom: 20px; /* Reduced for the new notice */
         color: #667eea;
 
         @media (max-width: 768px) {
           font-size: 32px;
-          margin-bottom: 32px;
+          margin-bottom: 16px;
         }
 
         @media (max-width: 480px) {
           font-size: 28px;
+          margin-bottom: 12px;
+        }
+      }
+
+      .verification-notice {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 40px;
+        color: #374151;
+        text-align: center;
+
+        @media (max-width: 768px) {
+          font-size: 16px;
+          margin-bottom: 32px;
+        }
+
+        @media (max-width: 480px) {
+          font-size: 15px;
           margin-bottom: 24px;
         }
       }
