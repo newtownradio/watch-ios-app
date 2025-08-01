@@ -84,28 +84,16 @@ You have the right to:
 
 Our app is not intended for children under 18. We do not knowingly collect personal information from children under 18, as our platform requires government ID verification.
 
-## 9. International Users
-
-If you are using our app from outside the United States, please note that your information may be transferred to, stored, and processed in the United States where our servers are located.
-
-## 10. Changes to This Policy
+## 9. Changes to This Policy
 
 We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app and updating the effective date.
 
-## 11. Contact Us
+## 10. Contact Us
 
 If you have any questions about this Privacy Policy or our data practices, please contact us at:
 - Email: support@watchios.com
 - App Support: Through the in-app support feature
 
-## 12. Consent
+## 11. Consent
 
-By using Watch Style iOS, you consent to the collection and use of information in accordance with this Privacy Policy. If you do not agree with this policy, please do not use our app.
-
-## 13. California Privacy Rights
-
-If you are a California resident, you have additional rights under the California Consumer Privacy Act (CCPA). Please contact us for more information about these rights.
-
-## 14. GDPR Compliance
-
-If you are a resident of the European Union, you have additional rights under the General Data Protection Regulation (GDPR). Please contact us for more information about these rights. 
+By using Watch Style iOS, you consent to the collection and use of information in accordance with this Privacy Policy. If you do not agree with this policy, please do not use our app. 
