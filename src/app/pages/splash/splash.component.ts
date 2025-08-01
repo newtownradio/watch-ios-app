@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
       <div class="hero-section">
         <div class="hero-content">
           <div class="logo">
-            <img src="assets/AppIcon-web.png" alt="Watch Style Logo" class="logo-image">
+            <img src="assets/AppIcon.png" alt="Watch Style Logo" class="logo-image">
           </div>
 
 
