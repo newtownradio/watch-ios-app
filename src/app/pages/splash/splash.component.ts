@@ -11,11 +11,11 @@ import { Router } from '@angular/router';
       <!-- Hero Section -->
       <div class="hero-section">
         <div class="hero-content">
+          <div class="app-subtitle" style="color: #ffb300; font-size: 20px; font-weight: bold;">TRUSTED MARKETPLACE</div>
           <div class="logo">
-            <h2 class="app-subtitle">The Trusted Marketplace</h2>
             <img src="assets/AppIcon.png" alt="Watch Style Logo" class="logo-image">
-            <h3 class="app-tagline">Pre-Owned Luxury Timepieces</h3>
           </div>
+          <h3 class="app-tagline">Pre-Owned Luxury Timepieces</h3>
 
 
           <div class="cta-buttons">
@@ -197,34 +197,34 @@ import { Router } from '@angular/router';
       }
     }
 
+          .app-subtitle {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e3a8a;
+        margin: 0 0 10px 0;
+        text-align: center;
+        display: block;
+
+        @media (max-width: 768px) {
+          font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+          font-size: 12px;
+        }
+      }
+
     .logo {
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 20px;
 
-      .app-subtitle {
-        font-size: 24px;
-        font-weight: 600;
-        color: #1e3a8a;
-        margin: 0 0 16px 0;
-        text-align: center;
-        letter-spacing: 1px;
-
-        @media (max-width: 768px) {
-          font-size: 20px;
-        }
-
-        @media (max-width: 480px) {
-          font-size: 18px;
-        }
-      }
-
       .logo-image {
         width: 120px;
         height: auto;
         max-width: 100%;
-        margin: 0 0 16px 0;
+        margin: 0;
 
         @media (max-width: 768px) {
           width: 100px;
@@ -232,23 +232,6 @@ import { Router } from '@angular/router';
 
         @media (max-width: 480px) {
           width: 80px;
-        }
-      }
-
-      .app-tagline {
-        font-size: 18px;
-        font-weight: 400;
-        color: #6b7280;
-        margin: 0;
-        text-align: center;
-        font-style: italic;
-
-        @media (max-width: 768px) {
-          font-size: 16px;
-        }
-
-        @media (max-width: 480px) {
-          font-size: 14px;
         }
       }
     }
