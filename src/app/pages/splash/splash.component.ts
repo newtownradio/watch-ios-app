@@ -362,6 +362,7 @@ import { Router } from '@angular/router';
         font-weight: 600;
         margin-bottom: 32px;
         color: #374151;
+        text-align: left;
       }
     }
 
