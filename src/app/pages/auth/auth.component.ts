@@ -17,7 +17,7 @@ import { User } from '../../models/bid.interface';
         <!-- Logo and Header -->
         <div class="auth-header">
           <div class="logo">
-            <h1>Watch</h1>
+            <h1>Watch Style</h1>
           </div>
           <p class="auth-subtitle">Join the trusted marketplace for luxury timepieces</p>
           <div class="auth-actions" *ngIf="isAuthenticated()">
