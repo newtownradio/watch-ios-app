@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Listing } from '../../models/bid.interface';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 
@@ -23,9 +24,18 @@ export class DiscoveryComponent implements OnInit {
   listings: Listing[] = [];
   favorites: string[] = [];
 
-  constructor(private dataService: DataPersistenceService) {}
+  constructor(
+    private dataService: DataPersistenceService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    // Check if user is authenticated
+    if (!this.dataService.isAuthenticated()) {
+      this.router.navigate(['/auth']);
+      return;
+    }
+    
     this.loadListings();
     this.loadFavorites();
   }

@@ -12,14 +12,9 @@ import { Router } from '@angular/router';
 export class SplashComponent {
   private router = inject(Router);
 
+  // Both Login and Create Account buttons navigate to auth page
+  // Users must authenticate before accessing any features
   navigateToAuth() {
     this.router.navigate(['/auth']);
-  }
-
-  scrollToHowItWorks() {
-    const element = document.getElementById('how-it-works');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
   }
 }

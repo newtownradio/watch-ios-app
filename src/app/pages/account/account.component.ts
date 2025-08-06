@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { DataManagerComponent } from '../../components/data-manager/data-manager.component';
 import { ContactEmailService, ContactFormData } from '../../services/contact-email.service';
@@ -36,10 +37,17 @@ export class AccountComponent implements OnInit {
 
   constructor(
     private dataService: DataPersistenceService,
-    private contactEmailService: ContactEmailService
+    private contactEmailService: ContactEmailService,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    // Check if user is authenticated
+    if (!this.dataService.isAuthenticated()) {
+      this.router.navigate(['/auth']);
+      return;
+    }
+    
     this.currentUser = this.dataService.getCurrentUser();
     this.loadUserStats();
     this.loadRecentOrders();

@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
@@ -47,10 +48,17 @@ export class SellComponent implements OnInit {
   constructor(
     private dataService: DataPersistenceService,
     private aiPricingService: AiPricingService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    // Check if user is authenticated
+    if (!this.dataService.isAuthenticated()) {
+      this.router.navigate(['/auth']);
+      return;
+    }
+    
     this.loadActiveListings();
     this.loadAvailableBrands();
   }
