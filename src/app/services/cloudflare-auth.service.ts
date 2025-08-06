@@ -44,8 +44,8 @@ export class CloudflareAuthService {
   private dataService = inject(DataPersistenceService);
   private emailService = inject(EmailService);
 
-  // Cloudflare Workers URL (you'll need to deploy this)
-  private readonly CLOUDFLARE_WORKER_URL = 'https://your-worker.your-subdomain.workers.dev';
+  // Cloudflare Workers URL (deployed)
+  private readonly CLOUDFLARE_WORKER_URL = 'https://watch-ios-auth.perplexity-proxy.workers.dev';
 
   constructor() {
     console.log('CloudflareAuthService initialized');

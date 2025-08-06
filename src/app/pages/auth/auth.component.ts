@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CloudflareAuthService } from '../../services/cloudflare-auth.service';
+import { AppleAuthService } from '../../services/apple-auth.service';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { EmailService } from '../../services/email.service';
 import { User } from '../../models/bid.interface';
@@ -46,6 +47,24 @@ import { User } from '../../models/bid.interface';
             [attr.aria-selected]="activeTab === 'register'"
           >
             Create Account
+          </button>
+        </div>
+
+        <!-- Apple Sign In Button -->
+        <div class="apple-signin-section" *ngIf="isIOS()">
+          <div class="divider">
+            <span>or</span>
+          </div>
+          <button 
+            class="btn-apple-signin" 
+            (click)="signInWithApple()"
+            type="button"
+            aria-label="Sign in with Apple"
+          >
+            <svg class="apple-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+            Sign in with Apple
           </button>
         </div>
 
@@ -529,6 +548,62 @@ import { User } from '../../models/bid.interface';
       margin: 0;
       line-height: 1.4;
     }
+
+    /* Apple Sign In Styles */
+    .apple-signin-section {
+      margin: 30px 0;
+      text-align: center;
+    }
+
+    .divider {
+      position: relative;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .divider span {
+      background: white;
+      padding: 0 15px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .btn-apple-signin {
+      width: 100%;
+      padding: 14px;
+      background: #000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.3s ease;
+      min-height: 44px;
+    }
+
+    .btn-apple-signin:hover {
+      background: #333;
+    }
+
+    .apple-icon {
+      width: 20px;
+      height: 20px;
+    }
   `]
 })
 export class AuthComponent implements OnInit {
@@ -570,6 +645,7 @@ export class AuthComponent implements OnInit {
   private dataService = inject(DataPersistenceService);
   private emailService = inject(EmailService);
   private cloudflareAuthService = inject(CloudflareAuthService);
+  private appleAuthService = inject(AppleAuthService);
 
   ngOnInit() {
     // Check if user is already authenticated
@@ -843,5 +919,33 @@ export class AuthComponent implements OnInit {
       this.modalTitle = 'Error';
       this.modalContent = 'Failed to create demo account. Please try again.';
     }
+  }
+
+  /**
+   * Sign in with Apple
+   */
+  async signInWithApple() {
+    try {
+      console.log('Starting Apple Sign In...');
+      
+      const result = await this.appleAuthService.signInWithApple();
+      
+      if (result.success && result.data) {
+        this.router.navigate(['/discovery']);
+      } else {
+        alert(result.message || 'Apple Sign In failed. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Apple Sign In error:', error);
+      alert('Apple Sign In failed. Please try again.');
+    }
+  }
+
+  /**
+   * Check if running on iOS
+   */
+  isIOS(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 } 
