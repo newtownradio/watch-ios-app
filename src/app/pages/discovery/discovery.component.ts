@@ -189,7 +189,7 @@ export class DiscoveryComponent implements OnInit {
         imageUrl: '',
         images: [],
         createdAt: new Date(),
-        endTime: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48 hours from now
+        endTime: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 2 months from now
         status: 'active',
         bids: [],
         counteroffers: [],

@@ -63,7 +63,7 @@ Test the complete flow from creating a listing in the Sell component to viewing 
 
 ## Potential Issues to Check
 
-1. **Date Handling**: Ensure `endTime` is properly set to 48 hours from creation
+1. **Date Handling**: Ensure `endTime` is properly set to 2 months from creation
 2. **Seller ID Consistency**: User listings use 'seller1', demo listings use 'seller-1', 'seller-2', etc.
 3. **Status Filtering**: Only 'active' listings with future end times should appear
 4. **LocalStorage**: Data should persist across browser sessions

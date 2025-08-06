@@ -176,7 +176,7 @@ export class SellComponent implements OnInit {
       startTime = new Date();
     }
     
-    const endTime = new Date(startTime.getTime() + 48 * 60 * 60 * 1000); // 48 hours from start
+    const endTime = new Date(startTime.getTime() + 60 * 24 * 60 * 60 * 1000); // 2 months from start
     
     const newListing: Listing = {
       id: this.dataService.generateId(),
@@ -231,9 +231,9 @@ export class SellComponent implements OnInit {
       const wasScheduled = this.form.scheduleType === 'scheduled';
       
       if (wasScheduled) {
-        alert(`Item scheduled successfully!\n\nGoes live: ${startTimeStr}\nEnds: ${endTimeStr}\n\nBidding window is 48 hours.`);
+        alert(`Item scheduled successfully!\n\nGoes live: ${startTimeStr}\nEnds: ${endTimeStr}\n\nBidding window is 2 months.`);
       } else {
-        alert(`Item listed successfully!\n\nStart: ${startTimeStr}\nEnd: ${endTimeStr}\n\nBidding window is 48 hours.`);
+                  alert(`Item listed successfully!\n\nStart: ${startTimeStr}\nEnd: ${endTimeStr}\n\nBidding window is 2 months.`);
       }
     } catch (error) {
       console.error('Error saving listing:', error);
@@ -442,7 +442,7 @@ export class SellComponent implements OnInit {
         this.selectedBidForCounteroffer = null;
         this.counterofferForm = { amount: 0, message: '' };
         
-        alert(`Counteroffer sent for $${this.counterofferForm.amount.toLocaleString()}. Buyer has 48 hours to respond.`);
+        alert(`Counteroffer sent for $${this.counterofferForm.amount.toLocaleString()}. Buyer has 2 months to respond.`);
       }
     } else {
       alert('Please enter a valid counteroffer amount.');

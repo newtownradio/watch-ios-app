@@ -3,15 +3,7 @@
   <header class="header" *ngIf="!isSplashPage()">
     <div class="header-content">
       <a routerLink="/discovery" class="logo" *ngIf="!isAuthPage()">
-        <div class="logo-container">
-          <div class="watch-logo">
-            <div class="watch-face">
-              <div class="watch-hands"></div>
-              <div class="watch-markers"></div>
-            </div>
-            <div class="watch-strap"></div>
-          </div>
-        </div>
+        <img src="assets/AppIcon.png" alt="Watch Style Logo" class="logo-image">
       </a>
       <button class="hamburger-btn" (click)="toggleMenu()" type="button" *ngIf="!isAuthPage()">
         <div class="hamburger-lines">

@@ -18,7 +18,7 @@ Watch Style iOS is the trusted marketplace for pre-owned luxury timepieces. Buy 
 Key Features:
 • AI-powered pricing recommendations
 • Government ID verification for security
-• 48-hour auction system
+• 2-month auction system
 • Expert verification services
 • Secure shipping with full insurance
 • Real-time bidding and messaging
