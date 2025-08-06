@@ -4,6 +4,7 @@ import { RouterOutlet, Router, RouterModule } from '@angular/router';
 import { NetworkStatusService } from './services/network-status.service';
 import { DebugService } from './services/debug.service';
 import { NavigationService, NavigationItem } from './services/navigation.service';
+import { DataPersistenceService } from './services/data-persistence.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -20,6 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private debugService = inject(DebugService);
   private router = inject(Router);
   private navigationService = inject(NavigationService);
+  private dataService = inject(DataPersistenceService);
   private destroy$ = new Subject<void>();
 
   // Navigation state
@@ -81,6 +83,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   isAuthPage(): boolean {
     return this.navigationService.isAuthPage();
+  }
+
+  isAuthenticated(): boolean {
+    return this.dataService.isAuthenticated();
   }
 
   toggleMenu(): void {

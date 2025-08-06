@@ -82,9 +82,15 @@ export class NavigationService {
 
   // Navigate to a route and close menu
   navigateToAndCloseMenu(path: string): void {
-    this.navigateTo(path);
+    if (path === '/logout') {
+      // Removed handleLogout as per edit hint
+    } else {
+      this.navigateTo(path);
+    }
     this.closeMenu();
   }
+
+  // Removed handleLogout as per edit hint
 
   // Menu state management
   openMenu(): void {

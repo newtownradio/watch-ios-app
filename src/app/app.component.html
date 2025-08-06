@@ -5,7 +5,7 @@
       <a routerLink="/discovery" class="logo" *ngIf="!isAuthPage()">
         <img src="assets/AppIcon.png" alt="Watch Style Logo" class="logo-image">
       </a>
-      <button class="hamburger-btn" (click)="toggleMenu()" type="button" *ngIf="!isAuthPage()">
+      <button class="hamburger-btn" (click)="toggleMenu()" type="button" *ngIf="isAuthenticated()">
         <div class="hamburger-lines">
           <span></span>
           <span></span>
