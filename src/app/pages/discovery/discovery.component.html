@@ -23,46 +23,82 @@
     </div>
 
     <div class="filters">
-      <div class="price-range">
-        <label for="min-price">Price Range:</label>
-        <div class="price-inputs">
-          <input 
-            type="number" 
-            [(ngModel)]="minPrice" 
-            placeholder="Min"
-            class="price-input"
-            id="min-price"
-          >
-          <span>-</span>
-          <input 
-            type="number" 
-            [(ngModel)]="maxPrice" 
-            placeholder="Max"
-            class="price-input"
-            id="max-price"
-          >
+      <div class="filter-row">
+        <div class="price-range">
+          <label for="min-price">Price Range:</label>
+          <div class="price-inputs">
+            <input 
+              type="number" 
+              [(ngModel)]="minPrice" 
+              placeholder="Min"
+              class="price-input"
+              id="min-price"
+            >
+            <span>-</span>
+            <input 
+              type="number" 
+              [(ngModel)]="maxPrice" 
+              placeholder="Max"
+              class="price-input"
+              id="max-price"
+            >
+          </div>
+        </div>
+
+        <div class="brand-filter">
+          <label for="brand-select">Brand:</label>
+          <select [(ngModel)]="selectedBrand" id="brand-select" class="filter-select">
+            <option value="">All Brands</option>
+            <option *ngFor="let brand of getAvailableBrands()" [value]="brand">
+              {{ brand }}
+            </option>
+          </select>
+        </div>
+
+        <div class="condition-filter">
+          <label for="condition-select">Condition:</label>
+          <select [(ngModel)]="selectedCondition" id="condition-select" class="filter-select">
+            <option value="">All Conditions</option>
+            <option *ngFor="let condition of getAvailableConditions()" [value]="condition">
+              {{ condition }}
+            </option>
+          </select>
+        </div>
+
+        <div class="sort-filter">
+          <label for="sort-select">Sort by:</label>
+          <select [(ngModel)]="sortBy" id="sort-select" class="filter-select">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="ending-soon">Ending Soon</option>
+            <option value="most-bids">Most Bids</option>
+          </select>
         </div>
       </div>
 
-      <div class="favorites-filter">
-        <label class="checkbox-label" for="favorites-only">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="showFavoritesOnly"
-            class="checkbox"
-            id="favorites-only"
-          >
-          <span>Favorites only</span>
-        </label>
-      </div>
+      <div class="filter-row">
+        <div class="favorites-filter">
+          <label class="checkbox-label" for="favorites-only">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="showFavoritesOnly"
+              class="checkbox"
+              id="favorites-only"
+            >
+            <span>Favorites only</span>
+          </label>
+        </div>
 
-      <div class="filter-buttons">
-        <button class="search-filters-btn" (click)="performSearch()" type="button">
-          Search
-        </button>
-        <button class="clear-btn" (click)="clearFilters()" type="button">
-          Clear Filters
-        </button>
+        <div class="filter-buttons">
+          <button class="search-filters-btn" (click)="performSearch()" type="button">
+            Search
+          </button>
+          <button class="clear-btn" (click)="clearFilters()" type="button">
+            Clear Filters
+          </button>
+        </div>
       </div>
     </div>
   </div>

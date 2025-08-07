@@ -20,6 +20,9 @@ export class DiscoveryComponent implements OnInit {
   minPrice: number | undefined;
   maxPrice: number | undefined;
   showFavoritesOnly = false;
+  selectedBrand = '';
+  selectedCondition = '';
+  sortBy = 'newest';
   
   // Get current user ID from authentication
   get currentUserId(): string {
@@ -58,23 +61,44 @@ export class DiscoveryComponent implements OnInit {
   get filteredListings(): Listing[] {
     const now = new Date();
     
-    return this.listings.filter(listing => {
+    let filtered = this.listings.filter(listing => {
       // Filter out scheduled listings that haven't gone live yet
       if (listing.status === 'scheduled' && listing.createdAt > now) {
         return false;
       }
       
+      // Search term matching (enhanced)
+      const searchLower = this.searchTerm.toLowerCase();
       const matchesSearch = !this.searchTerm || 
-        listing.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        listing.sellerName.toLowerCase().includes(this.searchTerm.toLowerCase());
+        listing.title.toLowerCase().includes(searchLower) ||
+        listing.sellerName.toLowerCase().includes(searchLower) ||
+        (listing.brand && listing.brand.toLowerCase().includes(searchLower)) ||
+        (listing.model && listing.model.toLowerCase().includes(searchLower)) ||
+        (listing.description && listing.description.toLowerCase().includes(searchLower)) ||
+        listing.condition?.toLowerCase().includes(searchLower);
       
+      // Price range matching
       const matchesPrice = (!this.minPrice || listing.currentPrice >= this.minPrice) &&
                           (!this.maxPrice || listing.currentPrice <= this.maxPrice);
       
+      // Brand filter
+      const matchesBrand = !this.selectedBrand || 
+        (listing.brand && listing.brand.toLowerCase() === this.selectedBrand.toLowerCase());
+      
+      // Condition filter
+      const matchesCondition = !this.selectedCondition || 
+        (listing.condition && listing.condition.toLowerCase() === this.selectedCondition.toLowerCase());
+      
+      // Favorites filter
       const matchesFavorites = !this.showFavoritesOnly || this.isFavorited(listing.id);
       
-      return matchesSearch && matchesPrice && matchesFavorites;
+      return matchesSearch && matchesPrice && matchesBrand && matchesCondition && matchesFavorites;
     });
+    
+    // Sort results
+    filtered = this.sortListings(filtered);
+    
+    return filtered;
   }
 
   getFavoriteListings(): Listing[] {
@@ -122,6 +146,48 @@ export class DiscoveryComponent implements OnInit {
     this.minPrice = undefined;
     this.maxPrice = undefined;
     this.showFavoritesOnly = false;
+    this.selectedBrand = '';
+    this.selectedCondition = '';
+    this.sortBy = 'newest';
+  }
+
+  private sortListings(listings: Listing[]): Listing[] {
+    switch (this.sortBy) {
+      case 'newest':
+        return listings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      case 'oldest':
+        return listings.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      case 'price-low':
+        return listings.sort((a, b) => a.currentPrice - b.currentPrice);
+      case 'price-high':
+        return listings.sort((a, b) => b.currentPrice - a.currentPrice);
+      case 'ending-soon':
+        return listings.sort((a, b) => a.endTime.getTime() - b.endTime.getTime());
+      case 'most-bids':
+        return listings.sort((a, b) => b.bids.length - a.bids.length);
+      default:
+        return listings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+  }
+
+  getAvailableBrands(): string[] {
+    const brands = new Set<string>();
+    this.listings.forEach(listing => {
+      if (listing.brand) {
+        brands.add(listing.brand);
+      }
+    });
+    return Array.from(brands).sort();
+  }
+
+  getAvailableConditions(): string[] {
+    const conditions = new Set<string>();
+    this.listings.forEach(listing => {
+      if (listing.condition) {
+        conditions.add(listing.condition);
+      }
+    });
+    return Array.from(conditions).sort();
   }
 
   // Bid functionality
