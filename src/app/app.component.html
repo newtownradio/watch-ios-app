@@ -9,8 +9,12 @@
         class="hamburger-btn" 
         (click)="toggleMenu()" 
         type="button" 
-        *ngIf="isAuthenticated()"
-        aria-label="Toggle navigation menu">
+        role="button"
+        tabindex="0"
+        *ngIf="!isSplashPage() && !isAuthPage()"
+        aria-label="Toggle navigation menu"
+        [attr.aria-expanded]="isMenuOpen"
+        aria-controls="navigation-menu">
         <div class="hamburger-lines">
           <span></span>
           <span></span>
@@ -21,7 +25,7 @@
   </header>
 
   <!-- Menu -->
-  <div class="menu" [class.open]="isMenuOpen">
+  <div class="menu" [class.open]="isMenuOpen" id="navigation-menu">
     <!-- Close Button -->
     <button class="menu-close-btn" (click)="closeMenu()" type="button" aria-label="Close menu">
       <span>×</span>

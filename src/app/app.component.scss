@@ -20,6 +20,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   pointer-events: auto;
   
+  /* iOS 18 specific improvements */
+  -webkit-overflow-scrolling: touch;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  
   @media (max-width: 768px) {
     padding: 10px 14px;
     padding-top: 16px;
@@ -37,9 +42,15 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 22px; /* Move header content down by 22px */
   min-height: 44px; /* Apple's minimum touch target */
   gap: 16px; /* Ensure proper spacing between elements */
   pointer-events: auto; /* Ensure content is interactive */
+  overflow: visible; /* Allow content to overflow */
+  
+  /* iOS 18 specific improvements */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   
   @media (max-width: 480px) {
     min-height: 44px; /* Keep 44px minimum even on mobile */
@@ -55,6 +66,7 @@
   min-width: 44px; /* Ensure logo area is also touchable */
   min-height: 44px;
   flex-shrink: 0; /* Prevent logo from shrinking */
+  margin-top: 45px; /* Move logo down by 45px (25px + 20px) */
 }
 
 .logo-image {
@@ -155,63 +167,82 @@
   }
 }
 
-/* Hamburger Button - iOS Human Interface Guidelines */
+/* Hamburger Button - Apple HIG Compliant */
 .hamburger-btn {
   background: transparent;
   border: none;
-  padding: 8px;
+  padding: 12px; /* Apple recommended padding for 44pt touch target */
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px; /* iOS minimum touch target */
-  min-height: 44px; /* iOS minimum touch target */
-  transition: none;
+  min-width: 44px; /* Apple HIG minimum: 44x44 points */
+  min-height: 44px; /* Apple HIG minimum: 44x44 points */
+  transition: background-color 0.2s ease; /* Smooth visual feedback */
   position: relative;
-  z-index: 9999; /* Higher z-index to ensure it's on top */
+  z-index: 9999;
   flex-shrink: 0;
+  border-radius: 8px; /* Apple recommended corner radius */
   
-  /* iOS touch handling - Apple recommended */
+  /* Apple HIG touch handling */
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  -webkit-touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
   
   /* Remove default button styling */
   -webkit-appearance: none;
   appearance: none;
   
-  /* Ensure button is clickable on iOS */
+  /* Ensure button is clickable */
   pointer-events: auto;
+  position: relative;
+  display: flex;
+  
+  /* Apple HIG focus states */
+  &:focus {
+    outline: 2px solid #007AFF; /* iOS blue focus color */
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid #007AFF;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  
+  /* Apple HIG active/pressed state */
+  &:active {
+    background-color: rgba(0, 122, 255, 0.1); /* iOS blue with opacity */
+    border-radius: 8px;
+  }
+  
+  /* Apple HIG hover state (for accessibility) */
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+  }
   
   @media (max-width: 480px) {
     min-width: 44px;
     min-height: 44px;
-    padding: 8px;
+    padding: 12px;
     width: 44px;
     height: 44px;
   }
-}
-
-/* Focus state for accessibility */
-.hamburger-btn:focus {
-  outline: 2px solid #ffffff;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Active state for touch devices */
-.hamburger-btn:active {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-/* iOS-specific touch handling */
-.hamburger-btn:focus-visible {
-  outline: 2px solid #ffffff;
-  outline-offset: 2px;
-  border-radius: 4px;
+  
+  /* iPhone 16 specific (iOS 18) */
+  @media screen and (max-width: 430px) and (max-height: 932px) {
+    min-width: 44px; /* Keep Apple HIG standard */
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    padding: 12px;
+  }
 }
 
 .hamburger-lines {
@@ -221,11 +252,13 @@
   width: 24px;
   height: 18px;
   flex-shrink: 0; /* Prevent compression */
+  align-self: center; /* Ensure centered within button */
+  margin-top: 45px; /* Move hamburger lines down by 45px (25px + 20px) */
   
   @media (max-width: 480px) {
-    width: 22px; /* Keep larger size */
-    height: 18px; /* Keep proper height */
-    gap: 4px; /* Keep consistent gap */
+    width: 22px;
+    height: 18px;
+    gap: 4px;
   }
 }
 
@@ -238,7 +271,7 @@
   flex-shrink: 0; /* Prevent compression */
   
   @media (max-width: 480px) {
-    height: 3px; /* Keep consistent height */
+    height: 3px;
   }
 }
 

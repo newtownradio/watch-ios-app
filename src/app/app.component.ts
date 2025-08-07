@@ -83,7 +83,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   toggleMenu(): void {
+    alert('Hamburger clicked!');
     this.navigationService.toggleMenu();
+  }
+
+  // Check if running on iOS
+  private isIOS(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
 
