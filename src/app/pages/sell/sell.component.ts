@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
+import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-sell',
@@ -467,25 +468,38 @@ export class SellComponent implements OnInit {
     return listing.counteroffers.filter(co => co.status === 'pending');
   }
 
-  shareListing(listing: Listing) {
+  async shareListing(listing: Listing) {
     const shareText = `${listing.title} - $${listing.currentPrice.toLocaleString()}\n\n` +
       `Sale ends: ${this.getListingEndTime(listing.endTime)}\n` +
       `Time remaining: ${this.getTimeRemaining(listing.endTime)}\n\n` +
       `Check out this watch on Watch Style iOS!`;
 
-    // Try to use Web Share API first (mobile devices)
-    if (navigator.share) {
-      navigator.share({
+    try {
+      // Use Capacitor Share plugin for native iOS sharing
+      await Share.share({
         title: listing.title,
         text: shareText,
-        url: window.location.href
-      }).catch((error) => {
-        console.error('Error sharing:', error);
-        this.fallbackShare(shareText);
+        url: window.location.href,
+        dialogTitle: 'Share Watch Listing'
       });
-    } else {
-      // Fallback to clipboard copy
-      this.fallbackShare(shareText);
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Fallback to Web Share API
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: listing.title,
+            text: shareText,
+            url: window.location.href
+          });
+        } catch (webShareError) {
+          console.error('Web Share API error:', webShareError);
+          this.fallbackShare(shareText);
+        }
+      } else {
+        // Final fallback to clipboard copy
+        this.fallbackShare(shareText);
+      }
     }
   }
 
