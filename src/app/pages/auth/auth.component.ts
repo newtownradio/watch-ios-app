@@ -76,9 +76,7 @@ export class AuthComponent implements OnInit {
   }
 
   setActiveTab(tab: string) {
-    console.log('Setting active tab to:', tab);
     this.activeTab = tab;
-    console.log('Active tab is now:', this.activeTab);
   }
 
   async login() {
@@ -150,9 +148,6 @@ export class AuthComponent implements OnInit {
       });
 
       if (result.success) {
-        if (result.code) {
-          console.log('🔐 Verification Code:', result.code);
-        }
         
         alert('Password reset code sent to your email! Please check your inbox and enter the verification code below.');
         this.setActiveTab('reset');

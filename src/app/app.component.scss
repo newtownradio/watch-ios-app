@@ -11,8 +11,7 @@
 /* Header */
 .header {
   background: #f5f5f0;
-  padding: 12px 16px;
-  padding-top: 20px;
+  padding: 8px 16px; /* Reduced top padding to fix alignment */
   position: sticky;
   top: 0;
   z-index: 100;
@@ -26,13 +25,11 @@
   transform: translateZ(0);
   
   @media (max-width: 768px) {
-    padding: 10px 14px;
-    padding-top: 16px;
+    padding: 6px 14px;
   }
   
   @media (max-width: 480px) {
-    padding: 8px 12px;
-    padding-top: 14px;
+    padding: 4px 12px;
   }
 }
 
@@ -42,7 +39,7 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 22px; /* Move header content down by 22px */
+  /* Removed margin-top to align with Apple HIG standards */
   min-height: 44px; /* Apple's minimum touch target */
   gap: 16px; /* Ensure proper spacing between elements */
   pointer-events: auto; /* Ensure content is interactive */
@@ -56,6 +53,24 @@
     min-height: 44px; /* Keep 44px minimum even on mobile */
     gap: 12px; /* Slightly reduced gap on mobile */
   }
+  
+  /* iPhone 15 Pro Max / iPhone 16 Pro Max */
+  @media screen and (max-width: 430px) and (min-height: 932px) {
+    min-height: 44px;
+    gap: 14px;
+  }
+  
+  /* iPad / Tablet landscape */
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    min-height: 44px;
+    gap: 20px;
+  }
+  
+  /* Large tablets and small desktops */
+  @media screen and (min-width: 1024px) and (max-width: 1366px) {
+    min-height: 44px;
+    gap: 24px;
+  }
 }
 
 /* Logo */
@@ -66,7 +81,7 @@
   min-width: 44px; /* Ensure logo area is also touchable */
   min-height: 44px;
   flex-shrink: 0; /* Prevent logo from shrinking */
-  margin-top: 45px; /* Move logo down by 45px (25px + 20px) */
+  margin-top: 40px; /* Align with hamburger button target */
 }
 
 .logo-image {
@@ -77,6 +92,24 @@
   @media (max-width: 480px) {
     width: 20px;
     height: 20px;
+  }
+  
+  /* iPhone 15 Pro Max / iPhone 16 Pro Max */
+  @media screen and (max-width: 430px) and (min-height: 932px) {
+    width: 22px;
+    height: 22px;
+  }
+  
+  /* iPad / Tablet landscape */
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    width: 28px;
+    height: 28px;
+  }
+  
+  /* Large tablets and small desktops */
+  @media screen and (min-width: 1024px) and (max-width: 1366px) {
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -167,24 +200,25 @@
   }
 }
 
-/* Hamburger Button - Apple HIG Compliant */
+/* Hamburger Button - Apple UINavigationBar Compliant */
 .hamburger-btn {
   background: transparent;
   border: none;
-  padding: 12px; /* Apple recommended padding for 44pt touch target */
+  padding: 8px; /* Apple UINavigationBar standard padding */
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px; /* Apple HIG minimum: 44x44 points */
-  min-height: 44px; /* Apple HIG minimum: 44x44 points */
-  transition: background-color 0.2s ease; /* Smooth visual feedback */
+  width: 44px; /* Apple HIG minimum: 44x44 points */
+  height: 44px; /* Apple HIG minimum: 44x44 points */
+  transition: all 0.2s ease; /* Smooth visual feedback */
   position: relative;
   z-index: 9999;
   flex-shrink: 0;
   border-radius: 8px; /* Apple recommended corner radius */
+  margin-top: 40px; /* Fix touch target alignment with visual elements */
   
-  /* Apple HIG touch handling */
+  /* Apple UINavigationBar touch handling */
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   -webkit-user-select: none;
@@ -243,6 +277,33 @@
     height: 44px;
     padding: 12px;
   }
+  
+  /* iPhone 15 Pro Max / iPhone 16 Pro Max */
+  @media screen and (max-width: 430px) and (min-height: 932px) {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    padding: 12px;
+  }
+  
+  /* iPad / Tablet landscape */
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+  }
+  
+  /* Large tablets and small desktops */
+  @media screen and (min-width: 1024px) and (max-width: 1366px) {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    padding: 8px;
+  }
 }
 
 .hamburger-lines {
@@ -253,7 +314,7 @@
   height: 18px;
   flex-shrink: 0; /* Prevent compression */
   align-self: center; /* Ensure centered within button */
-  margin-top: 45px; /* Move hamburger lines down by 45px (25px + 20px) */
+  /* Removed margin-top to align with touch target */
   
   @media (max-width: 480px) {
     width: 22px;
@@ -304,7 +365,7 @@
 /* Menu Close Button */
 .menu-close-btn {
   position: absolute;
-  top: 20px;
+  top: 60px; /* Increased from 20px to align with hamburger button */
   right: 20px;
   background: transparent;
   border: none;
@@ -329,7 +390,7 @@
   appearance: none;
   
   @media (max-width: 768px) {
-    top: 16px;
+    top: 56px; /* Adjusted for mobile */
     right: 16px;
     font-size: 28px;
     width: 44px; /* Keep 44px minimum */
@@ -337,11 +398,38 @@
   }
   
   @media (max-width: 480px) {
-    top: 12px;
+    top: 52px; /* Adjusted for smaller mobile */
     right: 12px;
     font-size: 24px;
     width: 44px; /* Keep 44px minimum */
     height: 44px; /* Keep 44px minimum */
+  }
+  
+  /* iPhone 15 Pro Max / iPhone 16 Pro Max */
+  @media screen and (max-width: 430px) and (min-height: 932px) {
+    top: 56px;
+    right: 16px;
+    font-size: 26px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  /* iPad / Tablet landscape */
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    top: 64px;
+    right: 24px;
+    font-size: 30px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  /* Large tablets and small desktops */
+  @media screen and (min-width: 1024px) and (max-width: 1366px) {
+    top: 68px;
+    right: 28px;
+    font-size: 32px;
+    width: 44px;
+    height: 44px;
   }
 }
 
@@ -368,16 +456,31 @@
 /* Menu Links - Mobile style for all screen sizes */
 .menu-links {
   flex: 1;
-  padding: 80px 0 30px 0;
+  padding: 120px 0 30px 0; /* Increased top padding for better spacing */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   
   @media (max-width: 768px) {
-    padding: 70px 0 24px 0;
+    padding: 110px 0 24px 0; /* Increased top padding for tablets */
   }
   
   @media (max-width: 480px) {
-    padding: 60px 0 20px 0;
+    padding: 100px 0 20px 0; /* At least 40px more than before for mobile */
+  }
+  
+  /* iPhone 15 Pro Max / iPhone 16 Pro Max */
+  @media screen and (max-width: 430px) and (min-height: 932px) {
+    padding: 105px 0 25px 0;
+  }
+  
+  /* iPad / Tablet landscape */
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    padding: 130px 0 30px 0;
+  }
+  
+  /* Large tablets and small desktops */
+  @media screen and (min-width: 1024px) and (max-width: 1366px) {
+    padding: 140px 0 35px 0;
   }
 }
 
@@ -415,6 +518,27 @@
     padding: 16px;
     font-size: 16px;
     min-height: 44px; /* Apple's minimum touch target */
+  }
+  
+  /* iPhone 15 Pro Max / iPhone 16 Pro Max */
+  @media screen and (max-width: 430px) and (min-height: 932px) {
+    padding: 18px;
+    font-size: 17px;
+    min-height: 44px;
+  }
+  
+  /* iPad / Tablet landscape */
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    padding: 28px;
+    font-size: 22px;
+    min-height: 44px;
+  }
+  
+  /* Large tablets and small desktops */
+  @media screen and (min-width: 1024px) and (max-width: 1366px) {
+    padding: 32px;
+    font-size: 24px;
+    min-height: 44px;
   }
 
   &.active {

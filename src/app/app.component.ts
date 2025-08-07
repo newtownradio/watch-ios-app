@@ -83,7 +83,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   toggleMenu(): void {
-    alert('Hamburger clicked!');
     this.navigationService.toggleMenu();
   }
 
