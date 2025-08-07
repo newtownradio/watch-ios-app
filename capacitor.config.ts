@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.newtownradio.watchiosapp',
+  appId: 'com.newtownradio.watchstyleios',
   appName: 'Watch iOS App',
   webDir: 'dist/watch-ios/browser',
   ios: {
