@@ -172,16 +172,12 @@ export class DiscoveryComponent implements OnInit {
 
   getAvailableBrands(): string[] {
     const brands = new Set<string>();
-    console.log('Total listings:', this.listings.length);
     this.listings.forEach(listing => {
-      console.log('Listing brand:', listing.brand);
       if (listing.brand) {
         brands.add(listing.brand);
       }
     });
-    const result = Array.from(brands).sort();
-    console.log('Available brands:', result);
-    return result;
+    return Array.from(brands).sort();
   }
 
   getAvailableConditions(): string[] {
@@ -308,6 +304,8 @@ export class DiscoveryComponent implements OnInit {
     // If no listings exist, create some demo data
     if (this.listings.length === 0) {
       this.createDemoListings();
+      // After creating demo listings, reload them
+      this.listings = this.dataService.getActiveListings();
     }
   }
 
