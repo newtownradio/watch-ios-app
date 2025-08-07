@@ -249,7 +249,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -267,7 +267,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -285,7 +285,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -303,7 +303,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -321,7 +321,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -339,7 +339,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -357,7 +357,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -375,7 +375,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -393,7 +393,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       },
       {
         id: this.dataService.generateId(),
@@ -411,7 +411,7 @@ export class DiscoveryComponent implements OnInit {
         status: 'active',
         bids: [],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       }
     ];
 

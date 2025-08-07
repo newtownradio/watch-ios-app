@@ -180,7 +180,7 @@
         <li>Bidders can place offers during this time</li>
         <li>You'll receive notifications for new bids</li>
                   <li>You have 3 months to accept or decline the highest bid</li>
-        <li>You can make 1 counteroffer per listing</li>
+        <li>You can make 3 counteroffers per listing</li>
         <li>If accepted, a smart contract will be created</li>
       </ul>
     </div>
@@ -270,7 +270,7 @@
   <div class="counteroffer-modal" *ngIf="showCounterofferForm">
     <div class="modal-content">
       <h3>Make Counteroffer</h3>
-              <p>You can make 1 counteroffer per listing. Buyer has 3 months to respond.</p>
+              <p>You can make 3 counteroffers per listing. Buyer has 3 months to respond.</p>
       
       <div class="form-group">
         <label for="counteroffer-amount">Counteroffer Amount</label>
@@ -330,8 +330,8 @@
         <p class="bid-count">
           <strong>Bids Received:</strong> {{ listing.bids.length }}
         </p>
-        <p class="counteroffer-status" *ngIf="listing.hasMadeCounteroffer">
-          <strong>Counteroffer Made:</strong> Yes (1/1 used)
+        <p class="counteroffer-status" *ngIf="listing.counterofferCount && listing.counterofferCount > 0">
+          <strong>Counteroffers Made:</strong> {{ listing.counterofferCount }}/3 used
         </p>
       </div>
 
@@ -354,7 +354,7 @@
             </button>
             <button class="counteroffer-btn" 
                     (click)="makeCounteroffer(listing.id, bid.id)"
-                    *ngIf="!listing.hasMadeCounteroffer">
+                    *ngIf="(listing.counterofferCount || 0) < 3">
               Make Counteroffer
             </button>
           </div>

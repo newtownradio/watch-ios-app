@@ -70,7 +70,7 @@ export interface Listing {
   status: 'active' | 'sold' | 'expired' | 'scheduled';
   createdAt: Date;
   endTime: Date;
-  hasMadeCounteroffer?: boolean;
+  counterofferCount?: number; // Track number of counteroffers made (max 3)
   bids: Bid[];
   counteroffers: Counteroffer[];
   highestBid?: Bid;

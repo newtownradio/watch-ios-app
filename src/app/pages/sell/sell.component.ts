@@ -206,7 +206,7 @@ export class SellComponent implements OnInit {
       status: this.form.scheduleType === 'scheduled' ? 'scheduled' : 'active',
       bids: [],
       counteroffers: [],
-      hasMadeCounteroffer: false
+      counterofferCount: 0
     };
 
     try {
@@ -304,7 +304,7 @@ export class SellComponent implements OnInit {
           }
         ],
         counteroffers: [],
-        hasMadeCounteroffer: false
+        counterofferCount: 0
       }
     ];
 
@@ -401,15 +401,15 @@ export class SellComponent implements OnInit {
 
   makeCounteroffer(listingId: string, bidId: string) {
     const listing = this.activeListings.find(l => l.id === listingId);
-    if (listing && !listing.hasMadeCounteroffer) {
+    if (listing && (listing.counterofferCount || 0) < 3) {
       const bid = listing.bids.find(b => b.id === bidId);
       if (bid) {
         this.selectedBidForCounteroffer = bid;
         this.counterofferForm.amount = bid.amount + 500; // Suggest 500 more
         this.showCounterofferForm = true;
       }
-    } else if (listing?.hasMadeCounteroffer) {
-      alert('You have already made a counteroffer for this listing.');
+    } else if (listing && (listing.counterofferCount || 0) >= 3) {
+      alert('You have already made 3 counteroffers for this listing.');
     }
   }
 
@@ -438,7 +438,7 @@ export class SellComponent implements OnInit {
         };
 
         listing.counteroffers.push(counteroffer);
-        listing.hasMadeCounteroffer = true;
+        listing.counterofferCount = (listing.counterofferCount || 0) + 1;
         
         // Update the original bid status
         const originalBid = listing.bids.find(b => b.id === this.selectedBidForCounteroffer?.id);
