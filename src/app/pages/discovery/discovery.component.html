@@ -67,6 +67,35 @@
     </div>
   </div>
 
+  <!-- Place Bid Section -->
+  <div class="place-bid-section">
+    <div class="place-bid-header">
+      <h2>Place Bids on Your Favorites</h2>
+      <p>Quick bid on items you've favorited</p>
+    </div>
+    
+    <div class="favorite-listings">
+      <div class="favorite-card" *ngFor="let listing of getFavoriteListings()">
+        <div class="favorite-image">
+          <img [src]="listing.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPldhdGNoPC90ZXh0Pjwvc3ZnPg=='" [alt]="listing.title">
+        </div>
+        <div class="favorite-info">
+          <h3>{{ listing.title }}</h3>
+          <p class="current-bid">Current Bid: ${{ listing.currentPrice.toLocaleString() }}</p>
+          <p class="time-left">{{ getTimeRemaining(listing.endTime) }} left</p>
+          <div class="favorite-actions">
+            <button class="favorite-bid-btn" (click)="openBidForm(listing)" title="Place a bid">
+              💰 Place Bid
+            </button>
+            <button class="favorite-share-btn" (click)="shareListing(listing)" title="Share this listing">
+              📤 Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Results Count -->
   <div class="results-info">
     <p>{{ filteredListings.length }} items found</p>
@@ -114,11 +143,11 @@
           </span>
         </div>
         <div class="listing-actions">
-          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
-            📤 Share
-          </button>
           <button class="bid-btn" (click)="openBidForm(listing)" title="Place a bid">
             💰 Place Bid
+          </button>
+          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
+            📤 Share
           </button>
         </div>
       </div>
@@ -131,10 +160,13 @@
     <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
   </div>
 
-  <!-- Bid Form Modal -->
-  <div class="bid-modal" *ngIf="showBidForm && selectedListing">
-    <div class="modal-overlay" (click)="closeBidForm()"></div>
-    <div class="modal-content">
+  <!-- Bid Form Section (replaces modal) -->
+  <div class="bid-form-section" *ngIf="showBidForm && selectedListing">
+    <div class="bid-form-container">
+      <div class="bid-form-header">
+        <h3>Place Bid on {{ selectedListing.title }}</h3>
+        <button class="close-btn" (click)="closeBidForm()">✕</button>
+      </div>
       <app-bid-form 
         [listing]="selectedListing"
         (bidPlaced)="onBidPlaced($event)"

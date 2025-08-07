@@ -1,19 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { DataPersistenceService } from './data-persistence.service';
 import { AuthenticationService } from './authentication.service';
-
-export interface Bid {
-  id: string;
-  buyerId: string;
-  listingId: string;
-  amount: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'expired';
-  createdAt: Date;
-  expiresAt: Date;
-  acceptedAt?: Date;
-  rejectedAt?: Date;
-  authenticationRequestId?: string;
-}
+import { Bid } from '../models/bid.interface';
 
 export interface BidResponse {
   success: boolean;
@@ -83,15 +71,25 @@ export class BidService {
         };
       }
 
+      // Get bidder information
+      const bidder = this.dataService.getUserById(buyerId);
+      if (!bidder) {
+        return {
+          success: false,
+          message: 'User not found',
+          error: 'USER_NOT_FOUND'
+        };
+      }
+
       // Create the bid
       const bid: Bid = {
         id: this.generateId(),
-        buyerId,
-        listingId,
-        amount,
-        status: 'pending',
-        createdAt: new Date(),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+        itemId: listingId,
+        bidderId: buyerId,
+        bidderName: bidder.name,
+        amount: amount,
+        timestamp: new Date(),
+        status: 'pending'
       };
 
       // Save the bid
@@ -131,7 +129,7 @@ export class BidService {
       }
 
       // Verify the seller owns the listing
-      const listing = this.dataService.getListingById(bid.listingId);
+      const listing = this.dataService.getListingById(bid.itemId);
       if (!listing || listing.sellerId !== sellerId) {
         return {
           success: false,
@@ -150,7 +148,7 @@ export class BidService {
       }
 
       // Check if bid has expired
-      if (new Date() > bid.expiresAt) {
+      if (bid.expiresAt && new Date() > bid.expiresAt) {
         return {
           success: false,
           message: 'Bid has expired',
@@ -171,9 +169,9 @@ export class BidService {
       // Create authentication request
       const authRequest = await this.authService.createAuthenticationRequest(
         bid.id,
-        bid.buyerId,
+        bid.bidderId,
         sellerId,
-        bid.listingId,
+        bid.itemId,
         this.getRecommendedAuthPartner(listing)
       );
 
@@ -215,7 +213,7 @@ export class BidService {
       }
 
       // Verify the seller owns the listing
-      const listing = this.dataService.getListingById(bid.listingId);
+      const listing = this.dataService.getListingById(bid.itemId);
       if (!listing || listing.sellerId !== sellerId) {
         return {
           success: false,
@@ -282,7 +280,7 @@ export class BidService {
    * Create bid notification for seller
    */
   private createBidNotification(bid: Bid, listing: any): void {
-    const buyer = this.dataService.getUserById(bid.buyerId);
+    const buyer = this.dataService.getUserById(bid.bidderId);
     const buyerName = buyer ? buyer.name : 'A buyer';
     
     this.dataService.saveNotification({
@@ -304,7 +302,7 @@ export class BidService {
   private createAcceptanceNotification(bid: Bid, listing: any): void {
     this.dataService.saveNotification({
       id: this.generateId(),
-      userId: bid.buyerId,
+      userId: bid.bidderId,
       title: 'Bid Accepted!',
       message: `Your bid of $${bid.amount.toLocaleString()} on ${listing.title} has been accepted. Please pay the authentication fee to proceed.`,
       type: 'bid',
@@ -321,7 +319,7 @@ export class BidService {
   private createRejectionNotification(bid: Bid, listing: any): void {
     this.dataService.saveNotification({
       id: this.generateId(),
-      userId: bid.buyerId,
+      userId: bid.bidderId,
       title: 'Bid Rejected',
       message: `Your bid of $${bid.amount.toLocaleString()} on ${listing.title} was not accepted.`,
       type: 'bid',

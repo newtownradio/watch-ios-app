@@ -156,6 +156,252 @@
   background: #1a1a1a;
 }
 
+.clear-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  @media (max-width: 480px) {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+.clear-btn:hover {
+  background: #4b5563;
+}
+
+.bid-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+}
+
+.bid-section-header {
+  text-align: center;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    margin-bottom: 12px;
+  }
+}
+
+.bid-section-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 8px 0;
+  
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 18px;
+  }
+}
+
+.bid-section-header p {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+  
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
+}
+
+.featured-listings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.featured-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  
+  @media (max-width: 768px) {
+    padding: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.featured-image {
+  width: 100%;
+  height: 120px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #f3f4f6;
+  
+  @media (max-width: 480px) {
+    height: 100px;
+    margin-bottom: 10px;
+  }
+}
+
+.featured-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.featured-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  
+  @media (max-width: 480px) {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+}
+
+.current-bid {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8b7355;
+  margin: 0 0 6px 0;
+  
+  @media (max-width: 480px) {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+}
+
+.time-left {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+  
+  @media (max-width: 480px) {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+}
+
+.featured-actions {
+  display: flex;
+  gap: 8px;
+  
+  @media (max-width: 480px) {
+    gap: 6px;
+  }
+}
+
+.featured-bid-btn {
+  flex: 1;
+  background: #8b7355;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: 480px) {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-height: 32px;
+  }
+  
+  &:hover {
+    background: #7a6344;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.featured-share-btn {
+  background: #2c2c2c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: 480px) {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-height: 32px;
+  }
+  
+  &:hover {
+    background: #1a1a1a;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -432,31 +678,57 @@
   }
 }
 
+.listing-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    gap: 6px;
+    margin-top: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 4px;
+    margin-top: 8px;
+    justify-content: space-between;
+  }
+}
+
 .share-btn {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
   background: #2c2c2c;
   color: white;
   border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
+  border-radius: 6px;
+  padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(44, 44, 44, 0.3);
-  z-index: 10;
+  flex: 1;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  
+  @media (max-width: 768px) {
+    padding: 6px 10px;
+    font-size: 11px;
+    min-height: 32px;
+  }
   
   @media (max-width: 480px) {
-    padding: 6px 12px;
-    font-size: 11px;
-    bottom: 8px;
-    right: 8px;
+    padding: 5px 8px;
+    font-size: 10px;
+    min-height: 30px;
+    flex: 0 0 calc(50% - 2px);
   }
   
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(44, 44, 44, 0.4);
     background: #1a1a1a;
   }
@@ -471,32 +743,31 @@
   background: #8b7355;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 14px;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
+  flex: 1;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-width: 100px;
-  min-height: 40px;
+  gap: 4px;
   
   @media (max-width: 768px) {
-    padding: 8px 12px;
-    font-size: 13px;
-    min-width: 90px;
-    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 11px;
+    min-height: 32px;
   }
   
   @media (max-width: 480px) {
-    padding: 6px 10px;
-    font-size: 12px;
-    min-width: 80px;
-    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 10px;
+    min-height: 30px;
+    flex: 0 0 calc(50% - 2px);
   }
   
   &:hover {
@@ -733,15 +1004,58 @@
   .product-card {
     margin-bottom: 0;
   }
+  
+  .product-info {
+    padding: 12px;
+  }
+  
+  .product-info h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  
+  .price {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .description {
+    font-size: 13px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  
+  .watch-details {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+  
+  .seller {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .listing-details {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+  
+  .listing-times {
+    font-size: 10px;
+    margin-top: 6px;
+  }
 }
 
 @media (max-width: 360px) {
-  .discovery-page {
-    padding: 8px;
+  .listing-actions {
+    flex-direction: column;
+    gap: 6px;
   }
   
-  .search-section {
-    padding: 10px;
+  .share-btn,
+  .bid-btn {
+    flex: 1;
+    width: 100%;
   }
   
   .product-info {
@@ -750,5 +1064,287 @@
   
   .product-image {
     height: 140px;
+  }
+}
+
+/* Place Bid Section */
+.place-bid-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+}
+
+.place-bid-header {
+  text-align: center;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    margin-bottom: 12px;
+  }
+}
+
+.place-bid-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 8px 0;
+  
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 18px;
+  }
+}
+
+.place-bid-header p {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+  
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
+}
+
+.favorite-listings {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.favorite-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e9ecef;
+  
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
+}
+
+.favorite-image {
+  height: 120px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  
+  @media (max-width: 480px) {
+    height: 100px;
+    margin-bottom: 10px;
+  }
+}
+
+.favorite-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.favorite-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 6px 0;
+  
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
+}
+
+.current-bid {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+  
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
+}
+
+.time-left {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  
+  @media (max-width: 480px) {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+}
+
+.favorite-actions {
+  display: flex;
+  gap: 8px;
+  
+  @media (max-width: 480px) {
+    gap: 6px;
+  }
+}
+
+.favorite-bid-btn {
+  background: #8b7355;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  
+  @media (max-width: 480px) {
+    padding: 5px 8px;
+    font-size: 10px;
+    min-height: 28px;
+  }
+  
+  &:hover {
+    background: #7a6344;
+    transform: translateY(-1px);
+  }
+}
+
+.favorite-share-btn {
+  background: #2c2c2c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  
+  @media (max-width: 480px) {
+    padding: 5px 8px;
+    font-size: 10px;
+    min-height: 28px;
+  }
+  
+  &:hover {
+    background: #1a1a1a;
+    transform: translateY(-1px);
+  }
+}
+
+/* Bid Form Section (replaces modal) */
+.bid-form-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
+}
+
+.bid-form-container {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 480px) {
+    max-height: 95vh;
+  }
+}
+
+.bid-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 0 20px;
+  border-bottom: 1px solid #e5e7eb;
+  
+  @media (max-width: 480px) {
+    padding: 16px 16px 0 16px;
+  }
+}
+
+.bid-form-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0;
+  
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: #374151;
   }
 }

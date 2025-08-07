@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Listing, Bid, Counteroffer, Watch, User, Message, Notification } from '../models/bid.interface';
 import { AuthenticationRequest } from './authentication.service';
-import { Bid as BidInterface } from './bid.service';
 
 @Injectable({
   providedIn: 'root'
@@ -1198,7 +1197,7 @@ Note: These are test accounts for development purposes only.
   /**
    * Save a new bid
    */
-  saveBid(bid: BidInterface): void {
+  saveBid(bid: Bid): void {
     const bids = this.getAllBids();
     bids.push(bid);
     this.saveBids(bids);
@@ -1207,47 +1206,44 @@ Note: These are test accounts for development purposes only.
   /**
    * Get all bids
    */
-  getAllBids(): BidInterface[] {
+  getAllBids(): Bid[] {
     const data = localStorage.getItem(this.BIDS_KEY);
     if (!data) return [];
     
     const bids = JSON.parse(data);
     
     // Convert date strings back to Date objects
-    return bids.map((bid: any) => ({
+    return bids.map((bid: Record<string, unknown>) => ({
       ...bid,
-      createdAt: new Date(bid.createdAt),
-      expiresAt: new Date(bid.expiresAt),
-      acceptedAt: bid.acceptedAt ? new Date(bid.acceptedAt) : undefined,
-      rejectedAt: bid.rejectedAt ? new Date(bid.rejectedAt) : undefined
+      timestamp: new Date(bid['timestamp'] as string)
     }));
   }
 
   /**
    * Get bids by listing
    */
-  getBidsByListing(listingId: string): BidInterface[] {
-    return this.getAllBids().filter(bid => bid.listingId === listingId);
+  getBidsByListing(listingId: string): Bid[] {
+    return this.getAllBids().filter(bid => bid.itemId === listingId);
   }
 
   /**
    * Get bids by user
    */
-  getBidsByUser(userId: string): any[] {
-    return this.getAllBids().filter(bid => bid.buyerId === userId);
+  getBidsByUser(userId: string): Bid[] {
+    return this.getAllBids().filter(bid => bid.bidderId === userId);
   }
 
   /**
    * Get bid by ID
    */
-  getBidById(bidId: string): any | null {
+  getBidById(bidId: string): Bid | null {
     return this.getAllBids().find(bid => bid.id === bidId) || null;
   }
 
   /**
    * Update bid
    */
-  updateBid(updatedBid: any): void {
+  updateBid(updatedBid: Bid): void {
     const bids = this.getAllBids();
     const index = bids.findIndex(b => b.id === updatedBid.id);
     if (index !== -1) {
@@ -1268,7 +1264,7 @@ Note: These are test accounts for development purposes only.
   /**
    * Save bids to localStorage
    */
-  private saveBids(bids: any[]): void {
+  private saveBids(bids: Bid[]): void {
     try {
       localStorage.setItem(this.BIDS_KEY, JSON.stringify(bids));
     } catch {

@@ -44,7 +44,11 @@ export interface Bid {
   bidderName: string;
   amount: number;
   timestamp: Date;
-  status: 'active' | 'won' | 'lost' | 'pending' | 'accepted' | 'declined' | 'counteroffered';
+  status: 'active' | 'won' | 'lost' | 'pending' | 'accepted' | 'declined' | 'counteroffered' | 'rejected';
+  expiresAt?: Date;
+  acceptedAt?: Date;
+  rejectedAt?: Date;
+  authenticationRequestId?: string;
 }
 
 export interface Listing {

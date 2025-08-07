@@ -210,7 +210,7 @@ export class AuthorizationService {
         case 'is_bidder':
           if (resource === 'bid') {
             const bid = this.dataService.getBidById(resourceId);
-            return bid?.buyerId === user.id;
+            return bid?.bidderId === user.id;
           }
           break;
       }

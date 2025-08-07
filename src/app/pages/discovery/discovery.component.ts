@@ -76,6 +76,21 @@ export class DiscoveryComponent implements OnInit {
     });
   }
 
+  getFavoriteListings(): Listing[] {
+    const now = new Date();
+    
+    return this.listings.filter(listing => {
+      // Filter out scheduled listings that haven't gone live yet
+      if (listing.status === 'scheduled' && listing.createdAt > now) {
+        return false;
+      }
+      
+      // Only return active listings that are favorited
+      return listing.status === 'active' && this.isFavorited(listing.id);
+    });
+  }
+
+
   performSearch() {
     // Trigger search - the filteredListings getter will automatically update
   }
