@@ -1,14 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Listing } from '../../models/bid.interface';
 import { DataPersistenceService } from '../../services/data-persistence.service';
+import { BidService, BidResponse } from '../../services/bid.service';
+import { BidFormComponent } from '../../components/bid-form/bid-form.component';
 
 @Component({
   selector: 'app-discovery',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BidFormComponent],
   templateUrl: './discovery.component.html',
   styleUrl: './discovery.component.scss'
 })
@@ -18,24 +20,36 @@ export class DiscoveryComponent implements OnInit {
   maxPrice: number | undefined;
   showFavoritesOnly = false;
   
-  // Demo user ID - in production this would come from auth service
-  private currentUserId = 'demo-user-123';
+  // Get current user ID from authentication
+  get currentUserId(): string {
+    const currentUser = this.dataService.getCurrentUser();
+    return currentUser?.id || '';
+  }
   
   listings: Listing[] = [];
   favorites: string[] = [];
+  
+  // Bid form state
+  showBidForm = false;
+  selectedListing: Listing | null = null;
 
-  constructor(
-    private dataService: DataPersistenceService,
-    private router: Router
-  ) {}
+  private dataService = inject(DataPersistenceService);
+  private router = inject(Router);
+  private bidService = inject(BidService);
 
   ngOnInit() {
     // Check if user is authenticated
+    console.log('Discovery: Checking authentication...');
+    console.log('Is authenticated:', this.dataService.isAuthenticated());
+    console.log('Current user:', this.dataService.getCurrentUser());
+    
     if (!this.dataService.isAuthenticated()) {
+      console.log('Discovery: User not authenticated, redirecting to auth');
       this.router.navigate(['/auth']);
       return;
     }
     
+    console.log('Discovery: User authenticated, loading data');
     this.loadListings();
     this.loadFavorites();
   }
@@ -92,6 +106,23 @@ export class DiscoveryComponent implements OnInit {
     this.minPrice = undefined;
     this.maxPrice = undefined;
     this.showFavoritesOnly = false;
+  }
+
+  // Bid functionality
+  openBidForm(listing: Listing) {
+    this.selectedListing = listing;
+    this.showBidForm = true;
+  }
+
+  closeBidForm() {
+    this.showBidForm = false;
+    this.selectedListing = null;
+  }
+
+  onBidPlaced(response: BidResponse) {
+    console.log('Bid placed successfully:', response);
+    this.closeBidForm();
+    // Optionally refresh listings or show success message
   }
 
   getTimeRemaining(endTime: Date): string {

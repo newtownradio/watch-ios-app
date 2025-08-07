@@ -1,206 +1,271 @@
 <div class="auth-container">
-  <div class="auth-tabs">
-    <button 
-      [class.active]="activeTab === 'login'" 
-      (click)="setActiveTab('login')"
-      class="tab-button">
-      Login
-    </button>
-    <button 
-      [class.active]="activeTab === 'register'" 
-      (click)="setActiveTab('register')"
-      class="tab-button">
-      Register
-    </button>
-  </div>
+  <div class="auth-card">
+    <!-- Header -->
+    <div class="auth-header">
+      <h1 class="app-title">Watch Style</h1>
+      <p class="app-subtitle">Join the trusted marketplace for pre-owned luxury timepieces</p>
+    </div>
 
-  <!-- Login Form -->
-  <div *ngIf="activeTab === 'login'" class="auth-form">
-    <h2>Login</h2>
-    <form (ngSubmit)="login()">
-      <div class="form-group">
-        <label for="loginEmail">Email</label>
-        <input 
-          type="email" 
-          id="loginEmail"
-          [(ngModel)]="loginData.email" 
-          name="loginEmail"
-          required>
-      </div>
-      <div class="form-group">
-        <label for="loginPassword">Password</label>
-        <input 
-          type="password" 
-          id="loginPassword"
-          [(ngModel)]="loginData.password" 
-          name="loginPassword"
-          required>
-      </div>
-      <button type="submit" class="submit-btn">Login</button>
-    </form>
-    
-    <p class="forgot-password">
-      <a (click)="setActiveTab('forgot')">Forgot Password?</a>
-    </p>
-    
-    <!-- Demo Account for App Store Reviewers -->
-    <div class="demo-account-section">
-      <p class="demo-label">For App Store Reviewers:</p>
-      <button type="button" class="demo-btn" (click)="createDemoAccount()">
+    <!-- Apple Sign In (iOS only) -->
+    <div class="apple-signin" *ngIf="isIOS()">
+      <button class="btn-apple" (click)="signInWithApple()">
+        <svg class="apple-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+        Sign in with Apple
+      </button>
+    </div>
+
+    <!-- Demo Account Button (for testing) -->
+    <div class="demo-section">
+      <button class="btn-demo" (click)="createDemoAccount()" type="button">
         Create Demo Account
       </button>
-      <p class="demo-credentials">
-        <strong>Demo Login:</strong><br>
-        Email: demo@watchios.com<br>
-        Password: Demo123!
-      </p>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider" *ngIf="isIOS()">
+      <span>or</span>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-form" *ngIf="activeTab === 'login'">
+      <h2>Welcome Back</h2>
+      <form (ngSubmit)="login()">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input 
+            type="email" 
+            id="login-email"
+            [(ngModel)]="loginData.email"
+            name="email"
+            required
+            placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input 
+            type="password" 
+            id="login-password"
+            [(ngModel)]="loginData.password"
+            name="password"
+            required
+            placeholder="Enter your password">
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="loginData.rememberMe"
+              name="rememberMe">
+            Remember me
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+
+      <div class="form-links">
+        <a (click)="setActiveTab('forgot')" class="link">Forgot Password?</a>
+        <br>
+        <a (click)="setActiveTab('register')" class="link">Don't have an account? Create one</a>
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <div class="auth-form" *ngIf="activeTab === 'register'">
+      <h2>Create Account</h2>
+      <form (ngSubmit)="register()">
+        <div class="form-group">
+          <label for="register-name">Full Name</label>
+          <input 
+            type="text" 
+            id="register-name"
+            [(ngModel)]="registerData.name"
+            name="name"
+            required
+            placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label for="register-email">Email Address</label>
+          <input 
+            type="email" 
+            id="register-email"
+            [(ngModel)]="registerData.email"
+            name="email"
+            required
+            placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+          <label for="register-password">Password</label>
+          <input 
+            type="password" 
+            id="register-password"
+            [(ngModel)]="registerData.password"
+            name="password"
+            required
+            minlength="6"
+            placeholder="Create a password">
+        </div>
+
+        <div class="form-group">
+          <label for="register-confirm">Confirm Password</label>
+          <input 
+            type="password" 
+            id="register-confirm"
+            [(ngModel)]="registerData.confirmPassword"
+            name="confirmPassword"
+            required
+            placeholder="Confirm your password">
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="registerData.rememberMe"
+              name="rememberMe">
+            Remember me
+          </label>
+        </div>
+
+        <!-- Terms -->
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="registerData.privacyPolicy"
+              name="privacyPolicy"
+              required>
+            I agree to the <a (click)="showPrivacyPolicy($event)" class="link">Privacy Policy</a>
+          </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="registerData.cookiePolicy"
+              name="cookiePolicy"
+              required>
+            I agree to the <a (click)="showCookiePolicy($event)" class="link">Cookie Policy</a>
+          </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="registerData.termsConditions"
+              name="termsConditions"
+              required>
+            I agree to the <a (click)="showTermsConditions($event)" class="link">Terms & Conditions</a>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="!isRegistrationValid()">
+          Create Account
+        </button>
+      </form>
+
+      <div class="form-links">
+        <a (click)="setActiveTab('login')" class="link">Already have an account? Sign in</a>
+      </div>
+    </div>
+
+    <!-- Forgot Password Form -->
+    <div class="auth-form" *ngIf="activeTab === 'forgot'">
+      <h2>Forgot Password</h2>
+      <form (ngSubmit)="forgotPassword()">
+        <div class="form-group">
+          <label for="forgot-email">Email Address</label>
+          <input 
+            type="email" 
+            id="forgot-email"
+            [(ngModel)]="forgotPasswordData.email"
+            name="email"
+            required
+            placeholder="Enter your email">
+        </div>
+
+        <button type="submit" class="btn-primary">Send Reset Code</button>
+      </form>
+
+      <div class="form-links">
+        <a (click)="setActiveTab('login')" class="link">Back to Login</a>
+      </div>
+    </div>
+
+    <!-- Reset Password Form -->
+    <div class="auth-form" *ngIf="activeTab === 'reset'">
+      <h2>Reset Password</h2>
+      <form (ngSubmit)="resetPassword()">
+        <div class="form-group">
+          <label for="reset-email">Email Address</label>
+          <input 
+            type="email" 
+            id="reset-email"
+            [(ngModel)]="resetPasswordData.email"
+            name="email"
+            required
+            placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+          <label for="reset-code">Verification Code</label>
+          <input 
+            type="text" 
+            id="reset-code"
+            [(ngModel)]="resetPasswordData.code"
+            name="code"
+            required
+            placeholder="Enter verification code">
+        </div>
+
+        <div class="form-group">
+          <label for="reset-password">New Password</label>
+          <input 
+            type="password" 
+            id="reset-password"
+            [(ngModel)]="resetPasswordData.password"
+            name="password"
+            required
+            minlength="6"
+            placeholder="Enter new password">
+        </div>
+
+        <div class="form-group">
+          <label for="reset-confirm">Confirm New Password</label>
+          <input 
+            type="password" 
+            id="reset-confirm"
+            [(ngModel)]="resetPasswordData.confirmPassword"
+            name="confirmPassword"
+            required
+            placeholder="Confirm new password">
+        </div>
+
+        <button type="submit" class="btn-primary">Reset Password</button>
+      </form>
+
+      <div class="form-links">
+        <a (click)="setActiveTab('login')" class="link">Back to Login</a>
+      </div>
     </div>
   </div>
 
-  <!-- Register Form -->
-  <div *ngIf="activeTab === 'register'" class="auth-form">
-    <h2>Register</h2>
-    <form (ngSubmit)="register()">
-      <div class="form-group">
-        <label for="registerName">Name</label>
-        <input 
-          type="text" 
-          id="registerName"
-          [(ngModel)]="registerData.name" 
-          name="registerName"
-          required>
+  <!-- Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ modalTitle }}</h3>
+        <button class="modal-close" (click)="closeModal()">&times;</button>
       </div>
-      <div class="form-group">
-        <label for="registerEmail">Email</label>
-        <input 
-          type="email" 
-          id="registerEmail"
-          [(ngModel)]="registerData.email" 
-          name="registerEmail"
-          required>
-      </div>
-      <div class="form-group">
-        <label for="registerPassword">Password</label>
-        <input 
-          type="password" 
-          id="registerPassword"
-          [(ngModel)]="registerData.password" 
-          name="registerPassword"
-          required>
-      </div>
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input 
-          type="password" 
-          id="confirmPassword"
-          [(ngModel)]="registerData.confirmPassword" 
-          name="confirmPassword"
-          required>
-      </div>
-      
-      <!-- Policy Agreements -->
-      <div class="form-group checkbox-group">
-        <label class="checkbox-label">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="registerData.privacyPolicy" 
-            name="privacyPolicy"
-            required>
-          I agree to the <a href="#" (click)="showPrivacyPolicy($event)">Privacy Policy</a>
-        </label>
-      </div>
-      
-      <div class="form-group checkbox-group">
-        <label class="checkbox-label">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="registerData.cookiePolicy" 
-            name="cookiePolicy"
-            required>
-          I agree to the <a href="#" (click)="showCookiePolicy($event)">Cookie Policy</a>
-        </label>
-      </div>
-      
-      <div class="form-group checkbox-group">
-        <label class="checkbox-label">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="registerData.termsConditions" 
-            name="termsConditions"
-            required>
-          I agree to the <a href="#" (click)="showTermsConditions($event)">Terms & Conditions</a>
-        </label>
-      </div>
-      
-      <button type="submit" class="submit-btn" [disabled]="!isRegistrationValid()">Register</button>
-    </form>
-  </div>
-
-  <!-- Forgot Password Form -->
-  <div *ngIf="activeTab === 'forgot'" class="auth-form">
-    <h2>Forgot Password</h2>
-    <form (ngSubmit)="forgotPassword()">
-      <div class="form-group">
-        <label for="forgotEmail">Email</label>
-        <input 
-          type="email" 
-          id="forgotEmail"
-          [(ngModel)]="forgotPasswordData.email" 
-          name="forgotEmail"
-          required>
-      </div>
-      <button type="submit" class="submit-btn">Send Reset Code</button>
-    </form>
-    
-    <p class="back-to-login">
-      <a (click)="setActiveTab('login')">Back to Login</a>
-    </p>
-  </div>
-
-  <!-- Reset Password Form -->
-  <div *ngIf="activeTab === 'reset'" class="auth-form">
-    <h2>Reset Password</h2>
-    <form (ngSubmit)="resetPassword()">
-      <div class="form-group">
-        <label for="resetEmail">Email</label>
-        <input 
-          type="email" 
-          id="resetEmail"
-          [(ngModel)]="resetPasswordData.email" 
-          name="resetEmail"
-          required>
-      </div>
-      <div class="form-group">
-        <label for="resetCode">Verification Code</label>
-        <input 
-          type="text" 
-          id="resetCode"
-          [(ngModel)]="resetPasswordData.code" 
-          name="resetCode"
-          required>
-      </div>
-      <div class="form-group">
-        <label for="resetPassword">New Password</label>
-        <input 
-          type="password" 
-          id="resetPassword"
-          [(ngModel)]="resetPasswordData.password" 
-          name="resetPassword"
-          required>
-      </div>
-      <div class="form-group">
-        <label for="resetConfirmPassword">Confirm New Password</label>
-        <input 
-          type="password" 
-          id="resetConfirmPassword"
-          [(ngModel)]="resetPasswordData.confirmPassword" 
-          name="resetConfirmPassword"
-          required>
-      </div>
-      <button type="submit" class="submit-btn">Reset Password</button>
-    </form>
-    <p class="back-to-login">
-      <a (click)="setActiveTab('login')">Back to Login</a>
-    </p>
+      <div class="modal-body" [innerHTML]="modalContent"></div>
+    </div>
   </div>
 </div>

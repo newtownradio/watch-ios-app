@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Listing, Bid, Counteroffer, Watch, User, Message, Notification } from '../models/bid.interface';
+import { AuthenticationRequest } from './authentication.service';
+import { Bid as BidInterface } from './bid.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +17,8 @@ export class DataPersistenceService {
   private readonly MESSAGES_KEY = 'watch_ios_messages';
   private readonly NOTIFICATIONS_KEY = 'watch_ios_notifications';
   private readonly PASSWORD_RESET_KEY = 'watch_ios_password_resets';
+  private readonly AUTHENTICATION_REQUESTS_KEY = 'watch_ios_authentication_requests';
+  private readonly BIDS_KEY = 'watch_ios_bids';
 
   // ===== LISTINGS MANAGEMENT =====
 
@@ -1103,6 +1107,175 @@ Note: These are test accounts for development purposes only.
     } catch (error) {
       console.error('Error getting password resets:', error);
       return {};
+    }
+  }
+
+  // ===== AUTHENTICATION REQUESTS MANAGEMENT =====
+
+  /**
+   * Save authentication request
+   */
+  saveAuthenticationRequest(request: AuthenticationRequest): void {
+    const requests = this.getAuthenticationRequests();
+    requests.push(request);
+    this.saveAuthenticationRequests(requests);
+  }
+
+  /**
+   * Get all authentication requests
+   */
+  getAuthenticationRequests(): AuthenticationRequest[] {
+    const data = localStorage.getItem(this.AUTHENTICATION_REQUESTS_KEY);
+    if (!data) return [];
+    
+    const requests = JSON.parse(data);
+    
+    // Convert date strings back to Date objects
+    return requests.map((request: AuthenticationRequest) => ({
+      ...request,
+      createdAt: new Date(request.createdAt),
+      estimatedCompletion: request.estimatedCompletion ? new Date(request.estimatedCompletion) : undefined,
+      result: request.result ? {
+        ...request.result,
+        completedAt: new Date(request.result.completedAt)
+      } : undefined
+    }));
+  }
+
+  /**
+   * Get authentication requests by user
+   */
+  getAuthenticationRequestsByUser(userId: string): AuthenticationRequest[] {
+    return this.getAuthenticationRequests().filter(request => 
+      request.buyerId === userId || request.sellerId === userId
+    );
+  }
+
+  /**
+   * Get authentication request by ID
+   */
+  getAuthenticationRequestById(id: string): AuthenticationRequest | null {
+    return this.getAuthenticationRequests().find(request => request.id === id) || null;
+  }
+
+  /**
+   * Update authentication request
+   */
+  updateAuthenticationRequest(updatedRequest: AuthenticationRequest): void {
+    const requests = this.getAuthenticationRequests();
+    const index = requests.findIndex(r => r.id === updatedRequest.id);
+    if (index !== -1) {
+      requests[index] = updatedRequest;
+      this.saveAuthenticationRequests(requests);
+    }
+  }
+
+  /**
+   * Delete authentication request
+   */
+  deleteAuthenticationRequest(id: string): void {
+    const requests = this.getAuthenticationRequests();
+    const filtered = requests.filter(r => r.id !== id);
+    this.saveAuthenticationRequests(filtered);
+  }
+
+  /**
+   * Save authentication requests to localStorage
+   */
+  private saveAuthenticationRequests(requests: AuthenticationRequest[]): void {
+    try {
+      localStorage.setItem(this.AUTHENTICATION_REQUESTS_KEY, JSON.stringify(requests));
+    } catch {
+      console.error('localStorage quota exceeded, clearing old data and retrying...');
+      // Clear old data and retry
+      this.clearAllData();
+      localStorage.setItem(this.AUTHENTICATION_REQUESTS_KEY, JSON.stringify(requests));
+    }
+  }
+
+  // ===== BID MANAGEMENT =====
+
+  /**
+   * Save a new bid
+   */
+  saveBid(bid: BidInterface): void {
+    const bids = this.getAllBids();
+    bids.push(bid);
+    this.saveBids(bids);
+  }
+
+  /**
+   * Get all bids
+   */
+  getAllBids(): BidInterface[] {
+    const data = localStorage.getItem(this.BIDS_KEY);
+    if (!data) return [];
+    
+    const bids = JSON.parse(data);
+    
+    // Convert date strings back to Date objects
+    return bids.map((bid: any) => ({
+      ...bid,
+      createdAt: new Date(bid.createdAt),
+      expiresAt: new Date(bid.expiresAt),
+      acceptedAt: bid.acceptedAt ? new Date(bid.acceptedAt) : undefined,
+      rejectedAt: bid.rejectedAt ? new Date(bid.rejectedAt) : undefined
+    }));
+  }
+
+  /**
+   * Get bids by listing
+   */
+  getBidsByListing(listingId: string): BidInterface[] {
+    return this.getAllBids().filter(bid => bid.listingId === listingId);
+  }
+
+  /**
+   * Get bids by user
+   */
+  getBidsByUser(userId: string): any[] {
+    return this.getAllBids().filter(bid => bid.buyerId === userId);
+  }
+
+  /**
+   * Get bid by ID
+   */
+  getBidById(bidId: string): any | null {
+    return this.getAllBids().find(bid => bid.id === bidId) || null;
+  }
+
+  /**
+   * Update bid
+   */
+  updateBid(updatedBid: any): void {
+    const bids = this.getAllBids();
+    const index = bids.findIndex(b => b.id === updatedBid.id);
+    if (index !== -1) {
+      bids[index] = updatedBid;
+      this.saveBids(bids);
+    }
+  }
+
+  /**
+   * Delete bid
+   */
+  deleteBid(bidId: string): void {
+    const bids = this.getAllBids();
+    const filtered = bids.filter(b => b.id !== bidId);
+    this.saveBids(filtered);
+  }
+
+  /**
+   * Save bids to localStorage
+   */
+  private saveBids(bids: any[]): void {
+    try {
+      localStorage.setItem(this.BIDS_KEY, JSON.stringify(bids));
+    } catch {
+      console.error('localStorage quota exceeded, clearing old data and retrying...');
+      // Clear old data and retry
+      this.clearAllData();
+      localStorage.setItem(this.BIDS_KEY, JSON.stringify(bids));
     }
   }
 }

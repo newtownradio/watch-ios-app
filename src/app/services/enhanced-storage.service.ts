@@ -1,112 +1,95 @@
 import { Injectable } from '@angular/core';
-import { Preferences } from '@capacitor/preferences';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EnhancedStorageService {
+  private readonly STORAGE_PREFIX = 'watch_ios_';
 
   /**
-   * Set a value in storage (prefers Capacitor Preferences, falls back to localStorage)
+   * Set a value in localStorage with error handling
    */
-  async set(key: string, value: any): Promise<void> {
+  setItem(key: string, value: any): boolean {
     try {
-      // Try Capacitor Preferences first
-      await Preferences.set({
-        key: key,
-        value: typeof value === 'string' ? value : JSON.stringify(value)
+      const fullKey = this.STORAGE_PREFIX + key;
+      const serializedValue = JSON.stringify(value);
+      localStorage.setItem(fullKey, serializedValue);
+      return true;
+    } catch (error) {
+      console.error('Error setting localStorage item:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get a value from localStorage with error handling
+   */
+  getItem<T>(key: string): T | null {
+    try {
+      const fullKey = this.STORAGE_PREFIX + key;
+      const item = localStorage.getItem(fullKey);
+      return item ? JSON.parse(item) : null;
+    } catch (error) {
+      console.error('Error getting localStorage item:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Remove an item from localStorage
+   */
+  removeItem(key: string): boolean {
+    try {
+      const fullKey = this.STORAGE_PREFIX + key;
+      localStorage.removeItem(fullKey);
+      return true;
+    } catch (error) {
+      console.error('Error removing localStorage item:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Clear all app-related localStorage items
+   */
+  clearAll(): boolean {
+    try {
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith(this.STORAGE_PREFIX)) {
+          localStorage.removeItem(key);
+        }
       });
+      return true;
     } catch (error) {
-      console.warn('Capacitor Preferences failed, falling back to localStorage:', error);
-      // Fallback to localStorage
-      try {
-        localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
-      } catch (localError) {
-        console.error('Both storage methods failed:', localError);
-        throw localError;
-      }
+      console.error('Error clearing localStorage:', error);
+      return false;
     }
   }
 
   /**
-   * Get a value from storage (prefers Capacitor Preferences, falls back to localStorage)
+   * Get storage usage statistics
    */
-  async get(key: string): Promise<any> {
+  getStorageStats(): { totalKeys: number; totalSize: number } {
     try {
-      // Try Capacitor Preferences first
-      const result = await Preferences.get({ key });
-      if (result.value !== null) {
-        try {
-          return JSON.parse(result.value);
-        } catch {
-          return result.value;
+      const keys = Object.keys(localStorage);
+      const appKeys = keys.filter(key => key.startsWith(this.STORAGE_PREFIX));
+      let totalSize = 0;
+      
+      appKeys.forEach(key => {
+        const item = localStorage.getItem(key);
+        if (item) {
+          totalSize += new Blob([item]).size;
         }
-      }
+      });
+
+      return {
+        totalKeys: appKeys.length,
+        totalSize
+      };
     } catch (error) {
-      console.warn('Capacitor Preferences failed, falling back to localStorage:', error);
-    }
-
-    // Fallback to localStorage
-    try {
-      const value = localStorage.getItem(key);
-      if (value !== null) {
-        try {
-          return JSON.parse(value);
-        } catch {
-          return value;
-        }
-      }
-    } catch (localError) {
-      console.error('localStorage get failed:', localError);
-    }
-
-    return null;
-  }
-
-  /**
-   * Remove a value from storage
-   */
-  async remove(key: string): Promise<void> {
-    try {
-      await Preferences.remove({ key });
-    } catch (error) {
-      console.warn('Capacitor Preferences remove failed, falling back to localStorage:', error);
-    }
-
-    try {
-      localStorage.removeItem(key);
-    } catch (localError) {
-      console.error('localStorage remove failed:', localError);
-    }
-  }
-
-  /**
-   * Clear all storage
-   */
-  async clear(): Promise<void> {
-    try {
-      await Preferences.clear();
-    } catch (error) {
-      console.warn('Capacitor Preferences clear failed, falling back to localStorage:', error);
-    }
-
-    try {
-      localStorage.clear();
-    } catch (localError) {
-      console.error('localStorage clear failed:', localError);
-    }
-  }
-
-  /**
-   * Get all keys from storage
-   */
-  async keys(): Promise<string[]> {
-    try {
-      const result = await Preferences.keys();
-      return result.keys;
-    } catch (error) {
-      console.warn('Capacitor Preferences keys failed, falling back to localStorage:', error);
-      return Object.keys(localStorage);
+      console.error('Error getting storage stats:', error);
+      return { totalKeys: 0, totalSize: 0 };
     }
   }
 } 

@@ -6,14 +6,33 @@ import { SplashComponent } from './pages/splash/splash.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { MessagesComponent } from './pages/messages/messages.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
+import { AuthGuard } from './guards/auth.guard';
+import { RoleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', component: SplashComponent },
   { path: 'auth', component: AuthComponent },
   { path: 'discovery', component: DiscoveryComponent },
-  { path: 'sell', component: SellComponent },
-  { path: 'account', component: AccountComponent },
-  { path: 'messages', component: MessagesComponent },
-  { path: 'notifications', component: NotificationsComponent },
+  { 
+    path: 'sell', 
+    component: SellComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['user', 'seller', 'verified'] }
+  },
+  { 
+    path: 'account', 
+    component: AccountComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'messages', 
+    component: MessagesComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'notifications', 
+    component: NotificationsComponent,
+    canActivate: [AuthGuard]
+  },
   { path: '**', redirectTo: '' }
 ];

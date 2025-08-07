@@ -113,9 +113,14 @@
             Ends: {{ getListingEndTime(listing.endTime) }}
           </span>
         </div>
-        <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
-          📤 Share
-        </button>
+        <div class="listing-actions">
+          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
+            📤 Share
+          </button>
+          <button class="bid-btn" (click)="openBidForm(listing)" title="Place a bid">
+            💰 Place Bid
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -124,5 +129,17 @@
   <div class="no-results" *ngIf="filteredListings.length === 0">
     <p>No listings found matching your criteria</p>
     <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
+  </div>
+
+  <!-- Bid Form Modal -->
+  <div class="bid-modal" *ngIf="showBidForm && selectedListing">
+    <div class="modal-overlay" (click)="closeBidForm()"></div>
+    <div class="modal-content">
+      <app-bid-form 
+        [listing]="selectedListing"
+        (bidPlaced)="onBidPlaced($event)"
+        (cancelled)="closeBidForm()"
+      ></app-bid-form>
+    </div>
   </div>
 </div>

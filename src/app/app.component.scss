@@ -3,21 +3,22 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: white;
-  overflow: visible;
+  background: #f5f5f0;
+  overflow: hidden; /* Changed from visible to hidden */
   position: relative;
 }
 
 /* Header */
 .header {
-  background: #1e3a8a;
+  background: #f5f5f0;
   padding: 12px 16px;
   padding-top: 20px;
   position: sticky;
   top: 0;
   z-index: 100;
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
   
   @media (max-width: 768px) {
     padding: 10px 14px;
@@ -36,10 +37,13 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  min-height: 44px;
+  min-height: 44px; /* Apple's minimum touch target */
+  gap: 16px; /* Ensure proper spacing between elements */
+  pointer-events: auto; /* Ensure content is interactive */
   
   @media (max-width: 480px) {
-    min-height: 40px;
+    min-height: 44px; /* Keep 44px minimum even on mobile */
+    gap: 12px; /* Slightly reduced gap on mobile */
   }
 }
 
@@ -48,6 +52,9 @@
   text-decoration: none;
   display: flex;
   align-items: center;
+  min-width: 44px; /* Ensure logo area is also touchable */
+  min-height: 44px;
+  flex-shrink: 0; /* Prevent logo from shrinking */
 }
 
 .logo-image {
@@ -73,9 +80,9 @@
 .watch-face {
   width: 20px;
   height: 20px;
-  background: white;
+  background: #8B4513;
   border-radius: 50%;
-  border: 2px solid #1e3a8a;
+  border: 2px solid #D2691E;
   position: relative;
   display: flex;
   align-items: center;
@@ -90,7 +97,7 @@
 .watch-hands {
   width: 2px;
   height: 8px;
-  background: #1e3a8a;
+  background: #D2691E;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -148,7 +155,7 @@
   }
 }
 
-/* Hamburger Button */
+/* Hamburger Button - iOS Human Interface Guidelines */
 .hamburger-btn {
   background: transparent;
   border: none;
@@ -157,17 +164,54 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 44px; /* iOS minimum touch target */
+  min-height: 44px; /* iOS minimum touch target */
   transition: none;
+  position: relative;
+  z-index: 9999; /* Higher z-index to ensure it's on top */
+  flex-shrink: 0;
+  
+  /* iOS touch handling - Apple recommended */
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  
+  /* Remove default button styling */
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* Ensure button is clickable on iOS */
+  pointer-events: auto;
   
   @media (max-width: 480px) {
-    min-width: 40px;
-    min-height: 40px;
-    padding: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px;
+    width: 44px;
+    height: 44px;
   }
+}
+
+/* Focus state for accessibility */
+.hamburger-btn:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Active state for touch devices */
+.hamburger-btn:active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* iOS-specific touch handling */
+.hamburger-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .hamburger-lines {
@@ -176,23 +220,25 @@
   gap: 4px;
   width: 24px;
   height: 18px;
+  flex-shrink: 0; /* Prevent compression */
   
   @media (max-width: 480px) {
-    width: 20px;
-    height: 16px;
-    gap: 3px;
+    width: 22px; /* Keep larger size */
+    height: 18px; /* Keep proper height */
+    gap: 4px; /* Keep consistent gap */
   }
 }
 
 .hamburger-lines span {
   width: 100%;
   height: 3px;
-  background: white;
+  background: #2c2c2c; /* French black color for better visibility */
   border-radius: 2px;
   display: block;
+  flex-shrink: 0; /* Prevent compression */
   
   @media (max-width: 480px) {
-    height: 2px;
+    height: 3px; /* Keep consistent height */
   }
 }
 
@@ -211,6 +257,11 @@
   flex-direction: column;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+  
+  /* iOS-specific enhancements */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .menu.open {
@@ -227,8 +278,8 @@
   font-size: 32px;
   color: #374151;
   cursor: pointer;
-  width: 44px;
-  height: 44px;
+  width: 44px; /* Apple's minimum touch target */
+  height: 44px; /* Apple's minimum touch target */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -237,27 +288,27 @@
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   
+  /* iOS-specific enhancements */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-appearance: none;
+  appearance: none;
+  
   @media (max-width: 768px) {
     top: 16px;
     right: 16px;
     font-size: 28px;
-    width: 40px;
-    height: 40px;
+    width: 44px; /* Keep 44px minimum */
+    height: 44px; /* Keep 44px minimum */
   }
   
   @media (max-width: 480px) {
     top: 12px;
     right: 12px;
     font-size: 24px;
-    width: 36px;
-    height: 36px;
-  }
-}
-
-/* Only show hover on devices that support it */
-@media (hover: hover) {
-  .menu-close-btn:hover {
-    color: #1e3a8a;
+    width: 44px; /* Keep 44px minimum */
+    height: 44px; /* Keep 44px minimum */
   }
 }
 
@@ -265,6 +316,20 @@
 .menu-close-btn:focus {
   outline: 2px solid #1e3a8a;
   outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Active state for touch devices */
+.menu-close-btn:active {
+  background-color: rgba(55, 65, 81, 0.1);
+  border-radius: 4px;
+}
+
+/* Only show hover on devices that support it */
+@media (hover: hover) {
+  .menu-close-btn:hover {
+    color: #1e3a8a;
+  }
 }
 
 /* Menu Links - Mobile style for all screen sizes */
@@ -289,49 +354,53 @@
   justify-content: space-between;
   padding: 24px;
   text-decoration: none;
-  color: #374151;
+  color: #2c2c2c;
   font-weight: 500;
   font-size: 20px;
   transition: all 0.2s ease;
   position: relative;
-
-  &.active {
-    color: #1e3a8a;
-    background-color: rgba(30, 58, 138, 0.05);
-    border-right: 3px solid #1e3a8a;
-  }
-
-  .active-indicator {
-    color: #1e3a8a;
-    font-size: 16px;
-    margin-left: 8px;
-  }
   border-left: 3px solid transparent;
-  min-height: 70px;
+  min-height: 44px; /* Apple's minimum touch target */
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   
+  /* iOS-specific enhancements */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-appearance: none;
+  appearance: none;
+  
   @media (max-width: 768px) {
     padding: 20px;
     font-size: 18px;
-    min-height: 60px;
+    min-height: 44px; /* Apple's minimum touch target */
   }
   
   @media (max-width: 480px) {
     padding: 16px;
     font-size: 16px;
-    min-height: 50px;
+    min-height: 44px; /* Apple's minimum touch target */
+  }
+
+  &.active {
+    color: #8b7355;
+    background-color: rgba(139, 115, 85, 0.1);
+    border-right: 3px solid #8b7355;
+  }
+
+  .active-indicator {
+    color: #8b7355;
+    font-size: 16px;
+    margin-left: 8px;
   }
 }
 
-/* Only show hover on devices that support it */
-@media (hover: hover) {
-  .menu-link:hover {
-    background: #f3f4f6;
-    color: #1e3a8a;
-    border-left-color: #1e3a8a;
-  }
+/* Focus state for accessibility */
+.menu-link:focus {
+  outline: 2px solid #1e3a8a;
+  outline-offset: 2px;
 }
 
 /* Active state for touch devices */
@@ -341,10 +410,13 @@
   border-left-color: #1e3a8a;
 }
 
-/* Focus state for accessibility */
-.menu-link:focus {
-  outline: 2px solid #1e3a8a;
-  outline-offset: 2px;
+/* Only show hover on devices that support it */
+@media (hover: hover) {
+  .menu-link:hover {
+    background: #f3f4f6;
+    color: #1e3a8a;
+    border-left-color: #1e3a8a;
+  }
 }
 
 .menu-text {
@@ -363,6 +435,11 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
+  
+  /* iOS-specific enhancements */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .overlay.open {
@@ -445,7 +522,7 @@
   }
   
   .header-content {
-    min-height: 36px;
+    min-height: 44px; /* Keep Apple's minimum */
   }
   
   .logo-circle {
@@ -458,9 +535,9 @@
   }
   
   .hamburger-btn {
-    min-width: 36px;
-    min-height: 36px;
-    padding: 4px;
+    min-width: 44px; /* Keep Apple's minimum */
+    min-height: 44px; /* Keep Apple's minimum */
+    padding: 8px; /* Keep consistent padding */
   }
   
   .hamburger-lines {
@@ -477,8 +554,8 @@
     top: 8px;
     right: 8px;
     font-size: 20px;
-    width: 32px;
-    height: 32px;
+    width: 44px; /* Keep Apple's minimum */
+    height: 44px; /* Keep Apple's minimum */
   }
   
   .menu-links {
@@ -488,6 +565,6 @@
   .menu-link {
     padding: 12px;
     font-size: 15px;
-    min-height: 44px;
+    min-height: 44px; /* Keep adequate touch target */
   }
 }

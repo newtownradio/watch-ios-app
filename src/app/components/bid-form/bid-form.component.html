@@ -1,0 +1,76 @@
+<div class="bid-form-container">
+  <div class="bid-form-header">
+    <h3>Place Your Bid</h3>
+    <p>{{ listing.title }}</p>
+  </div>
+
+  <div class="current-price">
+    <span class="label">Current Price:</span>
+    <span class="price">${{ listing.currentPrice.toLocaleString() }}</span>
+  </div>
+
+  <form (ngSubmit)="placeBid()" #bidForm="ngForm" class="bid-form">
+    <div class="form-group">
+      <label for="bidAmount">Your Bid Amount</label>
+      <div class="input-group">
+        <span class="currency-symbol">$</span>
+        <input
+          type="number"
+          id="bidAmount"
+          name="bidAmount"
+          [(ngModel)]="bidAmount"
+          [min]="listing.currentPrice + 1"
+          step="0.01"
+          required
+          class="bid-input"
+          placeholder="Enter your bid amount"
+        >
+      </div>
+      <small class="form-help">
+        Minimum bid: ${{ (listing.currentPrice + 1).toLocaleString() }}
+      </small>
+    </div>
+
+    <div class="bid-terms">
+      <div class="terms-checkbox">
+        <input
+          type="checkbox"
+          id="agreeTerms"
+          name="agreeTerms"
+          [(ngModel)]="agreeTerms"
+          required
+        >
+        <label for="agreeTerms">
+          I agree to the <a href="#" (click)="showTerms($event)">bid terms and conditions</a>
+        </label>
+      </div>
+    </div>
+
+    <div class="bid-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="cancelBid()"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="!bidForm.valid || isSubmitting"
+      >
+        {{ isSubmitting ? 'Placing Bid...' : 'Place Bid' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+</div> 

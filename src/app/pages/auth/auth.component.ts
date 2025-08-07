@@ -5,606 +5,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CloudflareAuthService } from '../../services/cloudflare-auth.service';
 import { AppleAuthService } from '../../services/apple-auth.service';
 import { DataPersistenceService } from '../../services/data-persistence.service';
-import { EmailService } from '../../services/email.service';
-import { User } from '../../models/bid.interface';
+import { KeychainService } from '../../services/keychain.service';
 
 @Component({
   selector: 'app-auth',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="auth-container">
-      <div class="auth-card">
-        <!-- Logo and Header -->
-        <div class="auth-header">
-          <div class="logo">
-            <h1>Watch Style</h1>
-          </div>
-          <p class="auth-subtitle">Join the trusted marketplace for luxury timepieces</p>
-          <div class="auth-actions" *ngIf="isAuthenticated()">
-            <button class="btn-link" (click)="logout()">
-              Sign Out
-            </button>
-          </div>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="auth-tabs">
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'login'"
-            (click)="setActiveTab('login')"
-            role="tab"
-            [attr.aria-selected]="activeTab === 'login'"
-          >
-            Sign In
-          </button>
-          <button 
-            class="tab-btn" 
-            [class.active]="activeTab === 'register'"
-            (click)="setActiveTab('register')"
-            role="tab"
-            [attr.aria-selected]="activeTab === 'register'"
-          >
-            Create Account
-          </button>
-        </div>
-
-        <!-- Apple Sign In Button -->
-        <div class="apple-signin-section" *ngIf="isIOS()">
-          <div class="divider">
-            <span>or</span>
-          </div>
-          <button 
-            class="btn-apple-signin" 
-            (click)="signInWithApple()"
-            type="button"
-            aria-label="Sign in with Apple"
-          >
-            <svg class="apple-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-            </svg>
-            Sign in with Apple
-          </button>
-        </div>
-
-        <!-- Login Form -->
-        <div class="auth-form" *ngIf="activeTab === 'login'">
-          <form (ngSubmit)="login()" #loginForm="ngForm">
-            <div class="form-group">
-              <label for="login-email">Email Address</label>
-              <input 
-                type="email" 
-                id="login-email"
-                [(ngModel)]="loginData.email"
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="Enter your email"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="login-password">Password</label>
-              <input 
-                type="password" 
-                id="login-password"
-                [(ngModel)]="loginData.password"
-                name="password"
-                required
-                autocomplete="current-password"
-                placeholder="Enter your password"
-              >
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="!loginForm.valid">
-                Sign In
-              </button>
-              <button type="button" class="btn-link" (click)="setActiveTab('forgot-password')">
-                Forgot Password?
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Registration Form -->
-        <div class="auth-form" *ngIf="activeTab === 'register'">
-          <form (ngSubmit)="register()" #registerForm="ngForm">
-            <div class="form-group">
-              <label for="register-name">Full Name</label>
-              <input 
-                type="text" 
-                id="register-name"
-                [(ngModel)]="registerData.name"
-                name="name"
-                required
-                autocomplete="name"
-                placeholder="Enter your full name"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="register-email">Email Address</label>
-              <input 
-                type="email" 
-                id="register-email"
-                [(ngModel)]="registerData.email"
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="Enter your email"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="register-password">Password</label>
-              <input 
-                type="password" 
-                id="register-password"
-                [(ngModel)]="registerData.password"
-                name="password"
-                required
-                minlength="6"
-                autocomplete="new-password"
-                placeholder="Create a password"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="register-confirm-password">Confirm Password</label>
-              <input 
-                type="password" 
-                id="register-confirm-password"
-                [(ngModel)]="registerData.confirmPassword"
-                name="confirmPassword"
-                required
-                autocomplete="new-password"
-                placeholder="Confirm your password"
-              >
-            </div>
-
-            <!-- Policy Agreements -->
-            <div class="form-group checkbox-group">
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  [(ngModel)]="registerData.privacyPolicy" 
-                  name="privacyPolicy"
-                  required>
-                I agree to the <a href="#" (click)="showPrivacyPolicy($event)">Privacy Policy</a>
-              </label>
-            </div>
-            
-            <div class="form-group checkbox-group">
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  [(ngModel)]="registerData.cookiePolicy" 
-                  name="cookiePolicy"
-                  required>
-                I agree to the <a href="#" (click)="showCookiePolicy($event)">Cookie Policy</a>
-              </label>
-            </div>
-            
-            <div class="form-group checkbox-group">
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  [(ngModel)]="registerData.termsConditions" 
-                  name="termsConditions"
-                  required>
-                I agree to the <a href="#" (click)="showTermsConditions($event)">Terms & Conditions</a>
-              </label>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="!isRegistrationValid()">
-                Create Account
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Forgot Password Form -->
-        <div class="auth-form" *ngIf="activeTab === 'forgot-password'">
-          <h2>Forgot Password</h2>
-          <form (ngSubmit)="forgotPassword()" #forgotForm="ngForm">
-            <div class="form-group">
-              <label for="forgot-email">Email Address</label>
-              <input 
-                type="email" 
-                id="forgot-email"
-                [(ngModel)]="forgotPasswordData.email"
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="Enter your email"
-              >
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="!forgotForm.valid">
-                Send Reset Code
-              </button>
-              <button type="button" class="btn-link" (click)="setActiveTab('login')">
-                Back to Login
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Reset Password Form -->
-        <div class="auth-form" *ngIf="activeTab === 'reset-password'">
-          <h2>Reset Password</h2>
-          <form (ngSubmit)="resetPassword()" #resetForm="ngForm">
-            <div class="form-group">
-              <label for="reset-email">Email Address</label>
-              <input 
-                type="email" 
-                id="reset-email"
-                [(ngModel)]="resetPasswordData.email"
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="Enter your email"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="reset-code">Verification Code</label>
-              <input 
-                type="text" 
-                id="reset-code"
-                [(ngModel)]="resetPasswordData.code"
-                name="code"
-                required
-                placeholder="Enter verification code"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="reset-password">New Password</label>
-              <input 
-                type="password" 
-                id="reset-password"
-                [(ngModel)]="resetPasswordData.password"
-                name="password"
-                required
-                minlength="6"
-                autocomplete="new-password"
-                placeholder="Enter new password"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="reset-confirm-password">Confirm New Password</label>
-              <input 
-                type="password" 
-                id="reset-confirm-password"
-                [(ngModel)]="resetPasswordData.confirmPassword"
-                name="confirmPassword"
-                required
-                autocomplete="new-password"
-                placeholder="Confirm new password"
-              >
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="!resetForm.valid">
-                Reset Password
-              </button>
-              <button type="button" class="btn-link" (click)="setActiveTab('login')">
-                Back to Login
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal for Privacy Policy, Terms, etc. -->
-    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>{{ modalTitle }}</h3>
-          <button class="modal-close" (click)="closeModal()">&times;</button>
-        </div>
-        <div class="modal-body" [innerHTML]="modalContent"></div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .auth-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 20px;
-    }
-
-    .auth-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      padding: 40px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .auth-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .logo h1 {
-      color: #333;
-      margin: 0;
-      font-size: 2.5rem;
-      font-weight: 700;
-    }
-
-    .auth-subtitle {
-      color: #666;
-      margin: 10px 0 0 0;
-      font-size: 1rem;
-    }
-
-    .auth-tabs {
-      display: flex;
-      margin-bottom: 30px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 15px;
-      background: none;
-      border: none;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #666;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .tab-btn.active {
-      color: #667eea;
-      border-bottom: 2px solid #667eea;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    .form-actions {
-      margin-top: 30px;
-    }
-
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-link {
-      background: none;
-      border: none;
-      color: #667eea;
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: underline;
-      margin-top: 15px;
-    }
-
-    .checkbox-group {
-      margin: 15px 0;
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 14px;
-      line-height: 1.4;
-      cursor: pointer;
-    }
-
-    .checkbox-label input[type="checkbox"] {
-      margin: 0;
-      flex-shrink: 0;
-    }
-
-    .checkbox-label a {
-      color: #667eea;
-      text-decoration: none;
-    }
-
-    .checkbox-label a:hover {
-      text-decoration: underline;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .modal-header h3 {
-      margin: 0;
-      color: #333;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #666;
-    }
-
-    .modal-body {
-      color: #666;
-      line-height: 1.6;
-    }
-
-    .demo-account-section {
-      margin-top: 30px;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      border: 1px solid #e9ecef;
-    }
-
-    .demo-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #495057;
-      margin: 0 0 10px 0;
-    }
-
-    .demo-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-bottom: 15px;
-      transition: background-color 0.3s ease;
-    }
-
-    .demo-btn:hover {
-      background: #218838;
-    }
-
-    .demo-credentials {
-      font-size: 13px;
-      color: #6c757d;
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    /* Apple Sign In Styles */
-    .apple-signin-section {
-      margin: 30px 0;
-      text-align: center;
-    }
-
-    .divider {
-      position: relative;
-      margin: 20px 0;
-      text-align: center;
-    }
-
-    .divider::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: #e0e0e0;
-    }
-
-    .divider span {
-      background: white;
-      padding: 0 15px;
-      color: #666;
-      font-size: 14px;
-    }
-
-    .btn-apple-signin {
-      width: 100%;
-      padding: 14px;
-      background: #000;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: background-color 0.3s ease;
-      min-height: 44px;
-    }
-
-    .btn-apple-signin:hover {
-      background: #333;
-    }
-
-    .apple-icon {
-      width: 20px;
-      height: 20px;
-    }
-  `]
+  templateUrl: './auth.component.html',
+  styleUrls: ['./auth.component.scss']
 })
 export class AuthComponent implements OnInit {
   activeTab = 'login';
@@ -614,7 +22,8 @@ export class AuthComponent implements OnInit {
 
   loginData = {
     email: '',
-    password: ''
+    password: '',
+    rememberMe: false
   };
 
   registerData = {
@@ -622,6 +31,7 @@ export class AuthComponent implements OnInit {
     email: '',
     password: '',
     confirmPassword: '',
+    rememberMe: false,
     privacyPolicy: false,
     cookiePolicy: false,
     termsConditions: false
@@ -638,35 +48,37 @@ export class AuthComponent implements OnInit {
     confirmPassword: ''
   };
 
-  currentVerificationCode = '';
-
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private dataService = inject(DataPersistenceService);
-  private emailService = inject(EmailService);
   private cloudflareAuthService = inject(CloudflareAuthService);
   private appleAuthService = inject(AppleAuthService);
+  private keychainService = inject(KeychainService);
 
-  ngOnInit() {
-    // Check if user is already authenticated
-    if (this.isAuthenticated()) {
-      this.router.navigate(['/discovery']);
-      return;
-    }
+  async ngOnInit() {
+    // Temporarily force login tab to show
+    this.activeTab = 'login';
+    
+    // Temporarily disable authentication check
+    // if (this.isAuthenticated()) {
+    //   this.router.navigate(['/discovery']);
+    //   return;
+    // }
 
-    // Check for password reset flow
     const resetEmail = this.route.snapshot.queryParams['email'];
     const resetCode = this.route.snapshot.queryParams['code'];
     
     if (resetEmail && resetCode) {
-      this.activeTab = 'reset-password';
+      this.activeTab = 'reset';
       this.resetPasswordData.email = resetEmail;
       this.resetPasswordData.code = resetCode;
     }
   }
 
   setActiveTab(tab: string) {
+    console.log('Setting active tab to:', tab);
     this.activeTab = tab;
+    console.log('Active tab is now:', this.activeTab);
   }
 
   async login() {
@@ -678,7 +90,8 @@ export class AuthComponent implements OnInit {
     try {
       const result = await this.cloudflareAuthService.loginUser({
         email: this.loginData.email,
-        password: this.loginData.password
+        password: this.loginData.password,
+        rememberMe: this.loginData.rememberMe
       });
 
       if (result.success && result.data) {
@@ -687,7 +100,7 @@ export class AuthComponent implements OnInit {
       } else {
         alert(result.message || 'Login failed. Please try again.');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       alert('Login failed. Please try again.');
     }
@@ -708,7 +121,8 @@ export class AuthComponent implements OnInit {
       const result = await this.cloudflareAuthService.registerUser({
         name: this.registerData.name,
         email: this.registerData.email,
-        password: this.registerData.password
+        password: this.registerData.password,
+        rememberMe: this.registerData.rememberMe
       });
 
       if (result.success && result.data) {
@@ -718,7 +132,7 @@ export class AuthComponent implements OnInit {
       } else {
         alert(result.message || 'Registration failed. Please try again.');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Registration error:', error);
       alert('Registration failed. Please try again.');
     }
@@ -731,39 +145,24 @@ export class AuthComponent implements OnInit {
     }
 
     try {
-      // Show immediate feedback
-      const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
-      if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.textContent = 'Sending...';
-      }
-
       const result = await this.cloudflareAuthService.resetPassword({
         email: this.forgotPasswordData.email
       });
 
       if (result.success) {
-        // Show the verification code in console for immediate access (simulates email)
         if (result.code) {
           console.log('🔐 Verification Code:', result.code);
         }
         
         alert('Password reset code sent to your email! Please check your inbox and enter the verification code below.');
-        this.setActiveTab('reset-password');
+        this.setActiveTab('reset');
         this.resetPasswordData.email = this.forgotPasswordData.email;
       } else {
         alert(result.message || 'Failed to send reset code. Please try again.');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Forgot password error:', error);
       alert('Failed to send reset code. Please try again.');
-    } finally {
-      // Reset button state
-      const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Send Reset Code';
-      }
     }
   }
 
@@ -787,7 +186,7 @@ export class AuthComponent implements OnInit {
       } else {
         alert(result.message || 'Failed to update password. Please try again.');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Reset password error:', error);
       alert('Failed to update password. Please try again.');
     }
@@ -884,66 +283,52 @@ export class AuthComponent implements OnInit {
   logout() {
     this.cloudflareAuthService.logout();
     this.dataService.logout();
+    this.keychainService.clearAllCredentials();
     window.location.href = '/';
+  }
+
+  // Temporary method to clear stored authentication
+  private async clearStoredAuth(): Promise<void> {
+    localStorage.removeItem('watch_ios_current_user');
+    localStorage.removeItem('watch_ios_users');
+    localStorage.removeItem('watch_ios_authentication_requests');
+    localStorage.removeItem('watch_ios_password_resets');
+    await this.keychainService.clearAllCredentials();
+  }
+
+
+  async signInWithApple() {
+    try {
+      const result = await this.appleAuthService.signInWithApple();
+      if (result.success && result.data) {
+        this.router.navigate(['/discovery']);
+      } else {
+        alert(result.message || 'Apple Sign In failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Apple Sign In error:', error);
+      alert('Apple Sign In failed. Please try again.');
+    }
   }
 
   async createDemoAccount() {
     try {
       const result = await this.cloudflareAuthService.createDemoAccount();
       if (result.success) {
-        this.showModal = true;
-        this.modalTitle = 'Demo Account Created';
-        this.modalContent = `
-          <p><strong>Demo account has been created successfully!</strong></p>
-          <p>You can now login with these credentials:</p>
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <p><strong>Email:</strong> demo@watchios.com</p>
-            <p><strong>Password:</strong> Demo123!</p>
-          </div>
-          <p>This account is pre-verified and ready for testing all app features.</p>
-        `;
+        alert(result.message);
+        // Pre-fill the login form with demo credentials
+        this.loginData.email = 'demo@watchios.com';
+        this.loginData.password = 'Demo123!';
+        this.setActiveTab('login');
       } else {
-        this.showModal = true;
-        this.modalTitle = 'Demo Account';
-        this.modalContent = `
-          <p><strong>Demo account already exists!</strong></p>
-          <p>You can login with these credentials:</p>
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <p><strong>Email:</strong> demo@watchios.com</p>
-            <p><strong>Password:</strong> Demo123!</p>
-          </div>
-        `;
+        alert(result.message || 'Failed to create demo account.');
       }
     } catch (error) {
-      this.showModal = true;
-      this.modalTitle = 'Error';
-      this.modalContent = 'Failed to create demo account. Please try again.';
+      console.error('Demo account creation error:', error);
+      alert('Failed to create demo account. Please try again.');
     }
   }
 
-  /**
-   * Sign in with Apple
-   */
-  async signInWithApple() {
-    try {
-      console.log('Starting Apple Sign In...');
-      
-      const result = await this.appleAuthService.signInWithApple();
-      
-      if (result.success && result.data) {
-        this.router.navigate(['/discovery']);
-      } else {
-        alert(result.message || 'Apple Sign In failed. Please try again.');
-      }
-    } catch (error: any) {
-      console.error('Apple Sign In error:', error);
-      alert('Apple Sign In failed. Please try again.');
-    }
-  }
-
-  /**
-   * Check if running on iOS
-   */
   isIOS(): boolean {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

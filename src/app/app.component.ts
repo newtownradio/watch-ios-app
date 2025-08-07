@@ -30,19 +30,6 @@ export class AppComponent implements OnInit, OnDestroy {
   currentRoute = '';
 
   ngOnInit() {
-    // Test network connectivity on app start
-    this.debugService.testNetworkConnectivity().then(isConnected => {
-      this.debugService.log('Network connectivity test result', { isConnected });
-    });
-
-    // Test ReSend API connectivity on app start
-    this.debugService.testReSendConnectivity().then(isConnected => {
-      this.debugService.log('ReSend API connectivity test result', { isConnected });
-    });
-
-    // Log system information
-    this.debugService.getSystemInfo();
-
     // Initialize navigation
     this.initializeNavigation();
   }
@@ -70,10 +57,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Get initial navigation items
     this.updateNavigationItems();
+    
+    // Force update navigation items after a short delay to handle auth redirects
+    setTimeout(() => {
+      this.updateNavigationItems();
+    }, 100);
   }
 
   private updateNavigationItems(): void {
-    this.navigationItems = this.navigationService.getNavigationItems();
+    const isAuth = this.dataService.isAuthenticated();
+    this.navigationItems = this.navigationService.getNavigationItemsForUser(isAuth);
   }
 
   // Navigation methods using the service
@@ -82,7 +75,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   isAuthPage(): boolean {
-    return this.navigationService.isAuthPage();
+    return this.router.url.includes('/auth');
   }
 
   isAuthenticated(): boolean {
@@ -92,6 +85,12 @@ export class AppComponent implements OnInit, OnDestroy {
   toggleMenu(): void {
     this.navigationService.toggleMenu();
   }
+
+
+
+
+
+
 
   closeMenu(): void {
     this.navigationService.closeMenu();

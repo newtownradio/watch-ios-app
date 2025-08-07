@@ -5,53 +5,47 @@ import { PricingBreakdown, VerificationPartner } from '../models/bid.interface';
   providedIn: 'root'
 })
 export class PricingService {
-
-  // Commission rate
-  private readonly COMMISSION_RATE = 0.06; // 6%
-
-  // Default costs
-  private readonly DEFAULT_SHIPPING_COST = 25; // Two-way shipping
-  private readonly DEFAULT_VERIFICATION_COST = 50; // WatchCSA standard
-  private readonly DEFAULT_INSURANCE_RATE = 0.02; // 2% of item value
-
-  // Verification partners
   private verificationPartners: VerificationPartner[] = [
     {
       id: 'watchcsa',
       name: 'WatchCSA',
-      cost: 50,
-      turnaroundTime: '2-3 business days',
-      description: 'Industry standard authentication service'
+      cost: 150,
+      turnaroundTime: '3-5 business days',
+      description: 'Professional watch authentication and certification service'
     },
     {
-      id: 'watchbox',
-      name: 'WatchBox Authentication',
-      cost: 45,
-      turnaroundTime: '1-2 business days',
-      description: 'Fast authentication with detailed report'
+      id: 'swiss-watch-group',
+      name: 'Swiss Watch Group',
+      cost: 200,
+      turnaroundTime: '5-7 business days',
+      description: 'Expert authentication for luxury Swiss timepieces'
     },
     {
-      id: 'crown-caliber',
-      name: 'Crown & Caliber',
-      cost: 55,
-      turnaroundTime: '2-3 business days',
-      description: 'Premium authentication with certification'
+      id: 'luxury-watch-specialists',
+      name: 'Luxury Watch Specialists',
+      cost: 175,
+      turnaroundTime: '4-6 business days',
+      description: 'Specialized authentication for high-end luxury watches'
+    },
+    {
+      id: 'gia',
+      name: 'GIA (Gemological Institute)',
+      cost: 250,
+      turnaroundTime: '7-10 business days',
+      description: 'Diamond-set watch authentication and certification'
     }
   ];
 
-  constructor() { }
+  getVerificationPartners(): VerificationPartner[] {
+    return this.verificationPartners;
+  }
 
-  /**
-   * Calculate complete pricing breakdown
-   */
-  calculatePricing(itemPrice: number, verificationPartnerId: string = 'watchcsa'): PricingBreakdown {
-    const verificationPartner = this.verificationPartners.find(vp => vp.id === verificationPartnerId);
-    const verificationCost = verificationPartner?.cost || this.DEFAULT_VERIFICATION_COST;
-    
-    const commissionFee = itemPrice * this.COMMISSION_RATE;
-    const insuranceCost = itemPrice * this.DEFAULT_INSURANCE_RATE;
-    const shippingCost = this.DEFAULT_SHIPPING_COST;
-    
+  calculatePricing(itemPrice: number, selectedPartnerId: string): PricingBreakdown {
+    const partner = this.verificationPartners.find(p => p.id === selectedPartnerId);
+    const verificationCost = partner ? partner.cost : 150;
+    const shippingCost = 25; // Fixed shipping cost
+    const commissionFee = itemPrice * 0.06; // 6% commission
+    const insuranceCost = itemPrice * 0.02; // 2% insurance
     const totalAmount = itemPrice + shippingCost + verificationCost + commissionFee + insuranceCost;
 
     return {
@@ -63,40 +57,4 @@ export class PricingService {
       totalAmount
     };
   }
-
-  /**
-   * Get available verification partners
-   */
-  getVerificationPartners(): VerificationPartner[] {
-    return this.verificationPartners;
-  }
-
-  /**
-   * Calculate commission fee
-   */
-  calculateCommission(itemPrice: number): number {
-    return itemPrice * this.COMMISSION_RATE;
-  }
-
-  /**
-   * Calculate insurance cost
-   */
-  calculateInsurance(itemPrice: number): number {
-    return itemPrice * this.DEFAULT_INSURANCE_RATE;
-  }
-
-  /**
-   * Get shipping cost
-   */
-  getShippingCost(): number {
-    return this.DEFAULT_SHIPPING_COST;
-  }
-
-  /**
-   * Get verification cost for specific partner
-   */
-  getVerificationCost(partnerId: string): number {
-    const partner = this.verificationPartners.find(vp => vp.id === partnerId);
-    return partner?.cost || this.DEFAULT_VERIFICATION_COST;
-  }
-}
+} 

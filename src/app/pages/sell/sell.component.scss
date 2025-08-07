@@ -271,7 +271,7 @@
 
 .submit-btn {
   width: 100%;
-  background: #1e3a8a;
+  background: #8b7355;
   color: white;
   border: none;
   padding: 12px;
@@ -292,7 +292,7 @@
 }
 
 .submit-btn:hover {
-  background: #1e40af;
+  background: #7a6344;
 }
 
 /* Counteroffer Modal */
@@ -896,7 +896,7 @@
 }
 
 .share-btn {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  background: #2c2c2c;
   color: white;
   border: none;
   border-radius: 20px;
@@ -905,18 +905,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+  box-shadow: 0 2px 8px rgba(44, 44, 44, 0.3);
   margin-right: 8px;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4);
-    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+    box-shadow: 0 4px 12px rgba(44, 44, 44, 0.4);
+    background: #1a1a1a;
   }
   
   &:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(30, 58, 138, 0.3);
+    box-shadow: 0 2px 4px rgba(44, 44, 44, 0.3);
   }
 }
 
@@ -1198,19 +1198,19 @@
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  background: #8b7355;
   color: white;
-  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+  box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4);
-    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+    box-shadow: 0 4px 12px rgba(139, 115, 85, 0.4);
+    background: #7a6344;
   }
 
   &:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(30, 58, 138, 0.3);
+    box-shadow: 0 2px 4px rgba(139, 115, 85, 0.3);
   }
 
   &:disabled {

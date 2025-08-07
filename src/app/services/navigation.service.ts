@@ -1,12 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { BehaviorSubject, Observable, filter } from 'rxjs';
+import { AuthorizationService } from './authorization.service';
 
 export interface NavigationItem {
   path: string;
   label: string;
   icon?: string;
   requiresAuth?: boolean;
+  requiredRoles?: string[];
   isActive?: boolean;
 }
 
@@ -15,6 +17,7 @@ export interface NavigationItem {
 })
 export class NavigationService {
   private router = inject(Router);
+  private authService = inject(AuthorizationService);
   
   private currentRouteSubject = new BehaviorSubject<string>('');
   public currentRoute$ = this.currentRouteSubject.asObservable();
@@ -22,12 +25,12 @@ export class NavigationService {
   private menuOpenSubject = new BehaviorSubject<boolean>(false);
   public menuOpen$ = this.menuOpenSubject.asObservable();
 
-  // Navigation items configuration
+  // Navigation items configuration with role-based access
   private navigationItems: NavigationItem[] = [
-    { path: '/discovery', label: 'Discovery', requiresAuth: true },
-    { path: '/sell', label: 'Sell', requiresAuth: true },
-    { path: '/messages', label: 'Messages', requiresAuth: true },
-    { path: '/notifications', label: 'Notifications', requiresAuth: true },
+    { path: '/discovery', label: 'Discovery', requiresAuth: false },
+    { path: '/sell', label: 'Sell', requiresAuth: true, requiredRoles: ['user', 'seller', 'verified'] },
+    { path: '/messages', label: 'Messages', requiresAuth: true, requiredRoles: ['buyer', 'seller', 'verified'] },
+    { path: '/notifications', label: 'Notifications', requiresAuth: true, requiredRoles: ['buyer', 'seller', 'verified'] },
     { path: '/account', label: 'Account', requiresAuth: true }
   ];
 
@@ -50,6 +53,30 @@ export class NavigationService {
       ...item,
       isActive: this.isRouteActive(item.path)
     }));
+  }
+
+  // Get navigation items based on authentication status and user role
+  getNavigationItemsForUser(isAuthenticated: boolean): NavigationItem[] {
+    const userRole = this.authService.getUserRole();
+    
+    return this.navigationItems
+      .filter(item => {
+        // Check authentication requirement
+        if (item.requiresAuth && !isAuthenticated) {
+          return false;
+        }
+        
+        // Check role requirements
+        if (item.requiredRoles && item.requiredRoles.length > 0) {
+          return item.requiredRoles.includes(userRole);
+        }
+        
+        return true;
+      })
+      .map(item => ({
+        ...item,
+        isActive: this.isRouteActive(item.path)
+      }));
   }
 
   // Check if a route is currently active
@@ -83,14 +110,20 @@ export class NavigationService {
   // Navigate to a route and close menu
   navigateToAndCloseMenu(path: string): void {
     if (path === '/logout') {
-      // Removed handleLogout as per edit hint
+      // Handle logout
+      this.logout();
     } else {
       this.navigateTo(path);
     }
     this.closeMenu();
   }
 
-  // Removed handleLogout as per edit hint
+  // Logout user
+  logout(): void {
+    // Clear authentication data
+    localStorage.removeItem('watch_ios_current_user');
+    this.router.navigate(['/auth']);
+  }
 
   // Menu state management
   openMenu(): void {
@@ -127,5 +160,21 @@ export class NavigationService {
   // Get current route as observable
   getCurrentRouteObservable(): Observable<string> {
     return this.currentRoute$;
+  }
+
+  // Check if user can access a specific navigation item
+  canAccessNavigationItem(item: NavigationItem): boolean {
+    const isAuthenticated = this.authService.getUserRole() !== 'guest';
+    
+    if (item.requiresAuth && !isAuthenticated) {
+      return false;
+    }
+    
+    if (item.requiredRoles && item.requiredRoles.length > 0) {
+      const userRole = this.authService.getUserRole();
+      return item.requiredRoles.includes(userRole);
+    }
+    
+    return true;
   }
 } 

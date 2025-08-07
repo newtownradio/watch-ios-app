@@ -21,7 +21,7 @@
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  color: #1e3a8a;
+  color: #2c2c2c;
 }
 
 .compose-btn {
@@ -29,7 +29,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #1e3a8a;
+  background: #8b7355;
   color: white;
   border: none;
   border-radius: 8px;
@@ -40,7 +40,7 @@
 }
 
 .compose-btn:hover {
-  background: #1e40af;
+  background: #7a6344;
 }
 
 .compose-icon {
@@ -67,8 +67,8 @@
 }
 
 .tab-btn.active {
-  color: #1e3a8a;
-  border-bottom-color: #1e3a8a;
+  color: #2c2c2c;
+  border-bottom-color: #2c2c2c;
 }
 
 .tab-btn:hover {

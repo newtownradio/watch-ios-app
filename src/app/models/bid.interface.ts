@@ -108,3 +108,28 @@ export interface Watch {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface PricingBreakdown {
+  itemPrice: number;
+  shippingCost: number;
+  verificationCost: number;
+  commissionFee: number;
+  insuranceCost: number;
+  totalAmount: number;
+}
+
+export interface VerificationPartner {
+  id: string;
+  name: string;
+  cost: number;
+  turnaroundTime: string;
+  description: string;
+}
+
+export interface VerificationPartner {
+  id: string;
+  name: string;
+  cost: number;
+  turnaroundTime: string;
+  description: string;
+}

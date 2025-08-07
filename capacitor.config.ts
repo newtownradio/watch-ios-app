@@ -9,18 +9,7 @@ const config: CapacitorConfig = {
     scrollEnabled: true,
     backgroundColor: '#ffffff',
     allowsLinkPreview: false,
-    limitsNavigationsToAppBoundDomains: false,
-    webViewAllowsBackForwardNavigationGestures: true,
-    webViewAllowsLinkPreview: false,
-    webViewAllowsInlineMediaPlayback: true,
-    webViewMediaPlaybackRequiresUserAction: false,
-    // Fix layout constraint issues
-    webViewAllowsSafeBrowsing: false,
-    webViewAllowsProtectedMedia: false,
-    // Disable keyboard toolbar to prevent constraint conflicts
-    keyboardAccessoryBarEnabled: false,
-    // Improve viewport handling
-    viewportFit: 'cover'
+    limitsNavigationsToAppBoundDomains: false
   },
   server: {
     androidScheme: 'https'
