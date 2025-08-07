@@ -172,12 +172,16 @@ export class DiscoveryComponent implements OnInit {
 
   getAvailableBrands(): string[] {
     const brands = new Set<string>();
+    console.log('Total listings:', this.listings.length);
     this.listings.forEach(listing => {
+      console.log('Listing brand:', listing.brand);
       if (listing.brand) {
         brands.add(listing.brand);
       }
     });
-    return Array.from(brands).sort();
+    const result = Array.from(brands).sort();
+    console.log('Available brands:', result);
+    return result;
   }
 
   getAvailableConditions(): string[] {

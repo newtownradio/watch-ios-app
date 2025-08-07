@@ -49,9 +49,16 @@
           <label for="brand-select">Brand:</label>
           <select [(ngModel)]="selectedBrand" id="brand-select" class="filter-select">
             <option value="">All Brands</option>
-            <option *ngFor="let brand of getAvailableBrands()" [value]="brand">
-              {{ brand }}
-            </option>
+            <option value="Rolex">Rolex</option>
+            <option value="Omega">Omega</option>
+            <option value="Cartier">Cartier</option>
+            <option value="Tudor">Tudor</option>
+            <option value="Seiko">Seiko</option>
+            <option value="Tag Heuer">Tag Heuer</option>
+            <option value="Breitling">Breitling</option>
+            <option value="Longines">Longines</option>
+            <option value="IWC">IWC</option>
+            <option value="Panerai">Panerai</option>
           </select>
         </div>
 
@@ -59,9 +66,10 @@
           <label for="condition-select">Condition:</label>
           <select [(ngModel)]="selectedCondition" id="condition-select" class="filter-select">
             <option value="">All Conditions</option>
-            <option *ngFor="let condition of getAvailableConditions()" [value]="condition">
-              {{ condition }}
-            </option>
+            <option value="Excellent">Excellent</option>
+            <option value="Very Good">Very Good</option>
+            <option value="Good">Good</option>
+            <option value="Fair">Fair</option>
           </select>
         </div>
 
