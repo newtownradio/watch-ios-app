@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
+import { AuthenticationPartnerService, AuthenticationPartner } from '../../services/authentication-partner.service';
 import { Share } from '@capacitor/share';
 
 @Component({
@@ -27,10 +28,15 @@ export class SellComponent implements OnInit {
     originalPrice: undefined as number | undefined,
     imageUrl: '',
     governmentIdUrl: '',
+    authenticationPartner: '',
     scheduleType: 'immediate' as 'immediate' | 'scheduled',
     scheduleDate: '',
     scheduleTime: ''
   };
+
+  // Authentication Partner properties
+  authenticationPartners: AuthenticationPartner[] = [];
+  selectedPartner: AuthenticationPartner | null = null;
 
   activeListings: Listing[] = [];
   showCounterofferForm = false;
@@ -49,6 +55,7 @@ export class SellComponent implements OnInit {
   constructor(
     private dataService: DataPersistenceService,
     private aiPricingService: AiPricingService,
+    private authenticationPartnerService: AuthenticationPartnerService,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {}
@@ -62,6 +69,7 @@ export class SellComponent implements OnInit {
     
     this.loadActiveListings();
     this.loadAvailableBrands();
+    this.loadAuthenticationPartners();
   }
 
   loadAvailableBrands() {
@@ -229,6 +237,7 @@ export class SellComponent implements OnInit {
         originalPrice: undefined,
         imageUrl: '',
         governmentIdUrl: '',
+        authenticationPartner: '',
         scheduleType: 'immediate',
         scheduleDate: '',
         scheduleTime: ''
@@ -637,5 +646,51 @@ export class SellComponent implements OnInit {
   removeGovernmentId() {
     this.form.governmentIdUrl = '';
     this.cdr.detectChanges();
+  }
+
+  // Authentication Partner Methods
+  loadAuthenticationPartners() {
+    this.authenticationPartnerService.getAllPartners().subscribe(
+      (partners) => {
+        this.authenticationPartners = partners;
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error loading authentication partners:', error);
+      }
+    );
+  }
+
+  onAuthenticationPartnerChange() {
+    if (this.form.authenticationPartner) {
+      this.selectedPartner = this.authenticationPartners.find(
+        partner => partner.name === this.form.authenticationPartner
+      ) || null;
+    } else {
+      this.selectedPartner = null;
+    }
+    this.cdr.detectChanges();
+  }
+
+  getPlatformFee(): number {
+    return this.form.startingPrice * 0.03;
+  }
+
+  getEstimatedShipping(): number {
+    // Simple shipping estimation based on watch value
+    if (this.form.startingPrice < 5000) {
+      return 25;
+    } else if (this.form.startingPrice < 15000) {
+      return 50;
+    } else if (this.form.startingPrice < 50000) {
+      return 100;
+    } else {
+      return 200;
+    }
+  }
+
+  getTotalSellerCosts(): number {
+    if (!this.selectedPartner) return 0;
+    return this.selectedPartner.fee + this.getPlatformFee() + this.getEstimatedShipping();
   }
 }

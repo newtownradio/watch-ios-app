@@ -145,6 +145,70 @@
       <textarea [(ngModel)]="form.description" placeholder="Describe your item..." id="description"></textarea>
     </div>
 
+    <!-- Authentication Partner Selection -->
+    <div class="authentication-section">
+      <h3>Authentication Service</h3>
+      <p>Select an authentication partner for your watch. This service will verify authenticity when a sale occurs.</p>
+      
+      <div class="form-group">
+        <label for="authentication-partner">Authentication Partner *</label>
+        <select [(ngModel)]="form.authenticationPartner" (change)="onAuthenticationPartnerChange()" id="authentication-partner" required>
+          <option value="">Select Authentication Partner</option>
+          <option *ngFor="let partner of authenticationPartners" [value]="partner.name">
+            {{ partner.name }} - ${{ partner.fee }}
+          </option>
+        </select>
+        <small class="form-help">Choose the authentication service that best fits your watch</small>
+      </div>
+
+      <div class="partner-details" *ngIf="selectedPartner">
+        <div class="partner-info">
+          <h4>{{ selectedPartner.name }}</h4>
+          <p class="partner-description">{{ selectedPartner.description }}</p>
+          <div class="partner-details-grid">
+            <div class="detail-item">
+              <span class="label">Fee:</span>
+              <span class="value">${{ selectedPartner.fee }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Specialty:</span>
+              <span class="value">{{ selectedPartner.specialty }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Estimated Time:</span>
+              <span class="value">{{ selectedPartner.estimatedTime }}</span>
+            </div>
+          </div>
+          <div class="coverage-list" *ngIf="selectedPartner.coverage">
+            <h5>Coverage Includes:</h5>
+            <ul>
+              <li *ngFor="let coverage of selectedPartner.coverage">{{ coverage }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="cost-breakdown" *ngIf="selectedPartner && form.startingPrice">
+        <h4>Cost Breakdown</h4>
+        <div class="cost-item">
+          <span class="label">Authentication Fee:</span>
+          <span class="value">${{ selectedPartner.fee }}</span>
+        </div>
+        <div class="cost-item">
+          <span class="label">Platform Fee (3%):</span>
+          <span class="value">${{ getPlatformFee() }}</span>
+        </div>
+        <div class="cost-item">
+          <span class="label">Estimated Shipping:</span>
+          <span class="value">${{ getEstimatedShipping() }}</span>
+        </div>
+        <div class="cost-item total">
+          <span class="label">Total Seller Costs:</span>
+          <span class="value">${{ getTotalSellerCosts() }}</span>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="schedule-listing">Schedule Listing</label>
       <div class="schedule-options">
