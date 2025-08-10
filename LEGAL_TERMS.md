@@ -122,7 +122,97 @@ All products on our platform are clearly identified as **USED** or **PRE-OWNED**
 - Our platform is independent of all watch manufacturers
 - We facilitate peer-to-peer transactions only
 
-## 8. Dispute Resolution
+## 8. How It Works - Platform Operations
+
+### 8.1 Seller Flow
+
+#### 8.1.1 Listing Creation
+- Sellers must create detailed listings with accurate descriptions
+- All watches must be accompanied by authentication documentation
+- Sellers must provide clear photos showing the watch's condition
+- Pricing must be reasonable and market-appropriate
+
+#### 8.1.2 Authentication Process
+- Sellers select from our network of trusted verification partners
+- Third-party authentication services verify watch authenticity
+- Authentication includes physical inspection, movement analysis, and documentation review
+- Sellers pay for authentication services upfront
+- Authentication results determine if the watch proceeds to sale
+
+#### 8.1.3 Sale Process
+- Once authenticated, watches are available for purchase
+- Sellers receive notifications of bids and offers
+- Sellers can accept, reject, or counter offers
+- Counteroffers may continue until a sale is reached
+- Sellers must ship authenticated watches within specified timeframes
+
+#### 8.1.4 Shipping and Delivery
+- Sellers are responsible for secure packaging and shipping
+- Shipping costs are typically borne by the seller
+- Tracking information must be provided to buyers
+- Insurance is recommended for high-value items
+
+### 8.2 Buyer Flow
+
+#### 8.2.1 Discovery and Selection
+- Buyers browse authenticated watch listings
+- Search and filter options help narrow down selections
+- Detailed product information and authentication reports are available
+- Buyers can view seller ratings and transaction history
+
+#### 8.2.2 Purchase Process
+- Buyers can place bids or make direct offers
+- All watches have been pre-authenticated by third-party services
+- Buyers receive detailed authentication documentation
+- Payment is processed securely through our platform
+
+#### 8.2.3 Verification and Review
+- Buyers receive authenticated watches with full documentation
+- 72-hour review period allows buyers to inspect items
+- Buyers can report issues or request additional verification
+- Returns are processed according to our return policy
+
+#### 8.2.4 Transaction Completion
+- Sales complete when both parties are satisfied
+- Funds are released to sellers after successful completion
+- Buyers receive ownership transfer documentation
+- Platform fees are deducted from successful transactions
+
+### 8.3 Authentication Partner Network
+
+#### 8.3.1 Partner Selection
+- We maintain a network of trusted authentication services
+- Partners include professional watchmakers, authentication specialists, and appraisal services
+- All partners are vetted for expertise and reliability
+- Partners specialize in different watch types and authentication methods
+
+#### 8.3.2 Authentication Standards
+- Partners must meet our quality and reliability standards
+- Authentication reports must be comprehensive and verifiable
+- Partners must provide clear documentation of their findings
+- We regularly review and update our partner network
+
+#### 8.3.3 Quality Assurance
+- We monitor authentication success rates and user satisfaction
+- Partners must maintain high standards of accuracy
+- We investigate any authentication disputes or issues
+- Partners may be removed for poor performance
+
+### 8.4 Platform Security and Trust
+
+#### 8.4.1 Transaction Security
+- All payments are processed securely through our platform
+- We hold funds in escrow until transactions are complete
+- Secure communication channels protect user information
+- Fraud detection systems monitor for suspicious activity
+
+#### 8.4.2 User Verification
+- Users must provide valid identification and contact information
+- We verify user identities to prevent fraud
+- User ratings and reviews build trust within the community
+- Dispute resolution processes protect both buyers and sellers
+
+## 9. Dispute Resolution
 
 ### 8.1 Authentication Disputes
 - Disputes regarding authenticity will be resolved through independent verification
@@ -136,17 +226,17 @@ All products on our platform are clearly identified as **USED** or **PRE-OWNED**
 - Users are responsible for their own legal compliance
 - We may report suspicious activity to authorities
 
-## 9. Updates to Legal Terms
+## 10. Updates to Legal Terms
 
 We may update these legal terms from time to time. Users will be notified of significant changes through the app or email.
 
-## 10. Contact Information
+## 11. Contact Information
 
 For questions about these legal terms, please contact us at:
 - Email: legal@watchios.com
 - Address: [Your Address]
 
-## 11. Acknowledgment
+## 12. Acknowledgment
 
 By using Watch Style iOS, you acknowledge that you have read, understood, and agree to these legal terms and disclaimers. You understand that:
 - All products are used/pre-owned
