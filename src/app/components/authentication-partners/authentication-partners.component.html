@@ -1,0 +1,66 @@
+<div class="authentication-partners">
+  <div class="partners-header">
+    <h3>Authentication Partners</h3>
+    <p class="subtitle">Choose a professional authentication service for your watch</p>
+  </div>
+
+  <div class="partners-grid" *ngIf="filteredPartners.length > 0">
+    <div 
+      class="partner-card" 
+      *ngFor="let partner of filteredPartners"
+      [class.selected]="partner.id === selectedPartnerId"
+      (click)="onPartnerSelect(partner)"
+    >
+      <div class="partner-header">
+        <h4 class="partner-name">{{ partner.name }}</h4>
+        <div class="partner-badge" *ngIf="partner.id === recommendedPartner?.id">
+          <span class="badge-text">Recommended</span>
+        </div>
+      </div>
+      
+      <p class="partner-description">{{ partner.description }}</p>
+      
+      <div class="partner-details">
+        <div class="detail-item">
+          <span class="label">Fee:</span>
+          <span class="value">${{ partner.baseFee }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Specialty:</span>
+          <span class="value">{{ partner.specialty }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Time:</span>
+          <span class="value">{{ partner.estimatedTime }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Coverage:</span>
+          <span class="value">{{ partner.coverage.join(', ') }}</span>
+        </div>
+      </div>
+
+      <div class="partner-actions">
+        <button 
+          class="select-btn"
+          [class.selected]="partner.id === selectedPartnerId"
+          (click)="onPartnerSelect(partner)"
+        >
+          {{ partner.id === selectedPartnerId ? 'Selected' : 'Select' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-partners" *ngIf="filteredPartners.length === 0">
+    <p>No authentication partners available for your criteria.</p>
+  </div>
+
+  <div class="selection-summary" *ngIf="selectedPartnerId">
+    <h4>Selected Partner</h4>
+    <div class="selected-partner-info">
+      <strong>{{ getSelectedPartner()?.name }}</strong>
+      <p>Fee: ${{ getSelectedPartner()?.baseFee }}</p>
+      <p>Estimated Time: {{ getSelectedPartner()?.estimatedTime }}</p>
+    </div>
+  </div>
+</div>

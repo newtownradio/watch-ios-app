@@ -145,6 +145,23 @@
       <textarea [(ngModel)]="form.description" placeholder="Describe your item..." id="description"></textarea>
     </div>
 
+    <!-- Authentication Partners Section -->
+    <div class="authentication-section">
+      <h3>Authentication Partner Selection</h3>
+      <p class="section-description">Choose a professional authentication service for your watch. This ensures buyers can trust the authenticity of your item.</p>
+      
+      <app-authentication-partners
+        [selectedPartnerId]="form.authenticationPartner"
+        [watchBrand]="form.brand"
+        [watchModel]="form.model"
+        [estimatedValue]="form.startingPrice"
+        [userCountry]="userCountry"
+        [showRecommended]="true"
+        (partnerSelected)="onAuthenticationPartnerChange($event)"
+        (partnerChanged)="onAuthenticationPartnerChange($event)">
+      </app-authentication-partners>
+    </div>
+
     <div class="form-group">
       <label for="schedule-listing">Schedule Listing</label>
       <div class="schedule-options">

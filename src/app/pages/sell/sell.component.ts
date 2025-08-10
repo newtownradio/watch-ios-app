@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
+import { AuthenticationPartner } from '../../models/authentication-partner.interface';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
+import { AuthenticationPartnerService } from '../../services/authentication-partner.service';
+import { AuthenticationPartnersComponent } from '../../components/authentication-partners/authentication-partners.component';
 import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-sell',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AuthenticationPartnersComponent],
   providers: [DataPersistenceService, AiPricingService],
   templateUrl: './sell.component.html',
   styleUrl: './sell.component.scss'
@@ -29,7 +32,8 @@ export class SellComponent implements OnInit {
     governmentIdUrl: '',
     scheduleType: 'immediate' as 'immediate' | 'scheduled',
     scheduleDate: '',
-    scheduleTime: ''
+    scheduleTime: '',
+    authenticationPartner: ''
   };
 
   activeListings: Listing[] = [];
@@ -45,6 +49,11 @@ export class SellComponent implements OnInit {
   pricingRecommendation: PricingRecommendation | null = null;
   availableBrands: string[] = [];
   availableModels: string[] = [];
+
+  // Authentication Partners
+  authenticationPartners: AuthenticationPartner[] = [];
+  selectedPartner: AuthenticationPartner | null = null;
+  userCountry: string = 'US';
 
   constructor(
     private dataService: DataPersistenceService,
@@ -231,7 +240,8 @@ export class SellComponent implements OnInit {
         governmentIdUrl: '',
         scheduleType: 'immediate',
         scheduleDate: '',
-        scheduleTime: ''
+        scheduleTime: '',
+        authenticationPartner: ''
       };
       
       // Show success message with times
@@ -637,5 +647,13 @@ export class SellComponent implements OnInit {
   removeGovernmentId() {
     this.form.governmentIdUrl = '';
     this.cdr.detectChanges();
+  }
+
+  onAuthenticationPartnerChange(partner: AuthenticationPartner | string) {
+    if (typeof partner === 'string') {
+      this.form.authenticationPartner = partner;
+    } else {
+      this.form.authenticationPartner = partner.id;
+    }
   }
 }
