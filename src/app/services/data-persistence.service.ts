@@ -18,6 +18,7 @@ export class DataPersistenceService {
   private readonly PASSWORD_RESET_KEY = 'watch_ios_password_resets';
   private readonly AUTHENTICATION_REQUESTS_KEY = 'watch_ios_authentication_requests';
   private readonly BIDS_KEY = 'watch_ios_bids';
+  private readonly ORDERS_KEY = 'watch_ios_orders';
 
   // ===== LISTINGS MANAGEMENT =====
 
@@ -1285,6 +1286,74 @@ Note: These are test accounts for development purposes only.
       // Clear old data and retry
       this.clearAllData();
       localStorage.setItem(this.BIDS_KEY, JSON.stringify(bids));
+    }
+  }
+
+  // ===== ORDER MANAGEMENT =====
+
+  /**
+   * Save a new order
+   */
+  saveOrder(order: any): void {
+    const orders = this.getAllOrders();
+    orders.push(order);
+    this.saveOrders(orders);
+  }
+
+  /**
+   * Get all orders
+   */
+  getAllOrders(): any[] {
+    const data = localStorage.getItem(this.ORDERS_KEY);
+    if (!data) return [];
+    
+    const orders = JSON.parse(data);
+    
+    // Convert date strings back to Date objects
+    return orders.map((order: any) => ({
+      ...order,
+      createdAt: new Date(order.createdAt),
+      updatedAt: new Date(order.updatedAt),
+      paymentConfirmedAt: order.paymentConfirmedAt ? new Date(order.paymentConfirmedAt) : undefined,
+      authenticationCompletedAt: order.authenticationCompletedAt ? new Date(order.authenticationCompletedAt) : undefined,
+      shippedAt: order.shippedAt ? new Date(order.shippedAt) : undefined,
+      deliveredAt: order.deliveredAt ? new Date(order.deliveredAt) : undefined,
+      cancelledAt: order.cancelledAt ? new Date(order.cancelledAt) : undefined,
+      estimatedDeliveryDate: order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate) : undefined,
+      actualDeliveryDate: order.actualDeliveryDate ? new Date(order.actualDeliveryDate) : undefined
+    }));
+  }
+
+  /**
+   * Get order by ID
+   */
+  getOrderById(orderId: string): any | undefined {
+    return this.getAllOrders().find(order => order.id === orderId);
+  }
+
+  /**
+   * Update an existing order
+   */
+  updateOrder(updatedOrder: any): void {
+    const orders = this.getAllOrders();
+    const index = orders.findIndex(o => o.id === updatedOrder.id);
+    if (index !== -1) {
+      orders[index] = updatedOrder;
+      this.saveOrders(orders);
+    }
+  }
+
+  /**
+   * Save orders to localStorage
+   */
+  private saveOrders(orders: any[]): void {
+    try {
+      localStorage.setItem(this.ORDERS_KEY, JSON.stringify(orders));
+    } catch {
+      console.error('localStorage quota exceeded, clearing old data and retrying...');
+      // Clear old data and retry
+      this.clearAllData();
+      localStorage.setItem(this.ORDERS_KEY, JSON.stringify(orders));
     }
   }
 }

@@ -118,6 +118,72 @@ export class AuthenticationPartnerService {
       rating: 4.6,
       totalVerifications: 8000,
       successRate: 98.7
+    },
+    {
+      id: 'bobs-watches',
+      name: 'Bob\'s Watches',
+      description: 'Premier Rolex and luxury watch authentication with 15+ years of expertise in pre-owned timepieces',
+      baseFee: 180,
+      specialty: 'Rolex authentication, Luxury Swiss watches, Pre-owned verification',
+      estimatedTime: '3-5 business days',
+      coverage: ['Rolex watches', 'Luxury Swiss brands', 'Pre-owned timepieces', 'Vintage pieces'],
+      features: [
+        'Rolex specialist team',
+        'Comprehensive authentication',
+        'Condition assessment',
+        'Market value evaluation',
+        'Investment grade certification'
+      ],
+      supportedCountries: ['US', 'CA', 'UK', 'EU', 'AU'],
+      verificationMethods: ['Expert review', 'Movement analysis', 'Documentation verification'],
+      isActive: true,
+      rating: 4.9,
+      totalVerifications: 25000,
+      successRate: 99.3
+    },
+    {
+      id: 'bobs-watches',
+      name: 'Bob\'s Watches',
+      description: 'Premier Rolex and luxury watch authentication with 15+ years of expertise in pre-owned timepieces',
+      baseFee: 180,
+      specialty: 'Rolex authentication, Luxury watch verification, Pre-owned timepieces',
+      estimatedTime: '3-5 business days',
+      coverage: ['Rolex watches', 'Luxury brands', 'Pre-owned timepieces', 'Vintage pieces'],
+      features: [
+        'Rolex specialist team',
+        'Comprehensive authentication',
+        'Condition assessment',
+        'Market value evaluation',
+        'Investment grade certification'
+      ],
+      supportedCountries: ['US', 'CA', 'UK', 'EU', 'AU'],
+      verificationMethods: ['Expert review', 'Movement analysis', 'Documentation verification'],
+      isActive: true,
+      rating: 4.9,
+      totalVerifications: 25000,
+      successRate: 99.3
+    },
+    {
+      id: 'bobs-watches',
+      name: 'Bob\'s Watches',
+      description: 'Premier Rolex and luxury watch authentication with extensive market expertise and rapid service',
+      baseFee: 180,
+      specialty: 'Rolex authentication, Luxury Swiss watches, Vintage timepieces',
+      estimatedTime: '3-5 business days',
+      coverage: ['Rolex watches', 'Luxury Swiss brands', 'Vintage pieces', 'Limited editions'],
+      features: [
+        'Rolex specialist team',
+        'Rapid authentication',
+        'Market value assessment',
+        'Condition certification',
+        'Investment documentation'
+      ],
+      supportedCountries: ['US', 'CA', 'UK', 'EU', 'AU'],
+      verificationMethods: ['Expert Rolex review', 'Movement verification', 'Documentation analysis'],
+      isActive: true,
+      rating: 4.9,
+      totalVerifications: 25000,
+      successRate: 99.3
     }
   ];
 

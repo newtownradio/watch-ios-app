@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,7 +8,10 @@ import { DataPersistenceService } from '../../services/data-persistence.service'
 import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
 import { AuthenticationPartnerService } from '../../services/authentication-partner.service';
 import { AuthenticationPartnersComponent } from '../../components/authentication-partners/authentication-partners.component';
+import { AuctionTimerService, AuctionTimer } from '../../services/auction-timer.service';
+import { OrderService } from '../../services/order.service';
 import { Share } from '@capacitor/share';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sell',
@@ -18,7 +21,7 @@ import { Share } from '@capacitor/share';
   templateUrl: './sell.component.html',
   styleUrl: './sell.component.scss'
 })
-export class SellComponent implements OnInit {
+export class SellComponent implements OnInit, OnDestroy {
   form = {
     title: '',
     startingPrice: 0,
@@ -54,6 +57,9 @@ export class SellComponent implements OnInit {
   authenticationPartners: AuthenticationPartner[] = [];
   selectedPartner: AuthenticationPartner | null = null;
   userCountry: string = 'US';
+
+  // Timer subscriptions for cleanup
+  private timerSubscriptions: Subscription[] = [];
 
   constructor(
     private dataService: DataPersistenceService,
@@ -655,5 +661,11 @@ export class SellComponent implements OnInit {
     } else {
       this.form.authenticationPartner = partner.id;
     }
+  }
+
+  ngOnDestroy() {
+    // Clean up timer subscriptions
+    this.timerSubscriptions.forEach(sub => sub.unsubscribe());
+    this.timerSubscriptions = [];
   }
 }

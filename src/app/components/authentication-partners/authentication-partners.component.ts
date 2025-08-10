@@ -29,6 +29,13 @@ export class AuthenticationPartnersComponent implements OnInit {
   selectedSpecialty: string = '';
   selectedPriceRange: string = '';
   sortBy: 'name' | 'price' | 'rating' | 'time' = 'rating';
+  
+  // New properties for enhanced UX
+  showHelp: boolean = false;
+  showAllPartners: boolean = false;
+  selectedPartnerForDetails: AuthenticationPartner | null = null;
+  hasSearched: boolean = false;
+  searchQuery: string = '';
 
   constructor(private authenticationPartnerService: AuthenticationPartnerService) {}
 
@@ -60,15 +67,41 @@ export class AuthenticationPartnersComponent implements OnInit {
     this.partnerChanged.emit(partner.id);
   }
 
-  onSearchChange(): void {
+  onSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery = target.value;
+    this.hasSearched = true;
     this.applyFilters();
   }
 
-  onSpecialtyChange(): void {
+  performSearch(): void {
+    this.hasSearched = true;
     this.applyFilters();
   }
 
-  onPriceRangeChange(): void {
+  onSpecialtyChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.selectedSpecialty = target.value;
+    this.hasSearched = true;
+    this.applyFilters();
+  }
+
+  onServiceTypeClick(serviceType: string) {
+    this.selectedSpecialty = serviceType;
+    this.hasSearched = true;
+    this.applyFilters();
+  }
+
+  onPriceRangeChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.selectedPriceRange = target.value;
+    this.hasSearched = true;
+    this.applyFilters();
+  }
+
+  onServiceTypeSelect(serviceType: string): void {
+    this.selectedSpecialty = serviceType;
+    this.hasSearched = true;
     this.applyFilters();
   }
 
@@ -80,11 +113,11 @@ export class AuthenticationPartnersComponent implements OnInit {
     let filtered = [...this.authenticationPartners];
 
     // Apply search filter
-    if (this.searchTerm) {
+    if (this.searchQuery) {
       filtered = filtered.filter(partner =>
-        partner.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        partner.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        partner.specialty.toLowerCase().includes(this.searchTerm.toLowerCase())
+        partner.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        partner.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        partner.specialty.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     }
 
@@ -183,5 +216,36 @@ export class AuthenticationPartnersComponent implements OnInit {
   getSelectedPartner(): AuthenticationPartner | null {
     if (!this.selectedPartnerId) return null;
     return this.authenticationPartners.find(partner => partner.id === this.selectedPartnerId) || null;
+  }
+
+  showPartnerDetails(partner: AuthenticationPartner): void {
+    // For now, just log the partner details
+    // In a real app, this could open a modal or navigate to a details page
+    console.log('Partner details:', partner);
+    // You could implement a modal service here
+    alert(`${partner.name}\n\nDescription: ${partner.description}\nSpecialty: ${partner.specialty}\nFeatures: ${partner.features.join(', ')}\nSuccess Rate: ${partner.successRate}%\nTotal Verifications: ${partner.totalVerifications.toLocaleString()}`);
+  }
+
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.selectedSpecialty = '';
+    this.selectedPriceRange = '';
+    this.sortBy = 'rating';
+    this.hasSearched = false;
+    this.applyFilters();
+  }
+
+  clearSelection(): void {
+    this.selectedPartnerId = '';
+    this.partnerChanged.emit('');
+    this.partnerSelected.emit(null as any);
+  }
+
+  // ===== SERVICE SELECTION =====
+  selectService(serviceType: string): void {
+    console.log('Selected service type:', serviceType);
+    // TODO: Implement service type filtering logic
+    // This could filter partners based on the selected service type
+    // For now, just log the selection
   }
 }

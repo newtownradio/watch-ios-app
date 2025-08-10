@@ -1,66 +1,301 @@
 <div class="authentication-partners">
+  <!-- Header Section -->
   <div class="partners-header">
-    <h3>Authentication Partners</h3>
-    <p class="subtitle">Choose a professional authentication service for your watch</p>
+    <div class="header-content">
+
+
+    </div>
+    
+    <!-- Authentication Services Dropdown -->
+    <div class="authentication-services-section">
+      <h3>Authentication Services</h3>
+      <p class="subtext">Choose from our network of trusted verification partners</p>
+      
+      <!-- Search and Filters -->
+      <div class="search-filters">
+        <div class="search-input-group">
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange($event)"
+            placeholder="Search partners by name or specialty..."
+            class="search-input"
+          >
+        </div>
+        
+        <div class="filter-dropdowns">
+          <select [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange($event)" class="filter-select">
+            <option value="">All Specialties</option>
+            <option value="luxury">Luxury Watch Authentication</option>
+            <option value="vintage">Vintage Verification</option>
+            <option value="modern">Modern Authentication</option>
+            <option value="certification">Certification Services</option>
+          </select>
+          
+          <select [(ngModel)]="selectedPriceRange" (change)="onPriceRangeChange($event)" class="filter-select">
+            <option value="">All Price Ranges</option>
+            <option value="0-50">$0 - $50</option>
+            <option value="51-100">$51 - $100</option>
+            <option value="101-200">$101 - $200</option>
+            <option value="201+">$201+</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+
   </div>
 
-  <div class="partners-grid" *ngIf="filteredPartners.length > 0">
-    <div 
-      class="partner-card" 
-      *ngFor="let partner of filteredPartners"
-      [class.selected]="partner.id === selectedPartnerId"
-      (click)="onPartnerSelect(partner)"
-    >
-      <div class="partner-header">
-        <h4 class="partner-name">{{ partner.name }}</h4>
-        <div class="partner-badge" *ngIf="partner.id === recommendedPartner?.id">
-          <span class="badge-text">Recommended</span>
+  <!-- Smart Recommendations -->
+  <div class="recommendations-section" *ngIf="recommendedPartner && showRecommended && hasSearched">
+    <div class="recommendation-card">
+      <div class="recommendation-header">
+        <span class="star-icon">⭐</span>
+        <h3>Recommended for your {{ watchBrand }} {{ watchModel }}</h3>
+      </div>
+      <div class="recommendation-content">
+        <div class="partner-preview">
+                  <div class="partner-info">
+          <h4>{{ recommendedPartner.name }}</h4>
+          <p class="partner-specialty">{{ recommendedPartner.specialty }}</p>
+            <p>{{ recommendedPartner.description }}</p>
+            <div class="partner-stats">
+              <span class="stat">
+                <span class="stat-label">Rating:</span>
+                <span class="stat-value">{{ recommendedPartner.rating }}/5</span>
+              </span>
+              <span class="stat">
+                <span class="stat-label">Success Rate:</span>
+                <span class="stat-value">{{ recommendedPartner.successRate }}%</span>
+              </span>
+              <span class="stat">
+                <span class="stat-label">Verified:</span>
+                <span class="stat-value">{{ recommendedPartner.totalVerifications.toLocaleString() }}+</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="recommendation-actions">
+          <button class="select-recommended-btn" (click)="onPartnerSelect(recommendedPartner)">
+            Select Recommended Partner
+          </button>
+          <button class="view-all-btn" (click)="showAllPartners = true">
+            View All Options
+          </button>
         </div>
       </div>
-      
-      <p class="partner-description">{{ partner.description }}</p>
-      
-      <div class="partner-details">
-        <div class="detail-item">
-          <span class="label">Fee:</span>
-          <span class="value">${{ partner.baseFee }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Specialty:</span>
-          <span class="value">{{ partner.specialty }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Time:</span>
-          <span class="value">{{ partner.estimatedTime }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Coverage:</span>
-          <span class="value">{{ partner.coverage.join(', ') }}</span>
-        </div>
-      </div>
+    </div>
+  </div>
 
-      <div class="partner-actions">
-        <button 
-          class="select-btn"
-          [class.selected]="partner.id === selectedPartnerId"
-          (click)="onPartnerSelect(partner)"
-        >
-          {{ partner.id === selectedPartnerId ? 'Selected' : 'Select' }}
+
+
+  <!-- All Partners Section -->
+  <div class="all-partners-section" *ngIf="(showAllPartners || !recommendedPartner) && hasSearched">
+    <!-- Filters and Search -->
+    <div class="filters-section">
+      <!-- Search Bar - Full Width -->
+      <div class="search-container">
+        <div class="search-input">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="Search partners by name or specialty..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange($event)"
+          >
+        </div>
+      </div>
+      
+      <!-- Filter Options - Responsive Grid -->
+      <div class="filter-options">
+        <div class="filter-group">
+          <label>Specialty</label>
+          <select [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange($event)">
+            <option value="">All Specialties</option>
+            <option *ngFor="let specialty of getSpecialties()" [value]="specialty">
+              {{ specialty }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Price Range</label>
+          <select [(ngModel)]="selectedPriceRange" (change)="onPriceRangeChange($event)">
+            <option value="">All Prices</option>
+            <option value="">All Prices</option>
+            <option *ngFor="let range of getPriceRanges()" [value]="range.value">
+              {{ range.label }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Sort By</label>
+          <select [(ngModel)]="sortBy" (change)="onSortChange()">
+            <option value="rating">Highest Rated</option>
+            <option value="price">Lowest Price</option>
+            <option value="time">Fastest Turnaround</option>
+            <option value="name">Name A-Z</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Partners Grid -->
+    <div class="partners-grid" *ngIf="filteredPartners.length > 0">
+      <div 
+        class="partner-card" 
+        *ngFor="let partner of filteredPartners"
+        [class.selected]="partner.id === selectedPartnerId"
+        [class.recommended]="partner.id === recommendedPartner?.id"
+      >
+        <!-- Partner Header -->
+        <div class="partner-header">
+          <div class="partner-info">
+            <h4 class="partner-name">{{ partner.name }}</h4>
+            <p class="partner-specialty">{{ partner.specialty }}</p>
+            <div class="partner-badges">
+              <span class="badge recommended" *ngIf="partner.id === recommendedPartner?.id">
+                ⭐ Recommended
+              </span>
+              <span class="badge verified" *ngIf="partner.totalVerifications > 10000">
+                ✅ Verified
+              </span>
+              <span class="badge premium" *ngIf="partner.rating >= 4.8">
+                🏆 Premium
+              </span>
+            </div>
+          </div>
+          <div class="partner-rating">
+            <div class="stars">
+              <span 
+                class="star" 
+                *ngFor="let star of getPartnerRatingStars(partner.rating)"
+                [class.filled]="star"
+              >
+                {{ star ? '★' : '☆' }}
+              </span>
+            </div>
+            <span class="rating-text">{{ partner.rating }}/5</span>
+          </div>
+        </div>
+
+        <!-- Partner Description -->
+        <p class="partner-description">{{ partner.description }}</p>
+
+        <!-- Partner Stats -->
+        <div class="partner-stats">
+          <div class="stat-item">
+            <span class="stat-icon">💰</span>
+            <span class="stat-label">Fee:</span>
+            <span class="stat-value">${{ partner.baseFee }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">⏱️</span>
+            <span class="stat-label">Time:</span>
+            <span class="stat-value">{{ partner.estimatedTime }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-label">Specialty:</span>
+            <span class="stat-value">{{ partner.specialty }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">📊</span>
+            <span class="stat-label">Success Rate:</span>
+            <span class="stat-value">{{ partner.successRate }}%</span>
+          </div>
+        </div>
+
+        <!-- Partner Features -->
+        <div class="partner-features">
+          <h5>Key Features:</h5>
+          <div class="features-list">
+            <span class="feature-tag" *ngFor="let feature of partner.features.slice(0, 3)">
+              {{ feature }}
+            </span>
+            <span class="feature-more" *ngIf="partner.features.length > 3">
+              +{{ partner.features.length - 3 }} more
+            </span>
+          </div>
+        </div>
+
+        <!-- Partner Actions -->
+        <div class="partner-actions">
+          <button 
+            class="select-btn"
+            [class.selected]="partner.id === selectedPartnerId"
+            (click)="onPartnerSelect(partner)"
+          >
+            <span *ngIf="partner.id === selectedPartnerId">✓ Selected</span>
+            <span *ngIf="partner.id !== selectedPartnerId">Select Partner</span>
+          </button>
+          
+          <button class="details-btn" (click)="showPartnerDetails(partner)">
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Partners Message -->
+    <div class="no-partners" *ngIf="filteredPartners.length === 0">
+      <div class="no-partners-content">
+        <span class="icon">🔍</span>
+        <h3>No partners found</h3>
+        <p>Try adjusting your filters or search terms to find authentication partners.</p>
+        <button class="reset-filters-btn" (click)="resetFilters()">
+          Reset Filters
         </button>
       </div>
     </div>
   </div>
 
-  <div class="no-partners" *ngIf="filteredPartners.length === 0">
-    <p>No authentication partners available for your criteria.</p>
-  </div>
-
+  <!-- Selection Summary -->
   <div class="selection-summary" *ngIf="selectedPartnerId">
-    <h4>Selected Partner</h4>
-    <div class="selected-partner-info">
-      <strong>{{ getSelectedPartner()?.name }}</strong>
-      <p>Fee: ${{ getSelectedPartner()?.baseFee }}</p>
-      <p>Estimated Time: {{ getSelectedPartner()?.estimatedTime }}</p>
+    <div class="summary-header">
+      <h3>✅ Partner Selected</h3>
+      <button class="change-selection-btn" (click)="clearSelection()">
+        Change Selection
+      </button>
+    </div>
+    
+    <div class="selected-partner-details">
+              <div class="partner-summary">
+          <div class="partner-info">
+          <h4>{{ getSelectedPartner()?.name }}</h4>
+          <p>{{ getSelectedPartner()?.description }}</p>
+        </div>
+      </div>
+      
+      <div class="selection-details">
+        <div class="detail-row">
+          <span class="label">Authentication Fee:</span>
+          <span class="value">${{ getSelectedPartner()?.baseFee }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Estimated Time:</span>
+          <span class="value">{{ getSelectedPartner()?.estimatedTime }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Success Rate:</span>
+          <span class="value">{{ getSelectedPartner()?.successRate }}%</span>
+        </div>
+        <div class="detail-row total">
+          <span class="label">Total Cost:</span>
+          <span class="value">${{ getSelectedPartner()?.baseFee }}</span>
+        </div>
+      </div>
+      
+      <div class="next-steps">
+        <h5>Next Steps:</h5>
+        <ol>
+          <li>Complete your listing details</li>
+          <li>Upload required documentation</li>
+          <li>Submit for authentication</li>
+          <li>Receive shipping instructions</li>
+        </ol>
+      </div>
     </div>
   </div>
 </div>
