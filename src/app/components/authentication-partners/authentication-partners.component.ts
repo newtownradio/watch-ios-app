@@ -12,30 +12,30 @@ import { AuthenticationPartnerService } from '../../services/authentication-part
   styleUrl: './authentication-partners.component.scss'
 })
 export class AuthenticationPartnersComponent implements OnInit {
-  @Input() selectedPartnerId: string = '';
-  @Input() watchBrand: string = '';
-  @Input() watchModel: string = '';
-  @Input() estimatedValue: number = 0;
-  @Input() userCountry: string = 'US';
-  @Input() showRecommended: boolean = true;
+  @Input() selectedPartnerId = '';
+  @Input() watchBrand = '';
+  @Input() watchModel = '';
+  @Input() estimatedValue = 0;
+  @Input() userCountry = 'US';
+  @Input() showRecommended = true;
   
-  @Output() partnerSelected = new EventEmitter<AuthenticationPartner>();
+  @Output() partnerSelected = new EventEmitter<AuthenticationPartner | null>();
   @Output() partnerChanged = new EventEmitter<string>();
 
   authenticationPartners: AuthenticationPartner[] = [];
   recommendedPartner: AuthenticationPartner | null = null;
   filteredPartners: AuthenticationPartner[] = [];
-  searchTerm: string = '';
-  selectedSpecialty: string = '';
-  selectedPriceRange: string = '';
+  searchTerm = '';
+  selectedSpecialty = '';
+  selectedPriceRange = '';
   sortBy: 'name' | 'price' | 'rating' | 'time' = 'rating';
   
   // New properties for enhanced UX
-  showHelp: boolean = false;
-  showAllPartners: boolean = false;
+  showHelp = false;
+  showAllPartners = false;
   selectedPartnerForDetails: AuthenticationPartner | null = null;
-  hasSearched: boolean = false;
-  searchQuery: string = '';
+  hasSearched = false;
+  searchQuery = '';
 
   constructor(private authenticationPartnerService: AuthenticationPartnerService) {}
 
@@ -153,10 +153,11 @@ export class AuthenticationPartnersComponent implements OnInit {
           return a.baseFee - b.baseFee;
         case 'rating':
           return b.rating - a.rating;
-        case 'time':
+        case 'time': {
           const aDays = parseInt(a.estimatedTime.split('-')[1]) || 5;
           const bDays = parseInt(b.estimatedTime.split('-')[1]) || 5;
           return aDays - bDays;
+        }
         default:
           return 0;
       }
@@ -173,7 +174,7 @@ export class AuthenticationPartnersComponent implements OnInit {
     return Array.from(specialties).sort();
   }
 
-  getPriceRanges(): Array<{ label: string; value: string; min: number; max?: number }> {
+  getPriceRanges(): { label: string; value: string; min: number; max?: number }[] {
     return [
       { label: 'Under $150', value: '0-150', min: 0, max: 150 },
       { label: '$150 - $200', value: '150-200', min: 150, max: 200 },
@@ -238,7 +239,7 @@ export class AuthenticationPartnersComponent implements OnInit {
   clearSelection(): void {
     this.selectedPartnerId = '';
     this.partnerChanged.emit('');
-    this.partnerSelected.emit(null as any);
+    this.partnerSelected.emit(null);
   }
 
   // ===== SERVICE SELECTION =====

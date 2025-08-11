@@ -21,7 +21,7 @@ export class AuthorizationService {
   private dataService = inject(DataPersistenceService);
 
   // Define user roles and their permissions
-  private readonly ROLES: { [key: string]: UserRole } = {
+  private readonly ROLES: Record<string, UserRole> = {
     'user': {
       role: 'user',
       permissions: ['view_discovery', 'create_account', 'edit_profile'],
@@ -116,7 +116,7 @@ export class AuthorizationService {
   /**
    * Get all available roles
    */
-  getAllRoles(): { [key: string]: UserRole } {
+  getAllRoles(): Record<string, UserRole> {
     return this.ROLES;
   }
 
@@ -127,7 +127,7 @@ export class AuthorizationService {
     const userRole = this.getUserRole();
     
     // Define route permissions
-    const routePermissions: { [key: string]: string[] } = {
+    const routePermissions: Record<string, string[]> = {
       '/discovery': ['view_discovery'],
       '/sell': ['create_listings'],
       '/account': ['edit_profile'],
@@ -153,7 +153,7 @@ export class AuthorizationService {
     }
 
     // Define action permissions
-    const actionPermissions: { [key: string]: { permissions: string[], conditions?: string[] } } = {
+    const actionPermissions: Record<string, { permissions: string[], conditions?: string[] }> = {
       'create_listing': {
         permissions: ['create_listings']
       },
@@ -248,7 +248,7 @@ export class AuthorizationService {
    */
   getUpgradeOptions(): string[] {
     const currentRole = this.getUserRole();
-    const upgradeOptions: { [key: string]: string[] } = {
+    const upgradeOptions: Record<string, string[]> = {
       'user': ['buyer', 'seller', 'verified'],
       'buyer': ['seller', 'verified'],
       'seller': ['verified']

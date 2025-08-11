@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BidService, BidResponse } from '../../services/bid.service';
@@ -12,7 +12,7 @@ import { Listing, User } from '../../models/bid.interface';
   templateUrl: './bid-form.component.html',
   styleUrls: ['./bid-form.component.scss']
 })
-export class BidFormComponent {
+export class BidFormComponent implements OnInit {
   @Input() listing!: Listing;
   @Output() bidPlaced = new EventEmitter<BidResponse>();
   @Output() cancelled = new EventEmitter<void>();
@@ -20,11 +20,11 @@ export class BidFormComponent {
   private bidService = inject(BidService);
   private dataService = inject(DataPersistenceService);
 
-  bidAmount: number = 0;
-  agreeTerms: boolean = false;
-  isSubmitting: boolean = false;
-  errorMessage: string = '';
-  successMessage: string = '';
+  bidAmount = 0;
+  agreeTerms = false;
+  isSubmitting = false;
+  errorMessage = '';
+  successMessage = '';
 
   ngOnInit() {
     // Set minimum bid amount

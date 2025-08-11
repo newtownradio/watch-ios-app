@@ -259,7 +259,7 @@ export class VerificationService {
   /**
    * Get recommended provider based on user location and requirements
    */
-  getRecommendedProvider(userCountry: string = 'US'): VerificationProvider {
+  getRecommendedProvider(userCountry = 'US'): VerificationProvider {
     const providers = this.getVerificationProviders();
     
     // Filter by country support

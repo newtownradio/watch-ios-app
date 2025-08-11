@@ -52,7 +52,7 @@ export class EmailService {
     return code;
   }
 
-  generateRandomPassword(length: number = 12): string {
+  generateRandomPassword(length = 12): string {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
     let password = '';
     

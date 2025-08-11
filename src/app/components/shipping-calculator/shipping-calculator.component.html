@@ -1,0 +1,361 @@
+<div class="shipping-calculator">
+  <!-- Toggle Button -->
+  <div class="calculator-toggle">
+    <button 
+      type="button" 
+      class="toggle-btn"
+      (click)="toggleCalculator()"
+      [class.active]="showCalculator">
+      🚚 {{ showCalculator ? 'Hide' : 'Show' }} Shipping Calculator
+    </button>
+  </div>
+
+  <!-- Calculator Form -->
+  <div class="calculator-form" *ngIf="showCalculator">
+    <div class="form-header">
+      <h3>📦 UPS Shipping Calculator</h3>
+      <p>Calculate shipping rates and delivery times for your package</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      <span class="error-icon">⚠️</span>
+      {{ errorMessage }}
+    </div>
+
+    <div class="form-sections">
+      <!-- From Address Section -->
+      <div class="address-section">
+        <h4>📤 From Address (Sender)</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="from-name">Full Name *</label>
+            <input 
+              type="text" 
+              id="from-name"
+              [(ngModel)]="fromAddress.name" 
+              placeholder="Your full name"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="from-company">Company</label>
+            <input 
+              type="text" 
+              id="from-company"
+              [(ngModel)]="fromAddress.company" 
+              placeholder="Company name (optional)">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="from-address1">Street Address *</label>
+            <input 
+              type="text" 
+              id="from-address1"
+              [(ngModel)]="fromAddress.address1" 
+              placeholder="123 Main Street"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="from-address2">Address Line 2</label>
+            <input 
+              type="text" 
+              id="from-address2"
+              [(ngModel)]="fromAddress.address2" 
+              placeholder="Apartment, suite, etc. (optional)">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="from-city">City *</label>
+            <input 
+              type="text" 
+              id="from-city"
+              [(ngModel)]="fromAddress.city" 
+              placeholder="City"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="from-state">State *</label>
+            <select 
+              id="from-state"
+              [(ngModel)]="fromAddress.state" 
+              required>
+              <option value="">Select State</option>
+              <option *ngFor="let state of usStates" [value]="state.code">
+                {{ state.code }} - {{ state.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="from-postal">ZIP Code *</label>
+            <input 
+              type="text" 
+              id="from-postal"
+              [(ngModel)]="fromAddress.postalCode" 
+              placeholder="12345"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="from-phone">Phone</label>
+            <input 
+              type="tel" 
+              id="from-phone"
+              [(ngModel)]="fromAddress.phone" 
+              placeholder="(555) 123-4567">
+          </div>
+          <div class="form-group">
+            <label for="from-email">Email</label>
+            <input 
+              type="email" 
+              id="from-email"
+              [(ngModel)]="fromAddress.email" 
+              placeholder="your@email.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- To Address Section -->
+      <div class="address-section">
+        <h4>📥 To Address (Recipient)</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="to-name">Full Name *</label>
+            <input 
+              type="text" 
+              id="to-name"
+              [(ngModel)]="toAddress.name" 
+              placeholder="Recipient's full name"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="to-company">Company</label>
+            <input 
+              type="text" 
+              id="to-company"
+              [(ngModel)]="toAddress.company" 
+              placeholder="Company name (optional)">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="to-address1">Street Address *</label>
+            <input 
+              type="text" 
+              id="to-address1"
+              [(ngModel)]="toAddress.address1" 
+              placeholder="456 Oak Avenue"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="to-address2">Address Line 2</label>
+            <input 
+              type="text" 
+              id="to-address2"
+              [(ngModel)]="toAddress.address2" 
+              placeholder="Apartment, suite, etc. (optional)">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="to-city">City *</label>
+            <input 
+              type="text" 
+              id="to-city"
+              [(ngModel)]="toAddress.city" 
+              placeholder="City"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="to-state">State *</label>
+            <select 
+              id="to-state"
+              [(ngModel)]="toAddress.state" 
+              required>
+              <option value="">Select State</option>
+              <option *ngFor="let state of usStates" [value]="state.code">
+                {{ state.code }} - {{ state.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="to-postal">ZIP Code *</label>
+            <input 
+              type="text" 
+              id="to-postal"
+              [(ngModel)]="toAddress.postalCode" 
+              placeholder="67890"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="to-phone">Phone</label>
+            <input 
+              type="tel" 
+              id="to-phone"
+              [(ngModel)]="toAddress.phone" 
+              placeholder="(555) 987-6543">
+          </div>
+          <div class="form-group">
+            <label for="to-email">Email</label>
+            <input 
+              type="email" 
+              id="to-email"
+              [(ngModel)]="toAddress.email" 
+              placeholder="recipient@email.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- Package Details Section -->
+      <div class="package-section">
+        <h4>📦 Package Details</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="package-weight">Weight (lbs) *</label>
+            <input 
+              type="number" 
+              id="package-weight"
+              [(ngModel)]="packageDetails.weight" 
+              min="0.1" 
+              step="0.1"
+              placeholder="2.0"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="package-length">Length (inches) *</label>
+            <input 
+              type="number" 
+              id="package-length"
+              [(ngModel)]="packageDetails.length" 
+              min="1" 
+              step="0.1"
+              placeholder="6.0"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="package-width">Width (inches) *</label>
+            <input 
+              type="number" 
+              id="package-width"
+              [(ngModel)]="packageDetails.width" 
+              min="1" 
+              step="0.1"
+              placeholder="4.0"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="package-height">Height (inches) *</label>
+            <input 
+              type="number" 
+              id="package-height"
+              [(ngModel)]="packageDetails.height" 
+              min="1" 
+              step="0.1"
+              placeholder="3.0"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="package-value">Declared Value ($)</label>
+            <input 
+              type="number" 
+              id="package-value"
+              [(ngModel)]="packageDetails.declaredValue" 
+              min="0" 
+              step="0.01"
+              placeholder="0.00">
+            <small class="form-help">For insurance purposes (optional)</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="calculate-btn"
+          (click)="calculateShipping()"
+          [disabled]="isLoading">
+          <span *ngIf="!isLoading">🚚 Calculate Shipping</span>
+          <span *ngIf="isLoading">⏳ Calculating...</span>
+        </button>
+        <button 
+          type="button" 
+          class="clear-btn"
+          (click)="clearForm()">
+          🗑️ Clear Form
+        </button>
+      </div>
+    </div>
+
+    <!-- Shipping Rates Results -->
+    <div class="shipping-rates" *ngIf="shippingRates.length > 0">
+      <h4>📊 Available Shipping Options</h4>
+      <div class="rates-grid">
+        <div 
+          class="rate-card" 
+          *ngFor="let rate of shippingRates"
+          [class.selected]="selectedRate?.serviceCode === rate.serviceCode"
+          (click)="selectShippingRate(rate)"
+          (keydown.enter)="selectShippingRate(rate)"
+          (keydown.space)="selectShippingRate(rate)"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'Select ' + rate.serviceName + ' shipping option'">
+          <div class="rate-header">
+            <h5>{{ rate.serviceName }}</h5>
+            <span class="guaranteed-badge" *ngIf="rate.guaranteedDelivery">
+              {{ getStatusIcon(rate.guaranteedDelivery) }} Guaranteed
+            </span>
+          </div>
+          <div class="rate-details">
+            <div class="rate-price">
+              <span class="price">{{ formatCurrency(rate.totalCharges) }}</span>
+            </div>
+            <div class="rate-info">
+              <p><strong>Delivery:</strong> {{ rate.deliveryDate }}</p>
+              <p><strong>Transit Time:</strong> {{ rate.transitDays }} day(s)</p>
+            </div>
+          </div>
+          <div class="rate-actions">
+            <button 
+              type="button" 
+              class="select-rate-btn"
+              [class.selected]="selectedRate?.serviceCode === rate.serviceCode">
+              {{ selectedRate?.serviceCode === rate.serviceCode ? '✓ Selected' : 'Select' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Rate Summary -->
+      <div class="selected-rate-summary" *ngIf="selectedRate">
+        <h5>✅ Selected Shipping Option</h5>
+        <div class="summary-details">
+          <p><strong>Service:</strong> {{ selectedRate.serviceName }}</p>
+          <p><strong>Cost:</strong> {{ formatCurrency(selectedRate.totalCharges) }}</p>
+          <p><strong>Delivery:</strong> {{ selectedRate.deliveryDate }}</p>
+          <p><strong>Transit Time:</strong> {{ selectedRate.transitDays }} day(s)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

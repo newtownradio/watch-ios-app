@@ -35,7 +35,7 @@ export interface PricingRecommendation {
 export class AiPricingService {
 
   // Market data for popular watch brands/models
-  private marketData: { [key: string]: MarketData } = {
+  private marketData: Record<string, MarketData> = {
     'rolex-submariner': {
       brand: 'Rolex',
       model: 'Submariner',
@@ -317,7 +317,7 @@ export class AiPricingService {
    * Calculate brand value factor
    */
   private getBrandValueFactor(brand: string): number {
-    const brandFactors: { [key: string]: number } = {
+    const brandFactors: Record<string, number> = {
       'rolex': 1.2,
       'patek philippe': 1.3,
       'audemars piguet': 1.25,
@@ -424,7 +424,7 @@ export class AiPricingService {
    * Get additional common models for each brand
    */
   private getAdditionalModelsForBrand(brand: string): string[] {
-    const brandModels: { [key: string]: string[] } = {
+    const brandModels: Record<string, string[]> = {
       'Rolex': [
         'Datejust', 'Daytona', 'GMT-Master', 'Explorer', 'Milgauss', 
         'Yacht-Master', 'Sea-Dweller', 'Air-King', 'Cellini', 'Oyster Perpetual'

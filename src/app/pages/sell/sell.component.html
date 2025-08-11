@@ -17,7 +17,13 @@
           <img [src]="form.imageUrl" alt="Product preview" class="preview-image">
           <button type="button" class="remove-image-btn" (click)="removeImage()">×</button>
         </div>
-        <div class="upload-area" *ngIf="!form.imageUrl" (click)="triggerFileInput()">
+        <div class="upload-area" *ngIf="!form.imageUrl" 
+             (click)="triggerFileInput()" 
+             (keydown.enter)="triggerFileInput()" 
+             (keydown.space)="triggerFileInput()"
+             tabindex="0"
+             role="button"
+             aria-label="Upload product image">
           <div class="upload-content">
             <span class="upload-icon">Photo</span>
             <p>Click to upload a photo of your watch</p>
@@ -43,7 +49,13 @@
           <img [src]="form.governmentIdUrl" alt="Government ID" class="id-image">
           <button type="button" class="remove-id-btn" (click)="removeGovernmentId()">×</button>
         </div>
-        <div class="id-upload-area" *ngIf="!form.governmentIdUrl" (click)="triggerGovernmentIdInput()">
+        <div class="id-upload-area" *ngIf="!form.governmentIdUrl" 
+             (click)="triggerGovernmentIdInput()" 
+             (keydown.enter)="triggerGovernmentIdInput()" 
+             (keydown.space)="triggerGovernmentIdInput()"
+             tabindex="0"
+             role="button"
+             aria-label="Upload government ID">
           <div class="upload-content">
             <span class="upload-icon">ID</span>
             <p>Click to upload your government ID</p>
@@ -440,6 +452,8 @@
     </div>
   </div>
 
+
+
   <!-- Active Listings Section -->
   <div class="active-listings" *ngIf="activeListings.length > 0">
     <h2>Your Active Listings</h2>
@@ -534,6 +548,115 @@
       <div class="sold-notice" *ngIf="listing.status === 'sold' && listing.highestBid">
         <p>Item sold to {{ listing.highestBid.bidderName }} for ${{ listing.highestBid.amount.toLocaleString() }}</p>
         <p>Smart contract created. Shipping costs will be split.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Step Bid Acceptance Flow -->
+  <div class="bid-acceptance-flow" *ngIf="showBidAcceptanceFlow">
+    <div class="flow-overlay">
+      <div class="flow-container">
+        <div class="flow-header">
+          <h2>🚀 Accept Bid & Create Order</h2>
+          <button class="close-flow-btn" (click)="showBidAcceptanceFlow = false">×</button>
+        </div>
+
+        <!-- Step Progress -->
+        <div class="step-progress">
+          <div class="step" [class.active]="currentAcceptanceStep >= 1" [class.completed]="currentAcceptanceStep > 1">
+            <span class="step-number">1</span>
+            <span class="step-label">Review Bid</span>
+          </div>
+          <div class="step" [class.active]="currentAcceptanceStep >= 2" [class.completed]="currentAcceptanceStep > 2">
+            <span class="step-number">2</span>
+            <span class="step-label">Shipping Calculator</span>
+          </div>
+          <div class="step" [class.active]="currentAcceptanceStep >= 3" [class.completed]="currentAcceptanceStep > 3">
+            <span class="step-number">3</span>
+            <span class="step-label">Order Confirmation</span>
+          </div>
+          <div class="step" [class.active]="currentAcceptanceStep >= 4" [class.completed]="currentAcceptanceStep > 4">
+            <span class="step-number">4</span>
+            <span class="step-label">Complete</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Review Bid -->
+        <div class="step-content" *ngIf="currentAcceptanceStep === 1">
+          <h3>📋 Review Bid Details</h3>
+          <div class="bid-review" *ngIf="selectedBidForAcceptance && selectedListingForAcceptance">
+            <div class="bid-info">
+              <h4>Bid Information</h4>
+              <p><strong>Bidder:</strong> {{ selectedBidForAcceptance.bidderName }}</p>
+              <p><strong>Amount:</strong> ${{ selectedBidForAcceptance.amount.toLocaleString() }}</p>
+              <p><strong>Time:</strong> {{ selectedBidForAcceptance.timestamp | date:'medium' }}</p>
+            </div>
+            <div class="listing-info">
+              <h4>Listing Information</h4>
+              <p><strong>Watch:</strong> {{ selectedListingForAcceptance.title }}</p>
+              <p><strong>Starting Price:</strong> ${{ selectedListingForAcceptance.startingPrice.toLocaleString() }}</p>
+              <p><strong>Final Sale Price:</strong> ${{ selectedBidForAcceptance.amount.toLocaleString() }}</p>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button class="btn-primary" (click)="nextAcceptanceStep()">Continue to Shipping Calculator</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Shipping Calculator -->
+        <div class="step-content" *ngIf="currentAcceptanceStep === 2">
+          <h3>🚚 Calculate Shipping Costs</h3>
+          <p>Calculate shipping costs to determine final order details.</p>
+          <app-shipping-calculator></app-shipping-calculator>
+          <div class="step-actions">
+            <button class="btn-secondary" (click)="previousAcceptanceStep()">Back to Review</button>
+            <button class="btn-primary" (click)="nextAcceptanceStep()">Continue to Confirmation</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Order Confirmation -->
+        <div class="step-content" *ngIf="currentAcceptanceStep === 3">
+          <h3>✅ Confirm Order Details</h3>
+          <div class="order-summary" *ngIf="selectedBidForAcceptance && selectedListingForAcceptance">
+            <h4>Order Summary</h4>
+            <div class="summary-row">
+              <span>Watch Price:</span>
+              <span>${{ selectedBidForAcceptance.amount.toLocaleString() }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping Cost:</span>
+              <span>To be calculated</span>
+            </div>
+            <div class="summary-row total">
+              <span>Total:</span>
+              <span>${{ selectedBidForAcceptance.amount.toLocaleString() }} + Shipping</span>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button class="btn-secondary" (click)="previousAcceptanceStep()">Back to Shipping</button>
+            <button class="btn-primary" (click)="nextAcceptanceStep()">Continue to Complete</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Complete -->
+        <div class="step-content" *ngIf="currentAcceptanceStep === 4">
+          <h3>🎉 Complete Order Creation</h3>
+          <p>Review all details and complete the order creation process.</p>
+          <div class="final-confirmation">
+            <p><strong>Ready to create order?</strong></p>
+            <p>This will:</p>
+            <ul>
+              <li>Accept the bid</li>
+              <li>Create an order</li>
+              <li>Mark the listing as sold</li>
+              <li>Begin the verification process</li>
+            </ul>
+          </div>
+          <div class="step-actions">
+            <button class="btn-secondary" (click)="previousAcceptanceStep()">Back to Confirmation</button>
+            <button class="btn-success" (click)="completeBidAcceptance()">Complete Order Creation</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

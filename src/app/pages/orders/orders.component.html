@@ -1,0 +1,127 @@
+<div class="orders-container">
+  <div class="orders-header">
+    <h1>📦 Order Management</h1>
+    <p class="subtitle">
+      {{ userRole === 'seller' ? 'Manage your watch sales and shipping' : 'Track your watch purchases and deliveries' }}
+    </p>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list" *ngIf="orders.length > 0">
+    <h2>Your Orders</h2>
+    
+    <div class="order-card" 
+         *ngFor="let order of orders" 
+         [class.selected]="selectedOrder?.id === order.id"
+         (click)="selectOrder(order)">
+      
+      <div class="order-header">
+        <div class="order-info">
+          <h3>{{ order.watchTitle }}</h3>
+          <p class="order-id">Order #{{ order.id }}</p>
+          <p class="order-date">{{ order.createdAt | date:'mediumDate' }}</p>
+        </div>
+        
+        <div class="order-status">
+          <span class="status-badge" 
+                [style.background-color]="getStatusColor(order.status)">
+            {{ getStatusIcon(order.status) }} {{ order.status.replace('_', ' ').toUpperCase() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="order-details">
+        <div class="price-info">
+          <p class="final-price">${{ order.finalPrice.toLocaleString() }}</p>
+          <p class="role-indicator">{{ userRole === 'seller' ? 'Sale Price' : 'Purchase Price' }}</p>
+        </div>
+        
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getOrderProgress(order)"></div>
+        </div>
+      </div>
+
+      <!-- Order Actions -->
+      <div class="order-actions" *ngIf="selectedOrder?.id === order.id">
+        <button class="action-btn" 
+                *ngIf="canShowShippingCalculator(order)"
+                (click)="toggleShippingCalculator()">
+          🚚 {{ showShippingCalculator ? 'Hide' : 'Show' }} Shipping Calculator
+        </button>
+        
+        <button class="action-btn" 
+                *ngIf="canShowPackageTracking(order)"
+                (click)="togglePackageTracking()">
+          📍 {{ showPackageTracking ? 'Hide' : 'Show' }} Package Tracking
+        </button>
+      </div>
+
+      <!-- Shipping Calculator (for sellers) -->
+      <div class="shipping-section" *ngIf="selectedOrder?.id === order.id && showShippingCalculator">
+        <h4>🚚 Calculate Shipping</h4>
+        <app-shipping-calculator></app-shipping-calculator>
+      </div>
+
+      <!-- Package Tracking -->
+      <div class="tracking-section" *ngIf="selectedOrder?.id === order.id && showPackageTracking">
+        <h4>📍 Track Package</h4>
+        <app-package-tracking 
+          [trackingNumber]="order.trackingNumber || ''"
+          [showTrackingForm]="false">
+        </app-package-tracking>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Orders Message -->
+  <div class="no-orders" *ngIf="orders.length === 0">
+    <div class="empty-state">
+      <h2>📦 No Orders Yet</h2>
+      <p *ngIf="userRole === 'seller'">
+        You haven't sold any watches yet. Start by creating a listing in the Sell section!
+      </p>
+      <p *ngIf="userRole === 'buyer'">
+        You haven't purchased any watches yet. Browse watches in the Discovery section!
+      </p>
+      <div class="action-buttons">
+        <a routerLink="/sell" class="btn-primary" *ngIf="userRole === 'seller'">
+          🚀 Start Selling
+        </a>
+        <a routerLink="/discovery" class="btn-primary" *ngIf="userRole === 'buyer'">
+          🔍 Browse Watches
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Details Panel -->
+  <div class="order-details-panel" *ngIf="selectedOrder">
+    <div class="panel-header">
+      <h3>Order Details</h3>
+      <button class="close-btn" (click)="selectedOrder = null">×</button>
+    </div>
+    
+    <div class="details-content">
+      <div class="detail-row">
+        <span class="label">Watch:</span>
+        <span class="value">{{ selectedOrder.watchTitle }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Status:</span>
+        <span class="value">{{ selectedOrder.status.replace('_', ' ').toUpperCase() }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Price:</span>
+        <span class="value">${{ selectedOrder.finalPrice.toLocaleString() }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Created:</span>
+        <span class="value">{{ selectedOrder.createdAt | date:'medium' }}</span>
+      </div>
+      <div class="detail-row" *ngIf="selectedOrder.trackingNumber">
+        <span class="label">Tracking:</span>
+        <span class="value">{{ selectedOrder.trackingNumber }}</span>
+      </div>
+    </div>
+  </div>
+</div>

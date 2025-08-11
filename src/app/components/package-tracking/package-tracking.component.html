@@ -1,0 +1,127 @@
+<div class="package-tracking">
+  <!-- Tracking Form -->
+  <div class="tracking-form" *ngIf="showTrackingForm">
+    <div class="form-header">
+      <h3>📦 Package Tracking</h3>
+      <p>Track your package with UPS tracking number</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      <span class="error-icon">⚠️</span>
+      {{ errorMessage }}
+    </div>
+
+    <div class="tracking-input">
+      <div class="input-group">
+        <input 
+          type="text" 
+          [(ngModel)]="customTrackingNumber"
+          placeholder="Enter UPS tracking number (e.g., 1Z999AA1234567890)"
+          class="tracking-input-field">
+        <button 
+          type="button" 
+          class="track-btn"
+          (click)="trackCustomPackage()"
+          [disabled]="isLoading || !customTrackingNumber.trim()">
+          <span *ngIf="!isLoading">🔍 Track</span>
+          <span *ngIf="isLoading">⏳ Tracking...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tracking Results -->
+  <div class="tracking-results" *ngIf="trackingInfo">
+    <div class="tracking-header">
+      <h4>📊 Tracking Information</h4>
+      <button 
+        type="button" 
+        class="clear-btn"
+        (click)="clearTracking()">
+        🗑️ Clear
+      </button>
+    </div>
+
+    <!-- Package Status Overview -->
+    <div class="status-overview">
+      <div class="tracking-number">
+        <strong>Tracking Number:</strong> {{ trackingInfo.trackingNumber }}
+      </div>
+      
+      <div class="current-status">
+        <div class="status-badge" [style.background-color]="getStatusColor(trackingInfo.status)">
+          <span class="status-icon">{{ getStatusIcon(trackingInfo.status) }}</span>
+          <span class="status-text">{{ trackingInfo.status }}</span>
+        </div>
+      </div>
+
+      <div class="delivery-info">
+        <div class="delivery-date">
+          <strong>Estimated Delivery:</strong> 
+          <span class="date">{{ formatDate(trackingInfo.estimatedDelivery) }}</span>
+        </div>
+        
+        <div class="delivery-status" [style.color]="getEstimatedDeliveryStatus().color">
+          <span class="status-icon">{{ getEstimatedDeliveryStatus().icon }}</span>
+          <span class="status-text">{{ getEstimatedDeliveryStatus().text }}</span>
+        </div>
+      </div>
+
+      <div class="current-location" *ngIf="trackingInfo.location">
+        <strong>Current Location:</strong> {{ trackingInfo.location }}
+        <div class="last-update">
+          <small>Last updated: {{ formatDate(trackingInfo.lastUpdate) }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracking Timeline -->
+    <div class="tracking-timeline">
+      <h5>📋 Tracking History</h5>
+      <div class="timeline">
+        <div 
+          class="timeline-item" 
+          *ngFor="let event of trackingInfo.events; let i = index"
+          [class.active]="i === 0">
+          <div class="timeline-marker" [style.background-color]="getStatusColor(event.status)">
+            <span class="marker-icon">{{ getStatusIcon(event.status) }}</span>
+          </div>
+          <div class="timeline-content">
+            <div class="event-header">
+              <h6 class="event-status">{{ event.status }}</h6>
+              <span class="event-time">{{ formatDate(event.timestamp) }}</span>
+            </div>
+            <div class="event-location">{{ event.location }}</div>
+            <div class="event-description">{{ event.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPS Tracking Link -->
+    <div class="ups-tracking-link">
+      <a 
+        [href]="'https://www.ups.com/track?tracknum=' + trackingInfo.trackingNumber" 
+        target="_blank" 
+        class="ups-link">
+        🔗 Track on UPS.com
+      </a>
+      <small>Opens in new tab</small>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p>Tracking package...</p>
+  </div>
+
+  <!-- No Results State -->
+  <div class="no-results" *ngIf="!trackingInfo && !isLoading && !errorMessage && customTrackingNumber">
+    <div class="no-results-icon">📦</div>
+    <p>Enter a tracking number above to start tracking your package</p>
+  </div>
+</div>

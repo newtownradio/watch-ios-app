@@ -242,7 +242,7 @@ export class AuthenticationPartnerService {
     brand: string,
     model: string,
     estimatedValue: number,
-    userCountry: string = 'US'
+    userCountry = 'US'
   ): AuthenticationPartner {
     const partners = this.getActivePartners();
     

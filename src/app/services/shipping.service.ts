@@ -339,11 +339,11 @@ export class ShippingService {
     location: string;
     lastUpdate: Date;
     estimatedDelivery: Date;
-    events: Array<{
+    events: {
       timestamp: Date;
       location: string;
       description: string;
-    }>;
+    }[];
   } {
     // Simulate tracking data
     const now = new Date();

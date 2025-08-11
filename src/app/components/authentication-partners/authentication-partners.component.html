@@ -109,8 +109,8 @@
       <!-- Filter Options - Responsive Grid -->
       <div class="filter-options">
         <div class="filter-group">
-          <label>Specialty</label>
-          <select [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange($event)">
+          <label for="specialty-select">Specialty</label>
+          <select id="specialty-select" [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange($event)">
             <option value="">All Specialties</option>
             <option *ngFor="let specialty of getSpecialties()" [value]="specialty">
               {{ specialty }}
@@ -119,9 +119,8 @@
         </div>
         
         <div class="filter-group">
-          <label>Price Range</label>
-          <select [(ngModel)]="selectedPriceRange" (change)="onPriceRangeChange($event)">
-            <option value="">All Prices</option>
+          <label for="price-range-select">Price Range</label>
+          <select id="price-range-select" [(ngModel)]="selectedPriceRange" (change)="onPriceRangeChange($event)">
             <option value="">All Prices</option>
             <option *ngFor="let range of getPriceRanges()" [value]="range.value">
               {{ range.label }}
@@ -130,8 +129,8 @@
         </div>
         
         <div class="filter-group">
-          <label>Sort By</label>
-          <select [(ngModel)]="sortBy" (change)="onSortChange()">
+          <label for="sort-by-select">Sort By</label>
+          <select id="sort-by-select" [(ngModel)]="sortBy" (change)="onSortChange()">
             <option value="rating">Highest Rated</option>
             <option value="price">Lowest Price</option>
             <option value="time">Fastest Turnaround</option>

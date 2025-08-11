@@ -6,17 +6,16 @@ import { Listing, Bid, Counteroffer } from '../../models/bid.interface';
 import { AuthenticationPartner } from '../../models/authentication-partner.interface';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
-import { AuthenticationPartnerService } from '../../services/authentication-partner.service';
 import { AuthenticationPartnersComponent } from '../../components/authentication-partners/authentication-partners.component';
-import { AuctionTimerService, AuctionTimer } from '../../services/auction-timer.service';
-import { OrderService } from '../../services/order.service';
+import { ShippingCalculatorComponent } from '../../components/shipping-calculator/shipping-calculator.component';
+
 import { Share } from '@capacitor/share';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sell',
   standalone: true,
-  imports: [CommonModule, FormsModule, AuthenticationPartnersComponent],
+  imports: [CommonModule, FormsModule, AuthenticationPartnersComponent, ShippingCalculatorComponent],
   providers: [DataPersistenceService, AiPricingService],
   templateUrl: './sell.component.html',
   styleUrl: './sell.component.scss'
@@ -56,7 +55,7 @@ export class SellComponent implements OnInit, OnDestroy {
   // Authentication Partners
   authenticationPartners: AuthenticationPartner[] = [];
   selectedPartner: AuthenticationPartner | null = null;
-  userCountry: string = 'US';
+  userCountry = 'US';
 
   // Timer subscriptions for cleanup
   private timerSubscriptions: Subscription[] = [];
@@ -385,15 +384,67 @@ export class SellComponent implements OnInit, OnDestroy {
     return this.getPendingBids(listing).length > 0;
   }
 
+  // Multi-step bid acceptance process
+  showBidAcceptanceFlow = false;
+  selectedBidForAcceptance: Bid | null = null;
+  selectedListingForAcceptance: Listing | null = null;
+  currentAcceptanceStep = 1;
+  totalAcceptanceSteps = 4;
+  
   acceptBid(listingId: string, bidId: string) {
     const listing = this.activeListings.find(l => l.id === listingId);
     if (listing) {
       const bid = listing.bids.find(b => b.id === bidId);
       if (bid) {
-        bid.status = 'accepted';
-        listing.status = 'sold';
-        alert(`Bid accepted! Smart contract will be created. Shipping costs will be split.`);
+        this.selectedBidForAcceptance = bid;
+        this.selectedListingForAcceptance = listing;
+        this.showBidAcceptanceFlow = true;
+        this.currentAcceptanceStep = 1;
       }
+    }
+  }
+
+  nextAcceptanceStep() {
+    if (this.currentAcceptanceStep < this.totalAcceptanceSteps) {
+      this.currentAcceptanceStep++;
+    }
+  }
+
+  previousAcceptanceStep() {
+    if (this.currentAcceptanceStep > 1) {
+      this.currentAcceptanceStep--;
+    }
+  }
+
+  completeBidAcceptance() {
+    if (this.selectedBidForAcceptance && this.selectedListingForAcceptance) {
+      // Update bid and listing status
+      this.selectedBidForAcceptance.status = 'accepted';
+      this.selectedListingForAcceptance.status = 'sold';
+      
+      // Create order (this will be implemented in the order service)
+      this.createOrderFromAcceptedBid();
+      
+      // Reset and close flow
+      this.showBidAcceptanceFlow = false;
+      this.selectedBidForAcceptance = null;
+      this.selectedListingForAcceptance = null;
+      this.currentAcceptanceStep = 1;
+      
+      alert('Bid accepted! Order created successfully. Proceed to verification and shipping.');
+    }
+  }
+
+  private createOrderFromAcceptedBid() {
+    if (this.selectedBidForAcceptance && this.selectedListingForAcceptance) {
+      // This will be implemented to create an order in the order service
+      console.log('Creating order from accepted bid:', {
+        listingId: this.selectedListingForAcceptance.id,
+        bidId: this.selectedBidForAcceptance.id,
+        buyerId: this.selectedBidForAcceptance.bidderId,
+        sellerId: this.selectedListingForAcceptance.sellerId,
+        finalPrice: this.selectedBidForAcceptance.amount
+      });
     }
   }
 
@@ -655,13 +706,17 @@ export class SellComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  onAuthenticationPartnerChange(partner: AuthenticationPartner | string) {
-    if (typeof partner === 'string') {
+  onAuthenticationPartnerChange(partner: AuthenticationPartner | string | null) {
+    if (partner === null) {
+      this.form.authenticationPartner = '';
+    } else if (typeof partner === 'string') {
       this.form.authenticationPartner = partner;
     } else {
       this.form.authenticationPartner = partner.id;
     }
   }
+
+
 
   ngOnDestroy() {
     // Clean up timer subscriptions

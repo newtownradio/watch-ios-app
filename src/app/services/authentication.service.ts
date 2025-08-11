@@ -181,7 +181,7 @@ export class AuthenticationService {
   /**
    * Get recommended authentication partner for a watch
    */
-  getRecommendedPartner(brand: string, hasDiamonds: boolean = false): AuthenticationPartner {
+  getRecommendedPartner(brand: string, hasDiamonds = false): AuthenticationPartner {
     if (hasDiamonds) {
       return this.AUTHENTICATION_PARTNERS.find(p => p.id === 'gia')!;
     }
