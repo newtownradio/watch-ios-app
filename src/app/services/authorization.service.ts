@@ -29,17 +29,17 @@ export class AuthorizationService {
     },
     'buyer': {
       role: 'buyer',
-      permissions: ['view_discovery', 'place_bids', 'view_messages', 'view_notifications', 'edit_profile'],
+      permissions: ['view_discovery', 'place_bids', 'view_messages', 'edit_profile'],
       description: 'User who can place bids on listings'
     },
     'seller': {
       role: 'seller',
-      permissions: ['view_discovery', 'create_listings', 'manage_listings', 'view_messages', 'view_notifications', 'edit_profile'],
+      permissions: ['view_discovery', 'create_listings', 'manage_listings', 'view_messages', 'edit_profile'],
       description: 'User who can create and manage listings'
     },
     'verified': {
       role: 'verified',
-      permissions: ['view_discovery', 'place_bids', 'create_listings', 'manage_listings', 'view_messages', 'view_notifications', 'edit_profile', 'priority_support'],
+      permissions: ['view_discovery', 'place_bids', 'create_listings', 'manage_listings', 'view_messages', 'edit_profile', 'priority_support'],
       description: 'Verified user with full access'
     }
   };
@@ -124,15 +124,12 @@ export class AuthorizationService {
    * Check if user can access a specific route
    */
   canAccessRoute(routePath: string): boolean {
-    const userRole = this.getUserRole();
-    
     // Define route permissions
     const routePermissions: Record<string, string[]> = {
       '/discovery': ['view_discovery'],
       '/sell': ['create_listings'],
       '/account': ['edit_profile'],
-      '/messages': ['view_messages'],
-      '/notifications': ['view_notifications']
+      '/messages': ['view_messages']
     };
 
     const requiredPermissions = routePermissions[routePath];

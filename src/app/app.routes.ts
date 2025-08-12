@@ -6,7 +6,6 @@ import { OrdersComponent } from './pages/orders/orders.component';
 import { SplashComponent } from './pages/splash/splash.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { MessagesComponent } from './pages/messages/messages.component';
-import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 
@@ -34,11 +33,6 @@ export const routes: Routes = [
   { 
     path: 'messages', 
     component: MessagesComponent,
-    canActivate: [AuthGuard]
-  },
-  { 
-    path: 'notifications', 
-    component: NotificationsComponent,
     canActivate: [AuthGuard]
   },
   { path: '**', redirectTo: '' }

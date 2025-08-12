@@ -31,7 +31,6 @@ export class NavigationService {
     { path: '/sell', label: 'Sell', requiresAuth: true, requiredRoles: ['user', 'seller', 'verified'] },
     { path: '/orders', label: 'Orders', requiresAuth: true, requiredRoles: ['buyer', 'seller', 'verified'] },
     { path: '/messages', label: 'Messages', requiresAuth: true, requiredRoles: ['buyer', 'seller', 'verified'] },
-    { path: '/notifications', label: 'Notifications', requiresAuth: true, requiredRoles: ['buyer', 'seller', 'verified'] },
     { path: '/account', label: 'Account', requiresAuth: true }
   ];
 
