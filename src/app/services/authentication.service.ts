@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { DataPersistenceService } from './data-persistence.service';
+import { UpsShippingService, ShippingAddress, PackageDetails } from './ups-shipping.service';
 
 export interface AuthenticationPartner {
   id: string;
@@ -147,7 +148,7 @@ export class AuthenticationService {
     }
   ];
 
-  constructor() {
+  constructor(private upsShippingService: UpsShippingService) {
     console.log('AuthenticationService initialized');
   }
 
@@ -293,15 +294,43 @@ export class AuthenticationService {
   }
 
   /**
-   * Calculate shipping costs for authentication
+   * Calculate shipping costs for authentication using real UPS rates
    */
-  calculateShippingCosts(fromZip: string, toZip: string, weight: number): number {
-    // Simplified calculation - in production, this would integrate with UPS API
-    const baseCost = 25;
-    const weightMultiplier = weight * 2;
+  async calculateShippingCosts(
+    fromAddress: ShippingAddress,
+    toAddress: ShippingAddress,
+    packageDetails: PackageDetails
+  ): Promise<number> {
+    try {
+      // Get real shipping rates from UPS
+      const rates = await this.upsShippingService.getShippingRates(fromAddress, toAddress, packageDetails).toPromise();
+      
+      if (rates && rates.length > 0) {
+        // Use the cheapest rate for cost calculation
+        const cheapestRate = rates.reduce((min, rate) => 
+          rate.totalCharges < min.totalCharges ? rate : min, rates[0]);
+        
+        return cheapestRate.totalCharges;
+      }
+      
+      // Fallback to estimated cost if UPS API fails
+      return this.estimateShippingCost(packageDetails.weight, fromAddress.postalCode, toAddress.postalCode);
+    } catch (error) {
+      console.error('Error calculating UPS shipping costs:', error);
+      // Fallback to estimated cost
+      return this.estimateShippingCost(packageDetails.weight, fromAddress.postalCode, toAddress.postalCode);
+    }
+  }
+
+  /**
+   * Fallback shipping cost estimation
+   */
+  private estimateShippingCost(weight: number, fromZip: string, toZip: string): number {
+    const baseCost = 15;
+    const weightMultiplier = weight * 1.5;
     const distanceMultiplier = 1.5; // Simplified distance calculation
     
-    return Math.round(baseCost + weightMultiplier + distanceMultiplier);
+    return Math.round((baseCost + weightMultiplier) * distanceMultiplier * 100) / 100;
   }
 
   /**

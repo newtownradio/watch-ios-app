@@ -472,12 +472,12 @@ export class VerificationApiService {
     // Simulate API delay
     return of({
       requestId: `mock-${Date.now()}`,
-      status: 'accepted',
+      status: 'accepted' as const,
       estimatedCompletion: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days
       totalCost: 175,
       breakdown: {
         authenticationFee: 150,
-        shippingCosts: 25,
+        shippingCosts: 0, // Will be calculated dynamically based on UPS rates
         insuranceCosts: 0,
         rushServiceFee: 0,
         additionalServices: 0
@@ -518,7 +518,7 @@ export class VerificationApiService {
   getMockStatusResponse(requestId: string): Observable<VerificationStatusResponse> {
     return of({
       requestId,
-      status: 'in_progress',
+      status: 'in_progress' as const,
       currentStage: 'Physical Examination',
       progress: 65,
       estimatedCompletion: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -537,7 +537,7 @@ export class VerificationApiService {
   getMockResultResponse(requestId: string): Observable<VerificationResultResponse> {
     return of({
       requestId,
-      status: 'completed',
+      status: 'completed' as const,
       result: {
         isAuthentic: true,
         confidence: 98,
