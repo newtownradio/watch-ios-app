@@ -149,6 +149,15 @@
   background: #388e3c;
 }
 
+.action-btn.payment-btn {
+  background: #8b7355 !important;
+  color: white !important;
+}
+
+.action-btn.payment-btn:hover {
+  background: #7a6344 !important;
+}
+
 .order-details-panel {
   background: white;
   border-radius: 12px;
@@ -284,4 +293,18 @@
   .action-btn {
     width: 100%;
   }
+}
+
+/* Payment Section */
+.payment-section {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.payment-section h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
 }

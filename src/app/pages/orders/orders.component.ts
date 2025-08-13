@@ -4,13 +4,15 @@ import { RouterModule } from '@angular/router';
 import { OrderService, Order } from '../../services/order.service';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { AuthorizationService } from '../../services/authorization.service';
+import { StripeService, StripePaymentResult } from '../../services/stripe.service';
 import { ShippingCalculatorComponent } from '../../components/shipping-calculator/shipping-calculator.component';
 import { PackageTrackingComponent } from '../../components/package-tracking/package-tracking.component';
+import { StripePaymentComponent } from '../../components/stripe-payment/stripe-payment.component';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, RouterModule, ShippingCalculatorComponent, PackageTrackingComponent],
+  imports: [CommonModule, RouterModule, ShippingCalculatorComponent, PackageTrackingComponent, StripePaymentComponent],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss'
 })
@@ -18,12 +20,15 @@ export class OrdersComponent implements OnInit {
   private orderService = inject(OrderService);
   private dataService = inject(DataPersistenceService);
   private authService = inject(AuthorizationService);
+  private stripeService = inject(StripeService);
 
   orders: Order[] = [];
   userRole: 'buyer' | 'seller' = 'buyer';
   selectedOrder: Order | null = null;
   showShippingCalculator = false;
   showPackageTracking = false;
+  showPaymentForm = false;
+  currentPaymentAmount = 0;
 
   ngOnInit() {
     this.loadUserOrders();
@@ -52,6 +57,50 @@ export class OrdersComponent implements OnInit {
   togglePackageTracking() {
     this.showPackageTracking = !this.showPackageTracking;
     this.showShippingCalculator = false;
+  }
+
+  togglePaymentForm() {
+    this.showPaymentForm = !this.showPaymentForm;
+    this.showShippingCalculator = false;
+    this.showPackageTracking = false;
+  }
+
+  async initiatePayment(order: Order) {
+    if (order.status === 'pending_payment') {
+      this.currentPaymentAmount = order.finalPrice * 100; // Convert to cents
+      this.selectedOrder = order;
+      this.showPaymentForm = true;
+      
+      // Create payment intent for winning bid
+      const result = await this.stripeService.createWinningBidPaymentIntent(
+        order.id,
+        order.listingId,
+        order.buyerId,
+        order.sellerId,
+        order.finalPrice,
+        150 // Default verification cost
+      );
+
+      if (!result.success) {
+        console.error('Failed to create payment intent:', result.error);
+      }
+    }
+  }
+
+  onPaymentSuccess(result: StripePaymentResult) {
+    console.log('Payment successful:', result);
+    // Update order status to payment confirmed
+    if (this.selectedOrder) {
+      this.orderService.confirmPayment(this.selectedOrder.id);
+      this.loadUserOrders(); // Refresh orders
+    }
+    this.showPaymentForm = false;
+  }
+
+  onPaymentError(result: StripePaymentResult) {
+    console.error('Payment failed:', result);
+    // Handle payment error
+    this.showPaymentForm = false;
   }
 
   getStatusColor(status: Order['status']): string {

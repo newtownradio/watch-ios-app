@@ -43,6 +43,12 @@
 
       <!-- Order Actions -->
       <div class="order-actions" *ngIf="selectedOrder?.id === order.id">
+        <button class="action-btn payment-btn" 
+                *ngIf="order.status === 'pending_payment' && userRole === 'buyer'"
+                (click)="initiatePayment(order)">
+          💳 Complete Payment
+        </button>
+        
         <button class="action-btn" 
                 *ngIf="canShowShippingCalculator(order)"
                 (click)="toggleShippingCalculator()">
@@ -123,5 +129,18 @@
         <span class="value">{{ selectedOrder.trackingNumber }}</span>
       </div>
     </div>
+  </div>
+
+  <!-- Stripe Payment Form -->
+  <div class="payment-section" *ngIf="showPaymentForm && selectedOrder">
+    <h4>💳 Complete Payment</h4>
+    <app-stripe-payment
+      [paymentTitle]="'Payment for ' + selectedOrder.watchTitle"
+      [paymentAmount]="currentPaymentAmount"
+      [paymentButtonText]="'Pay $' + (currentPaymentAmount / 100).toFixed(2)"
+      [paymentType]="'winning_bid_payment'"
+      (paymentSuccess)="onPaymentSuccess($event)"
+      (paymentError)="onPaymentError($event)">
+    </app-stripe-payment>
   </div>
 </div>
