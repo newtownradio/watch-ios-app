@@ -1,0 +1,292 @@
+<div class="verification-request-container">
+  <!-- Header -->
+  <div class="header">
+    <h2>Verification Request</h2>
+    <p class="subtitle">Submit your watch for professional authentication</p>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="progress-steps">
+    <div class="step" [class]="getStepStatus(1)">
+      <div class="step-number">1</div>
+      <div class="step-label">Partner Selection</div>
+    </div>
+    <div class="step" [class]="getStepStatus(2)">
+      <div class="step-number">2</div>
+      <div class="step-label">Watch Details</div>
+    </div>
+    <div class="step" [class]="getStepStatus(3)">
+      <div class="step-number">3</div>
+      <div class="step-label">Shipping & Package</div>
+    </div>
+    <div class="step" [class]="getStepStatus(4)">
+      <div class="step-number">4</div>
+      <div class="step-label">Review & Submit</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Partner Selection -->
+  <div class="step-content" *ngIf="currentStep === 1">
+    <h3>Select Authentication Partner</h3>
+    <p>Choose a trusted authentication partner for your watch verification.</p>
+    
+    <div class="partner-selection">
+      <div class="partner-card" 
+           *ngFor="let partner of authenticationPartners"
+           [class.selected]="formData.partnerId === partner.id"
+           (click)="formData.partnerId = partner.id">
+        <div class="partner-header">
+          <h4>{{ partner.name }}</h4>
+          <div class="partner-fee">${{ partner.baseFee }}</div>
+        </div>
+        <p class="partner-description">{{ partner.description }}</p>
+        <div class="partner-details">
+          <div class="detail">
+            <strong>Time:</strong> {{ partner.estimatedTime }}
+          </div>
+          <div class="detail">
+            <strong>Specialty:</strong> {{ partner.specialty }}
+          </div>
+        </div>
+        <div class="partner-features">
+          <span class="feature" *ngFor="let feature of partner.features">{{ feature }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Watch Details -->
+  <div class="step-content" *ngIf="currentStep === 2">
+    <h3>Watch Information</h3>
+    <p>Provide detailed information about the watch to be verified.</p>
+    
+    <div class="form-group">
+      <label for="brand">Brand *</label>
+      <input type="text" id="brand" [(ngModel)]="formData.watchDetails.brand" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="model">Model *</label>
+      <input type="text" id="model" [(ngModel)]="formData.watchDetails.model" required>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="serialNumber">Serial Number</label>
+        <input type="text" id="serialNumber" [(ngModel)]="formData.watchDetails.serialNumber">
+      </div>
+      
+      <div class="form-group">
+        <label for="year">Year</label>
+        <input type="number" id="year" [(ngModel)]="formData.watchDetails.year" min="1900" max="2030">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="condition">Condition *</label>
+      <select id="condition" [(ngModel)]="formData.watchDetails.condition" required>
+        <option value="">Select condition</option>
+        <option value="mint">Mint</option>
+        <option value="excellent">Excellent</option>
+        <option value="very-good">Very Good</option>
+        <option value="good">Good</option>
+        <option value="fair">Fair</option>
+        <option value="poor">Poor</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="estimatedValue">Estimated Value *</label>
+      <div class="input-with-prefix">
+        <span class="prefix">$</span>
+        <input type="number" id="estimatedValue" [(ngModel)]="formData.watchDetails.estimatedValue" min="0" step="100" required>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" [(ngModel)]="formData.watchDetails.description" rows="3" placeholder="Describe any notable features, modifications, or issues..."></textarea>
+    </div>
+  </div>
+
+  <!-- Step 3: Shipping & Package -->
+  <div class="step-content" *ngIf="currentStep === 3">
+    <h3>Shipping & Package Details</h3>
+    <p>Provide shipping information and package specifications.</p>
+    
+    <div class="shipping-section">
+      <h4>From Address (Your Address)</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fromName">Name *</label>
+          <input type="text" id="fromName" [(ngModel)]="formData.shippingDetails.fromAddress.name" required>
+        </div>
+        <div class="form-group">
+          <label for="fromCompany">Company</label>
+          <input type="text" id="fromCompany" [(ngModel)]="formData.shippingDetails.fromAddress.company">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="fromStreet">Street Address *</label>
+        <input type="text" id="fromStreet" [(ngModel)]="formData.shippingDetails.fromAddress.street" required>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fromCity">City *</label>
+          <input type="text" id="fromCity" [(ngModel)]="formData.shippingDetails.fromAddress.city" required>
+        </div>
+        <div class="form-group">
+          <label for="fromState">State *</label>
+          <input type="text" id="fromState" [(ngModel)]="formData.shippingDetails.fromAddress.state" required>
+        </div>
+        <div class="form-group">
+          <label for="fromZip">ZIP Code *</label>
+          <input type="text" id="fromZip" [(ngModel)]="formData.shippingDetails.fromAddress.zipCode" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fromPhone">Phone *</label>
+          <input type="tel" id="fromPhone" [(ngModel)]="formData.shippingDetails.fromAddress.phone" required>
+        </div>
+        <div class="form-group">
+          <label for="fromEmail">Email *</label>
+          <input type="email" id="fromEmail" [(ngModel)]="formData.shippingDetails.fromAddress.email" required>
+        </div>
+      </div>
+    </div>
+    
+    <div class="package-section">
+      <h4>Package Details</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="weight">Weight (lbs) *</label>
+          <input type="number" id="weight" [(ngModel)]="formData.shippingDetails.packageDetails.weight" min="0.1" step="0.1" required>
+        </div>
+        <div class="form-group">
+          <label for="length">Length (inches) *</label>
+          <input type="number" id="length" [(ngModel)]="formData.shippingDetails.packageDetails.dimensions.length" min="1" step="0.5" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="width">Width (inches) *</label>
+          <input type="number" id="width" [(ngModel)]="formData.shippingDetails.packageDetails.dimensions.width" min="1" step="0.5" required>
+        </div>
+        <div class="form-group">
+          <label for="height">Height (inches) *</label>
+          <input type="number" id="height" [(ngModel)]="formData.shippingDetails.packageDetails.dimensions.height" min="1" step="0.5" required>
+        </div>
+      </div>
+      
+      <div class="shipping-costs" *ngIf="shippingCosts > 0">
+        <div class="cost-item">
+          <span>Estimated Shipping Cost:</span>
+          <span class="cost">${{ shippingCosts.toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Review & Submit -->
+  <div class="step-content" *ngIf="currentStep === 4">
+    <h3>Review & Submit</h3>
+    <p>Review your verification request details before submitting.</p>
+    
+    <div class="review-section">
+      <div class="review-item">
+        <h4>Authentication Partner</h4>
+        <p>{{ getSelectedPartnerName() }}</p>
+      </div>
+      
+      <div class="review-item">
+        <h4>Watch Details</h4>
+        <p><strong>{{ formData.watchDetails.brand }} {{ formData.watchDetails.model }}</strong></p>
+        <p>Condition: {{ formData.watchDetails.condition }}</p>
+        <p>Estimated Value: ${{ formData.watchDetails.estimatedValue.toLocaleString() }}</p>
+      </div>
+      
+      <div class="review-item">
+        <h4>Shipping From</h4>
+        <p>{{ formData.shippingDetails.fromAddress.name }}</p>
+        <p>{{ formData.shippingDetails.fromAddress.street }}</p>
+        <p>{{ formData.shippingDetails.fromAddress.city }}, {{ formData.shippingDetails.fromAddress.state }} {{ formData.shippingDetails.fromAddress.zipCode }}</p>
+      </div>
+      
+      <div class="review-item">
+        <h4>Package Details</h4>
+        <p>Weight: {{ formData.shippingDetails.packageDetails.weight }} lbs</p>
+        <p>Dimensions: {{ formData.shippingDetails.packageDetails.dimensions.length }}" × {{ formData.shippingDetails.packageDetails.dimensions.width }}" × {{ formData.shippingDetails.packageDetails.dimensions.height }}"</p>
+      </div>
+    </div>
+    
+    <div class="cost-breakdown">
+      <h4>Cost Breakdown</h4>
+      <div class="cost-item">
+        <span>Authentication Fee:</span>
+        <span class="cost">${{ getSelectedPartnerFee() }}</span>
+      </div>
+      <div class="cost-item">
+        <span>Shipping Cost:</span>
+        <span class="cost">${{ shippingCosts.toFixed(2) }}</span>
+      </div>
+      <div class="cost-item total">
+        <span>Total Cost:</span>
+        <span class="cost">${{ totalCost.toFixed(2) }}</span>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="formData.authenticationOptions.includeConditionReport">
+        Include detailed condition report (+$25)
+      </label>
+    </div>
+    
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="formData.authenticationOptions.rushService">
+        Rush service (+$50)
+      </label>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="navigation-buttons">
+    <button type="button" 
+            class="btn btn-secondary" 
+            (click)="previousStep()" 
+            [disabled]="currentStep === 1">
+      Previous
+    </button>
+    
+    <div class="right-buttons">
+      <button type="button" 
+              class="btn btn-outline" 
+              (click)="cancel()">
+        Cancel
+      </button>
+      
+      <button type="button" 
+              class="btn btn-primary" 
+              (click)="nextStep()" 
+              *ngIf="currentStep < totalSteps"
+              [disabled]="!canProceedToStep(currentStep + 1)">
+        Next
+      </button>
+      
+      <button type="button" 
+              class="btn btn-primary" 
+              (click)="submitVerification()" 
+              *ngIf="currentStep === totalSteps"
+              [disabled]="!isFormValid() || isSubmitting">
+        <span *ngIf="!isSubmitting">Submit Verification Request</span>
+        <span *ngIf="isSubmitting">Submitting...</span>
+      </button>
+    </div>
+  </div>
+</div>
