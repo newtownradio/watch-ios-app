@@ -224,6 +224,14 @@
   font-weight: 600;
 }
 
+.detail-value.seller-pays {
+  color: #155724;
+  background: #d4edda;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #c3e6cb;
+}
+
 .shipping-section,
 .tracking-section {
   margin-top: 25px;
@@ -307,4 +315,235 @@
   color: #333;
   margin-bottom: 20px;
   text-align: center;
+}
+
+/* Return Window Section */
+.return-section {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.return-section h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.return-window-info {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid #8b7355;
+}
+
+.return-status {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.return-status p {
+  margin: 8px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.return-status strong {
+  color: #8b7355;
+}
+
+.return-actions {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.btn-confirm {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.btn-confirm:hover {
+  background: #388e3c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.confirm-note {
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0;
+}
+
+.return-request h5 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.return-request .form-group {
+  margin-bottom: 15px;
+}
+
+.return-request label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.return-type-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.return-type-select:focus {
+  outline: none;
+  border-color: #8b7355;
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+.shipping-info {
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border: 2px solid #e0e0e0;
+}
+
+.shipping-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shipping-note.seller-pays {
+  background: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.shipping-icon {
+  font-size: 1.2rem;
+}
+
+.shipping-text strong {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.return-request textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.3s ease;
+}
+
+.return-request textarea:focus {
+  outline: none;
+  border-color: #8b7355;
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+.btn-return {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.btn-return:hover:not(:disabled) {
+  background: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.btn-return:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.return-note {
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Return Window Status in Order Cards */
+.return-window-status {
+  margin-top: 15px;
+  padding: 12px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+}
+
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
+.status-text {
+  color: #856404;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.time-remaining {
+  color: #8b7355;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ffeaa7;
+}
+
+/* Return Button Styling */
+.action-btn.return-btn {
+  background: #ff9800 !important;
+  color: white !important;
+}
+
+.action-btn.return-btn:hover {
+  background: #f57c00 !important;
 }

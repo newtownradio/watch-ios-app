@@ -39,6 +39,17 @@
         <div class="progress-bar">
           <div class="progress-fill" [style.width.%]="getOrderProgress(order)"></div>
         </div>
+
+        <!-- Return Window Status -->
+        <div class="return-window-status" *ngIf="order.status === 'inspection_period' || order.status === 'delivered'">
+          <div class="status-info">
+            <span class="status-icon">⏰</span>
+            <span class="status-text">{{ getReturnWindowStatus(order).status }}</span>
+            <span class="time-remaining" *ngIf="getReturnWindowStatus(order).timeRemaining">
+              {{ getReturnWindowStatus(order).timeRemaining }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <!-- Order Actions -->
@@ -59,6 +70,19 @@
                 *ngIf="canShowPackageTracking(order)"
                 (click)="togglePackageTracking()">
           📍 {{ showPackageTracking ? 'Hide' : 'Show' }} Package Tracking
+        </button>
+
+        <!-- Return Window Actions -->
+        <button class="action-btn return-btn" 
+                *ngIf="canStartReturnWindow(order)"
+                (click)="orderService.startReturnWindow(order.id); loadUserOrders()">
+          ⏰ Start 72-Hour Return Window
+        </button>
+
+        <button class="action-btn return-btn" 
+                *ngIf="canShowReturnActions(order)"
+                (click)="toggleReturnForm()">
+          ⏰ {{ showReturnForm ? 'Hide' : 'Show' }} Return Actions
         </button>
       </div>
 
@@ -128,6 +152,26 @@
         <span class="label">Tracking:</span>
         <span class="value">{{ selectedOrder.trackingNumber }}</span>
       </div>
+
+      <!-- Return Information -->
+      <div class="detail-row" *ngIf="selectedOrder.status === 'return_requested' || selectedOrder.status === 'returned'">
+        <span class="label">Return Type:</span>
+        <span class="value">{{ selectedOrder.returnType ? selectedOrder.returnType.replace('_', ' ').toUpperCase() : 'N/A' }}</span>
+      </div>
+      
+      <div class="detail-row" *ngIf="selectedOrder.status === 'return_requested' || selectedOrder.status === 'returned'">
+        <span class="label">Return Shipping:</span>
+        <span class="value" [class.seller-pays]="getReturnShippingInfo(selectedOrder).sellerPays">
+          {{ getReturnShippingInfo(selectedOrder).message }}
+        </span>
+      </div>
+
+      <div class="detail-row" *ngIf="selectedOrder.status === 'returned'">
+        <span class="label">Refund Amount:</span>
+        <span class="value">
+          ${{ orderService.calculateRefundAmount(selectedOrder.id).refundAmount.toLocaleString() }}
+        </span>
+      </div>
     </div>
   </div>
 
@@ -142,5 +186,74 @@
       (paymentSuccess)="onPaymentSuccess($event)"
       (paymentError)="onPaymentError($event)">
     </app-stripe-payment>
+  </div>
+
+  <!-- Return Window Form -->
+  <div class="return-section" *ngIf="showReturnForm && selectedOrder">
+    <h4>⏰ 72-Hour Return Window</h4>
+    
+    <div class="return-window-info">
+      <div class="return-status">
+        <p><strong>Status:</strong> {{ getReturnWindowStatus(selectedOrder).status }}</p>
+        <p *ngIf="getReturnWindowStatus(selectedOrder).timeRemaining">
+          <strong>Time Remaining:</strong> {{ getReturnWindowStatus(selectedOrder).timeRemaining }}
+        </p>
+      </div>
+
+      <div class="return-actions" *ngIf="getReturnWindowStatus(selectedOrder).canConfirm">
+        <button class="btn-confirm" (click)="confirmItemReceived()">
+          ✅ Confirm Item Received as Intended
+        </button>
+        <p class="confirm-note">
+          <strong>Note:</strong> Confirming will complete the order and release funds to the seller.
+        </p>
+      </div>
+
+      <div class="return-request" *ngIf="getReturnWindowStatus(selectedOrder).canReturn">
+        <h5>Request Return</h5>
+        
+        <div class="form-group">
+          <label for="return-type">Return Type:</label>
+          <select id="return-type" [(ngModel)]="selectedReturnType" class="return-type-select">
+            <option value="buyer_remorse">Buyer Remorse / Changed Mind</option>
+            <option value="item_mismatch">Item Doesn't Match Listing</option>
+            <option value="not_as_described">Not As Described</option>
+            <option value="damaged_in_transit">Damaged in Transit</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="return-reason">Return Reason:</label>
+          <textarea 
+            id="return-reason"
+            [(ngModel)]="returnReason"
+            placeholder="Please describe why you want to return this item..."
+            rows="3"
+            required>
+          </textarea>
+        </div>
+
+        <div class="shipping-info" *ngIf="selectedReturnType">
+          <div class="shipping-note" [class.seller-pays]="selectedReturnType === 'item_mismatch' || selectedReturnType === 'not_as_described'">
+            <span class="shipping-icon">🚚</span>
+            <span class="shipping-text">
+              <strong *ngIf="selectedReturnType === 'item_mismatch' || selectedReturnType === 'not_as_described'">
+                ✅ Seller pays return shipping ($$25)
+              </strong>
+              <strong *ngIf="selectedReturnType === 'buyer_remorse' || selectedReturnType === 'damaged_in_transit'">
+                💳 Buyer pays return shipping ($$25)
+              </strong>
+            </span>
+          </div>
+        </div>
+
+        <button class="btn-return" (click)="requestReturn()" [disabled]="!returnReason.trim()">
+          ↩️ Request Return
+        </button>
+        <p class="return-note">
+          <strong>Note:</strong> Return requests must be made within the 72-hour window.
+        </p>
+      </div>
+    </div>
   </div>
 </div>

@@ -302,7 +302,7 @@ export class StripeService {
   }
 
   /**
-   * Process seller payout after successful delivery
+   * Process seller payout after successful delivery and 72-hour return window
    * This releases funds from escrow to the seller
    */
   async processSellerPayout(
@@ -321,7 +321,7 @@ export class StripeService {
         return {
           success: true,
           paymentIntentId: payoutResult.payoutId,
-          message: 'Seller payout processed successfully'
+          message: 'Seller payout processed successfully. Funds released from escrow after 72-hour return window.'
         };
       }
 
@@ -337,6 +337,101 @@ export class StripeService {
         success: false,
         error: 'STRIPE_ERROR',
         message: 'Payout processing error occurred'
+      };
+    } finally {
+      this.isLoadingSubject.next(false);
+    }
+  }
+
+  /**
+   * Release funds from escrow after buyer confirmation or return window expiry
+   */
+  async releaseEscrowFunds(
+    orderId: string,
+    type: 'buyer_confirmation' | 'return_window_expiry'
+  ): Promise<StripePaymentResult> {
+    try {
+      this.isLoadingSubject.next(true);
+
+      // This would typically call your backend to release escrow funds
+      // For now, we'll simulate the process
+      const releaseResult = await this.simulateEscrowRelease(orderId, type);
+
+      if (releaseResult.success) {
+        const message = type === 'buyer_confirmation' 
+          ? 'Funds released from escrow after buyer confirmation'
+          : 'Funds released from escrow after return window expiry';
+        
+        return {
+          success: true,
+          paymentIntentId: releaseResult.releaseId,
+          message
+        };
+      }
+
+      return {
+        success: false,
+        error: 'ESCROW_RELEASE_FAILED',
+        message: 'Failed to release escrow funds'
+      };
+
+    } catch (error) {
+      console.error('Error releasing escrow funds:', error);
+      return {
+        success: false,
+        error: 'STRIPE_ERROR',
+        message: 'Escrow release error occurred'
+      };
+    } finally {
+      this.isLoadingSubject.next(false);
+    }
+  }
+
+  /**
+   * Process refund for returned items with return shipping consideration
+   */
+  async processRefundForReturn(
+    orderId: string,
+    buyerId: string,
+    refundAmount: number,
+    returnShippingCost: number,
+    shippingPaidBy: 'buyer' | 'seller'
+  ): Promise<StripePaymentResult> {
+    try {
+      this.isLoadingSubject.next(true);
+
+      // This would typically call your backend to process the refund
+      // For now, we'll simulate the process
+      const refundResult = await this.simulateRefund(orderId, refundAmount);
+
+      if (refundResult.success) {
+        let message = 'Refund processed successfully for returned item.';
+        
+        if (shippingPaidBy === 'seller') {
+          message += ` Seller paid return shipping cost ($${returnShippingCost}).`;
+        } else {
+          message += ` Return shipping cost ($${returnShippingCost}) deducted from refund.`;
+        }
+
+        return {
+          success: true,
+          paymentIntentId: refundResult.refundId,
+          message
+        };
+      }
+
+      return {
+        success: false,
+        error: 'REFUND_FAILED',
+        message: 'Failed to process refund'
+      };
+
+    } catch (error) {
+      console.error('Error processing refund for return:', error);
+      return {
+        success: false,
+        error: 'STRIPE_ERROR',
+        message: 'Refund processing error occurred'
       };
     } finally {
       this.isLoadingSubject.next(false);
@@ -462,6 +557,24 @@ export class StripeService {
         resolve({
           success: true,
           refundId: `re_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        });
+      }, 1000);
+    });
+  }
+
+  /**
+   * Simulate escrow release (replace with actual backend call)
+   */
+  private async simulateEscrowRelease(
+    orderId: string,
+    type: 'buyer_confirmation' | 'return_window_expiry'
+  ): Promise<{ success: boolean; releaseId?: string }> {
+    // This is a simulation - replace with actual backend API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          success: true,
+          releaseId: `er_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         });
       }, 1000);
     });

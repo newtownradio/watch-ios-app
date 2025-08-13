@@ -15,7 +15,7 @@ export interface Order {
   watchModel?: string;
   finalPrice: number;
   authenticationRequestId: string;
-  status: 'pending_payment' | 'payment_confirmed' | 'authentication_in_progress' | 'authenticated' | 'shipped' | 'delivered' | 'completed' | 'cancelled';
+  status: 'pending_payment' | 'payment_confirmed' | 'authentication_in_progress' | 'authenticated' | 'shipped' | 'delivered' | 'inspection_period' | 'completed' | 'cancelled' | 'return_requested' | 'returned';
   createdAt: Date;
   updatedAt: Date;
   paymentConfirmedAt?: Date;
@@ -30,6 +30,16 @@ export interface Order {
   actualDeliveryDate?: Date;
   buyerNotes?: string;
   sellerNotes?: string;
+  // Return window tracking
+  returnWindowStart?: Date;
+  returnWindowEnd?: Date;
+  returnRequestedAt?: Date;
+  returnReason?: string;
+  returnType?: 'item_mismatch' | 'buyer_remorse' | 'damaged_in_transit' | 'not_as_described';
+  buyerConfirmationAt?: Date;
+  returnWindowExpiredAt?: Date;
+  returnShippingCost?: number;
+  returnShippingPaidBy?: 'buyer' | 'seller';
 }
 
 export interface OrderResponse {
@@ -341,6 +351,310 @@ export class OrderService {
    */
   setActiveOrder(order: Order | null): void {
     this.activeOrderSubject.next(order);
+  }
+
+  /**
+   * Start the 72-hour return window when item is delivered
+   */
+  startReturnWindow(orderId: string): OrderResponse {
+    try {
+      const order = this.dataService.getOrderById(orderId);
+      if (!order) {
+        return {
+          success: false,
+          message: 'Order not found',
+          error: 'ORDER_NOT_FOUND'
+        };
+      }
+
+      if (order.status !== 'delivered') {
+        return {
+          success: false,
+          message: 'Order must be delivered to start return window',
+          error: 'INVALID_STATUS'
+        };
+      }
+
+      // Set return window start and end (72 hours from now)
+      const now = new Date();
+      order.returnWindowStart = now;
+      order.returnWindowEnd = new Date(now.getTime() + (72 * 60 * 60 * 1000)); // 72 hours
+      order.status = 'inspection_period';
+      order.updatedAt = new Date();
+
+      this.dataService.updateOrder(order);
+      this.updateOrderInList(order);
+
+      return {
+        success: true,
+        message: '72-hour return window started',
+        data: order
+      };
+
+    } catch (error) {
+      console.error('Error starting return window:', error);
+      return {
+        success: false,
+        message: 'Failed to start return window',
+        error: 'RETURN_WINDOW_ERROR'
+      };
+    }
+  }
+
+  /**
+   * Buyer confirms item received as intended
+   */
+  confirmItemReceived(orderId: string): OrderResponse {
+    try {
+      const order = this.dataService.getOrderById(orderId);
+      if (!order) {
+        return {
+          success: false,
+          message: 'Order not found',
+          error: 'ORDER_NOT_FOUND'
+        };
+      }
+
+      if (order.status !== 'inspection_period') {
+        return {
+          success: false,
+          message: 'Order must be in inspection period',
+          error: 'INVALID_STATUS'
+        };
+      }
+
+      // Buyer confirms item received as intended
+      order.buyerConfirmationAt = new Date();
+      order.status = 'completed';
+      order.updatedAt = new Date();
+
+      this.dataService.updateOrder(order);
+      this.updateOrderInList(order);
+
+      return {
+        success: true,
+        message: 'Item confirmed as received. Order completed and funds released to seller.',
+        data: order
+      };
+
+    } catch (error) {
+      console.error('Error confirming item received:', error);
+      return {
+        success: false,
+        message: 'Failed to confirm item received',
+        error: 'CONFIRMATION_ERROR'
+      };
+    }
+  }
+
+  /**
+   * Buyer requests a return within the 72-hour window
+   */
+  requestReturn(orderId: string, reason: string, returnType: 'item_mismatch' | 'buyer_remorse' | 'damaged_in_transit' | 'not_as_described'): OrderResponse {
+    try {
+      const order = this.dataService.getOrderById(orderId);
+      if (!order) {
+        return {
+          success: false,
+          message: 'Order not found',
+          error: 'ORDER_NOT_FOUND'
+        };
+      }
+
+      if (order.status !== 'inspection_period') {
+        return {
+          success: false,
+          message: 'Order must be in inspection period',
+          error: 'INVALID_STATUS'
+        };
+      }
+
+      // Check if return window is still active
+      if (order.returnWindowEnd && new Date() > order.returnWindowEnd) {
+        return {
+          success: false,
+          message: 'Return window has expired',
+          error: 'RETURN_WINDOW_EXPIRED'
+        };
+      }
+
+      // Determine who pays return shipping based on return type
+      const sellerPaysShipping = returnType === 'item_mismatch' || returnType === 'not_as_described';
+      const returnShippingCost = 25; // Fixed return shipping cost
+
+      // Request return
+      order.returnRequestedAt = new Date();
+      order.returnReason = reason;
+      order.returnType = returnType;
+      order.returnShippingCost = returnShippingCost;
+      order.returnShippingPaidBy = sellerPaysShipping ? 'seller' : 'buyer';
+      order.status = 'return_requested';
+      order.updatedAt = new Date();
+
+      this.dataService.updateOrder(order);
+      this.updateOrderInList(order);
+
+      const shippingMessage = sellerPaysShipping 
+        ? 'Seller will pay return shipping due to item mismatch/description issues.'
+        : 'Buyer will pay return shipping.';
+
+      return {
+        success: true,
+        message: `Return requested successfully. ${shippingMessage}`,
+        data: order
+      };
+
+    } catch (error) {
+      console.error('Error requesting return:', error);
+      return {
+        success: false,
+        message: 'Return request failed',
+        error: 'RETURN_REQUEST_ERROR'
+      };
+    }
+  }
+
+  /**
+   * Process return and refund
+   */
+  processReturn(orderId: string): OrderResponse {
+    try {
+      const order = this.dataService.getOrderById(orderId);
+      if (!order) {
+        return {
+          success: false,
+          message: 'Order not found',
+          error: 'ORDER_NOT_FOUND'
+        };
+      }
+
+      if (order.status !== 'return_requested') {
+        return {
+          success: false,
+          message: 'Order must have return requested',
+          error: 'INVALID_STATUS'
+        };
+      }
+
+      // Process return
+      order.status = 'returned';
+      order.updatedAt = new Date();
+
+      this.dataService.updateOrder(order);
+      this.updateOrderInList(order);
+
+      // Determine refund amount based on who pays return shipping
+      let refundMessage = 'Return processed successfully. Refund will be processed.';
+      
+      if (order.returnShippingPaidBy === 'seller') {
+        refundMessage += ' Seller will pay return shipping costs.';
+      } else {
+        refundMessage += ' Return shipping costs will be deducted from refund.';
+      }
+
+      return {
+        success: true,
+        message: refundMessage,
+        data: order
+      };
+
+    } catch (error) {
+      console.error('Error processing return:', error);
+      return {
+        success: false,
+        message: 'Failed to process return',
+        error: 'RETURN_PROCESSING_ERROR'
+      };
+    }
+  }
+
+  /**
+   * Check if return window has expired and auto-complete order
+   */
+  checkReturnWindowExpiry(): void {
+    const orders = this.dataService.getAllOrders();
+    const now = new Date();
+
+    orders.forEach(order => {
+      if (order.status === 'inspection_period' && order.returnWindowEnd && now > order.returnWindowEnd) {
+        // Return window expired, auto-complete order
+        order.status = 'completed';
+        order.returnWindowExpiredAt = new Date();
+        order.updatedAt = new Date();
+
+        this.dataService.updateOrder(order);
+        this.updateOrderInList(order);
+      }
+    });
+  }
+
+  /**
+   * Get remaining time in return window
+   */
+  getReturnWindowRemainingTime(orderId: string): { hours: number; minutes: number; expired: boolean } {
+    const order = this.dataService.getOrderById(orderId);
+    if (!order || !order.returnWindowEnd) {
+      return { hours: 0, minutes: 0, expired: true };
+    }
+
+    const now = new Date();
+    const timeRemaining = order.returnWindowEnd.getTime() - now.getTime();
+
+    if (timeRemaining <= 0) {
+      return { hours: 0, minutes: 0, expired: true };
+    }
+
+    const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+
+    return { hours, minutes, expired: false };
+  }
+
+  /**
+   * Calculate refund amount for returned items
+   */
+  calculateRefundAmount(orderId: string): { 
+    originalAmount: number; 
+    returnShippingCost: number; 
+    refundAmount: number; 
+    shippingPaidBy: string;
+    notes: string;
+  } {
+    const order = this.dataService.getOrderById(orderId);
+    if (!order) {
+      return { 
+        originalAmount: 0, 
+        returnShippingCost: 0, 
+        refundAmount: 0, 
+        shippingPaidBy: 'unknown',
+        notes: 'Order not found'
+      };
+    }
+
+    const originalAmount = order.finalPrice;
+    const returnShippingCost = order.returnShippingCost || 25;
+    const shippingPaidBy = order.returnShippingPaidBy || 'buyer';
+
+    let refundAmount: number;
+    let notes: string;
+
+    if (shippingPaidBy === 'seller') {
+      // Seller pays return shipping, buyer gets full refund
+      refundAmount = originalAmount;
+      notes = 'Full refund - seller pays return shipping due to item mismatch/description issues';
+    } else {
+      // Buyer pays return shipping, shipping cost deducted from refund
+      refundAmount = originalAmount - returnShippingCost;
+      notes = `Partial refund - return shipping cost ($${returnShippingCost}) deducted from refund`;
+    }
+
+    return {
+      originalAmount,
+      returnShippingCost,
+      refundAmount,
+      shippingPaidBy,
+      notes
+    };
   }
 
   /**
