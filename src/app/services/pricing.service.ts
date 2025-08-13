@@ -36,15 +36,64 @@ export class PricingService {
     }
   ];
 
+  // Commission tiers based on transaction value
+  private readonly COMMISSION_TIERS = [
+    { min: 0, max: 5000, percentage: 0.15, description: 'Standard (15%)' },
+    { min: 5000, max: 15000, percentage: 0.10, description: 'Premium (10%)' },
+    { min: 15000, max: Infinity, percentage: 0.05, description: 'Luxury (5%)' }
+  ];
+
   getVerificationPartners(): VerificationPartner[] {
     return this.verificationPartners;
+  }
+
+  /**
+   * Calculate commission fee based on tiered structure
+   * 0-5000: 15%
+   * 5000-15000: 10%
+   * 15000+: 5%
+   */
+  calculateCommissionFee(itemPrice: number): { amount: number; percentage: number; tier: string } {
+    const tier = this.COMMISSION_TIERS.find(t => itemPrice >= t.min && itemPrice < t.max);
+    
+    if (!tier) {
+      // Fallback to highest tier for edge cases
+      const highestTier = this.COMMISSION_TIERS[this.COMMISSION_TIERS.length - 1];
+      return {
+        amount: itemPrice * highestTier.percentage,
+        percentage: highestTier.percentage,
+        tier: highestTier.description
+      };
+    }
+
+    return {
+      amount: itemPrice * tier.percentage,
+      percentage: tier.percentage,
+      tier: tier.description
+    };
+  }
+
+  /**
+   * Get commission tier information for display
+   */
+  getCommissionTiers(): Array<{ min: number; max: number; percentage: number; description: string }> {
+    return this.COMMISSION_TIERS.map(tier => ({
+      min: tier.min,
+      max: tier.max === Infinity ? '∞' : tier.max,
+      percentage: tier.percentage,
+      description: tier.description
+    }));
   }
 
   calculatePricing(itemPrice: number, selectedPartnerId: string): PricingBreakdown {
     const partner = this.verificationPartners.find(p => p.id === selectedPartnerId);
     const verificationCost = partner ? partner.cost : 150;
     const shippingCost = 25; // Fixed shipping cost
-    const commissionFee = itemPrice * 0.06; // 6% commission
+    
+    // Use new tiered commission calculation
+    const commissionInfo = this.calculateCommissionFee(itemPrice);
+    const commissionFee = commissionInfo.amount;
+    
     const insuranceCost = itemPrice * 0.02; // 2% insurance
     const totalAmount = itemPrice + shippingCost + verificationCost + commissionFee + insuranceCost;
 
@@ -55,6 +104,33 @@ export class PricingService {
       commissionFee,
       insuranceCost,
       totalAmount
+    };
+  }
+
+  /**
+   * Calculate seller payout after all fees
+   */
+  calculateSellerPayout(itemPrice: number, selectedPartnerId: string): {
+    itemPrice: number;
+    commissionFee: number;
+    verificationCost: number;
+    insuranceCost: number;
+    sellerPayout: number;
+    commissionTier: string;
+  } {
+    const pricing = this.calculatePricing(itemPrice, selectedPartnerId);
+    const commissionInfo = this.calculateCommissionFee(itemPrice);
+    
+    // Seller pays verification cost, buyer pays commission and insurance
+    const sellerPayout = itemPrice - pricing.verificationCost;
+
+    return {
+      itemPrice: pricing.itemPrice,
+      commissionFee: pricing.commissionFee,
+      verificationCost: pricing.verificationCost,
+      insuranceCost: pricing.insuranceCost,
+      sellerPayout,
+      commissionTier: commissionInfo.tier
     };
   }
 } 

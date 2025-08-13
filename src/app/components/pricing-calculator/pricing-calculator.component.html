@@ -44,7 +44,7 @@
     </div>
     
     <div class="breakdown-item">
-      <span>Commission (6%):</span>
+      <span>Commission ({{ getCommissionTier() }}):</span>
       <span>${{ pricing.commissionFee.toLocaleString() }}</span>
     </div>
     
@@ -63,5 +63,27 @@
     <p><strong>{{ selectedPartner.name }}</strong></p>
     <p>{{ selectedPartner.description }}</p>
     <p>Turnaround: {{ selectedPartner.turnaroundTime }}</p>
+  </div>
+
+  <div class="commission-info" *ngIf="pricing">
+    <h4>Commission Tier Information</h4>
+    <div class="tier-breakdown">
+      <div class="tier-item" [class.active]="isActiveTier(0, 5000)">
+        <span class="tier-range">$0 - $5,000</span>
+        <span class="tier-rate">15%</span>
+        <span class="tier-label">Standard</span>
+      </div>
+      <div class="tier-item" [class.active]="isActiveTier(5000, 15000)">
+        <span class="tier-range">$5,000 - $15,000</span>
+        <span class="tier-rate">10%</span>
+        <span class="tier-label">Premium</span>
+      </div>
+      <div class="tier-item" [class.active]="isActiveTier(15000, Infinity)">
+        <span class="tier-range">$15,000+</span>
+        <span class="tier-rate">5%</span>
+        <span class="tier-label">Luxury</span>
+      </div>
+    </div>
+    <p class="tier-note">* Commission rate automatically applied based on item price</p>
   </div>
 </div>
