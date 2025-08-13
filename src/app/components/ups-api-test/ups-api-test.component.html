@@ -1,0 +1,189 @@
+<div class="ups-api-test-container">
+  <!-- Header -->
+  <div class="header">
+    <h2>UPS API Test Suite</h2>
+    <p class="subtitle">Test your UPS API configuration and verify shipping functionality</p>
+  </div>
+
+  <!-- API Configuration Status -->
+  <div class="config-status">
+    <h3>API Configuration Status</h3>
+    <div class="status-grid">
+      <div class="status-item" [class.configured]="apiConfiguration.isConfigured">
+        <span class="status-icon">{{ apiConfiguration.isConfigured ? '✅' : '❌' }}</span>
+        <span class="status-label">Configuration</span>
+        <span class="status-value">{{ apiConfiguration.isConfigured ? 'Ready' : 'Not Configured' }}</span>
+      </div>
+      
+      <div class="status-item" [class.configured]="apiConfiguration.hasCredentials">
+        <span class="status-icon">{{ apiConfiguration.hasCredentials ? '✅' : '❌' }}</span>
+        <span class="status-label">Credentials</span>
+        <span class="status-value">{{ apiConfiguration.hasCredentials ? 'Present' : 'Missing' }}</span>
+      </div>
+      
+      <div class="status-item">
+        <span class="status-icon">🌐</span>
+        <span class="status-label">Base URL</span>
+        <span class="status-value">{{ apiConfiguration.baseUrl || 'Not Set' }}</span>
+      </div>
+      
+      <div class="status-item">
+        <span class="status-icon">{{ apiConfiguration.testMode ? '🧪' : '🚀' }}</span>
+        <span class="status-label">Mode</span>
+        <span class="status-value">{{ apiConfiguration.testMode ? 'Test' : 'Production' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Configuration -->
+  <div class="test-config">
+    <h3>Test Configuration</h3>
+    
+    <div class="config-section">
+      <h4>From Address (Test Sender)</h4>
+      <div class="address-display">
+        <p><strong>{{ testAddresses.from.name }}</strong></p>
+        <p>{{ testAddresses.from.address1 }}</p>
+        <p>{{ testAddresses.from.city }}, {{ testAddresses.from.state }} {{ testAddresses.from.postalCode }}</p>
+        <p>{{ testAddresses.from.country }}</p>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <h4>To Address (Test Receiver)</h4>
+      <div class="address-display">
+        <p><strong>{{ testAddresses.to.name }}</strong></p>
+        <p>{{ testAddresses.to.address1 }}</p>
+        <p>{{ testAddresses.to.city }}, {{ testAddresses.to.state }} {{ testAddresses.to.postalCode }}</p>
+        <p>{{ testAddresses.to.country }}</p>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <h4>Test Package</h4>
+      <div class="package-display">
+        <p><strong>Weight:</strong> {{ testPackage.weight }} lbs</p>
+        <p><strong>Dimensions:</strong> {{ testPackage.length }}" × {{ testPackage.width }}" × {{ testPackage.height }}"</p>
+        <p><strong>Declared Value:</strong> ${{ testPackage.declaredValue.toLocaleString() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Controls -->
+  <div class="test-controls">
+    <h3>Run Tests</h3>
+    
+    <div class="button-group">
+      <button 
+        class="btn btn-primary" 
+        (click)="runAllTests()" 
+        [disabled]="isRunningTests">
+        <span *ngIf="!isRunningTests">🚀 Run All Tests</span>
+        <span *ngIf="isRunningTests">⏳ Running Tests...</span>
+      </button>
+      
+      <button 
+        class="btn btn-secondary" 
+        (click)="testAddressValidationOnly()" 
+        [disabled]="isRunningTests">
+        🏠 Test Address Validation
+      </button>
+      
+      <button 
+        class="btn btn-secondary" 
+        (click)="testShippingRatesOnly()" 
+        [disabled]="isRunningTests">
+        📦 Test Shipping Rates
+      </button>
+      
+      <button 
+        class="btn btn-secondary" 
+        (click)="testPackageTrackingOnly()" 
+        [disabled]="isRunningTests">
+        📍 Test Package Tracking
+      </button>
+    </div>
+
+    <div class="current-test" *ngIf="currentTest">
+      <p><strong>Currently Testing:</strong> {{ currentTest }}</p>
+    </div>
+  </div>
+
+  <!-- Test Results -->
+  <div class="test-results" *ngIf="testResults.length > 0">
+    <div class="results-header">
+      <h3>Test Results</h3>
+      <div class="results-actions">
+        <button class="btn btn-outline" (click)="clearResults()">🗑️ Clear</button>
+        <button class="btn btn-outline" (click)="exportResults()">📥 Export</button>
+      </div>
+    </div>
+
+    <div class="results-summary">
+      <div class="summary-item">
+        <span class="summary-label">Total Tests:</span>
+        <span class="summary-value">{{ testResults.length }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Passed:</span>
+        <span class="summary-value success">{{ getSuccessCount() }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Failed:</span>
+        <span class="summary-value error">{{ getErrorCount() }}</span>
+      </div>
+    </div>
+
+    <div class="results-list">
+      <div class="result-item" 
+           *ngFor="let result of testResults" 
+           [class]="getTestStatusClass(result.status)">
+        
+        <div class="result-header">
+          <span class="result-icon">{{ getTestStatusIcon(result.status) }}</span>
+          <span class="result-name">{{ result.testName }}</span>
+          <span class="result-status">{{ result.status.toUpperCase() }}</span>
+          <span class="result-time">{{ result.timestamp | date:'HH:mm:ss' }}</span>
+        </div>
+        
+        <div class="result-message">
+          {{ result.message }}
+        </div>
+        
+        <div class="result-details" *ngIf="result.details">
+          <details>
+            <summary>View Details</summary>
+            <pre>{{ formatDetails(result.details) }}</pre>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Section -->
+  <div class="help-section">
+    <h3>Need Help?</h3>
+    <div class="help-content">
+      <p><strong>Configuration Issues?</strong></p>
+      <ul>
+        <li>Check your UPS API credentials in <code>environment.ts</code></li>
+        <li>Ensure your UPS developer account is active</li>
+        <li>Verify your API endpoints are correct</li>
+      </ul>
+      
+      <p><strong>Test Failures?</strong></p>
+      <ul>
+        <li>Address validation tests require valid US addresses</li>
+        <li>Shipping rates depend on package dimensions and weight</li>
+        <li>Tracking tests use demo numbers (real numbers work in production)</li>
+      </ul>
+      
+      <p><strong>Production Ready?</strong></p>
+      <ul>
+        <li>Set <code>testMode: false</code> in environment</li>
+        <li>Use real UPS production endpoints</li>
+        <li>Ensure all credentials are properly configured</li>
+      </ul>
+    </div>
+  </div>
+</div>
