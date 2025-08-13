@@ -192,13 +192,17 @@ export class DiscoveryComponent implements OnInit {
 
   // Bid functionality
   openBidForm(listing: Listing) {
+    console.log('Opening bid form for listing:', listing);
     this.selectedListing = listing;
     this.showBidForm = true;
+    console.log('showBidForm set to:', this.showBidForm);
   }
 
   closeBidForm() {
+    console.log('Closing bid form');
     this.showBidForm = false;
     this.selectedListing = null;
+    console.log('showBidForm set to:', this.showBidForm);
   }
 
   onBidPlaced(response: BidResponse) {

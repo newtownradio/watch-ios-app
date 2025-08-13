@@ -1,0 +1,70 @@
+<div class="stripe-payment-container">
+  <div class="payment-header">
+    <h3>{{ paymentTitle }}</h3>
+    <p class="payment-amount">${{ (paymentAmount / 100).toFixed(2) }}</p>
+  </div>
+
+  <div class="payment-form" *ngIf="!isProcessing">
+    <div class="form-group">
+      <label for="card-element">Credit or Debit Card</label>
+      <div id="card-element" class="card-element">
+        <!-- Stripe Card Element will be inserted here -->
+        <div class="card-placeholder">
+          <span>Card details will appear here</span>
+        </div>
+      </div>
+      <div id="card-errors" class="card-errors" role="alert"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input 
+        type="email" 
+        id="email" 
+        [(ngModel)]="email" 
+        placeholder="Enter your email"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input 
+        type="text" 
+        id="name" 
+        [(ngModel)]="name" 
+        placeholder="Enter your full name"
+        required
+      >
+    </div>
+
+    <button 
+      type="button" 
+      class="btn-pay" 
+      (click)="handlePayment()"
+      [disabled]="!isFormValid() || isProcessing"
+    >
+      {{ paymentButtonText }}
+    </button>
+  </div>
+
+  <div class="payment-processing" *ngIf="isProcessing">
+    <div class="spinner"></div>
+    <p>Processing payment...</p>
+  </div>
+
+  <div class="payment-result" *ngIf="paymentResult">
+    <div class="result-icon" [class.success]="paymentResult.success" [class.error]="!paymentResult.success">
+      {{ paymentResult.success ? '✅' : '❌' }}
+    </div>
+    <h4>{{ paymentResult.success ? 'Payment Successful!' : 'Payment Failed' }}</h4>
+    <p>{{ paymentResult.message }}</p>
+    <button 
+      type="button" 
+      class="btn-close" 
+      (click)="clearResult()"
+    >
+      Close
+    </button>
+  </div>
+</div>

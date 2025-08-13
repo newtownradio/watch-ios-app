@@ -30,8 +30,10 @@
     "@capacitor/share": "^7.0.2",
     "@capacitor/status-bar": "^6.0.0",
     "@stripe/stripe-js": "^7.8.0",
+    "htmlparser2": "^10.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "yargs": "^18.0.0",
     "zone.js": "~0.14.0"
   },
   "devDependencies": {

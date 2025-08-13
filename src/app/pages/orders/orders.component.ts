@@ -46,6 +46,8 @@ export class OrdersComponent implements OnInit {
       const role = this.authService.getUserRole();
       this.userRole = (role === 'buyer' || role === 'seller') ? role : 'buyer';
       this.orders = this.orderService.getUserOrders(currentUser.id, this.userRole);
+      console.log('Loaded orders:', this.orders);
+      console.log('User role:', this.userRole);
     }
   }
 
@@ -188,6 +190,45 @@ export class OrdersComponent implements OnInit {
   canShowReturnActions(order: Order): boolean {
     return this.userRole === 'buyer' && 
            order.status === 'inspection_period';
+  }
+
+  // Debug method to create test orders
+  createTestOrders() {
+    console.log('Creating test orders...');
+    
+    // Create a test order with 'delivered' status to test return window
+    const testOrder: Order = {
+      id: 'test-order-1',
+      listingId: 'test-listing-1',
+      buyerId: 'test-buyer',
+      buyerName: 'Test Buyer',
+      sellerId: 'test-seller',
+      sellerName: 'Test Seller',
+      watchTitle: 'Test Rolex Submariner',
+      finalPrice: 5000,
+      authenticationRequestId: 'test-auth-1',
+      status: 'delivered',
+      createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      updatedAt: new Date(),
+      deliveredAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      trackingNumber: 'TRK123456789'
+    };
+
+    // Add to orders array
+    this.orders.unshift(testOrder);
+    console.log('Test order created:', testOrder);
+    console.log('Current orders:', this.orders);
+  }
+
+  // Debug method to start return window
+  startReturnWindowForTest() {
+    if (this.orders.length > 0) {
+      const order = this.orders[0];
+      console.log('Starting return window for order:', order);
+      const result = this.orderService.startReturnWindow(order.id);
+      console.log('Return window result:', result);
+      this.loadUserOrders(); // Refresh
+    }
   }
 
   getReturnShippingInfo(order: Order): { message: string; sellerPays: boolean; cost: number } {

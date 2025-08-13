@@ -76,7 +76,7 @@ export class PricingService {
   /**
    * Get commission tier information for display
    */
-  getCommissionTiers(): Array<{ min: number; max: number; percentage: number; description: string }> {
+  getCommissionTiers(): Array<{ min: number; max: string | number; percentage: number; description: string }> {
     return this.COMMISSION_TIERS.map(tier => ({
       min: tier.min,
       max: tier.max === Infinity ? '∞' : tier.max,
