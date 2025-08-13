@@ -24,6 +24,7 @@ export class SellComponent implements OnInit, OnDestroy {
   form = {
     title: '',
     startingPrice: 0,
+    buyNowPrice: undefined as number | undefined,
     description: '',
     brand: '',
     model: '',
@@ -235,6 +236,7 @@ export class SellComponent implements OnInit, OnDestroy {
       this.form = { 
         title: '', 
         startingPrice: 0, 
+        buyNowPrice: undefined,
         description: '',
         brand: '',
         model: '',
@@ -261,6 +263,104 @@ export class SellComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error saving listing:', error);
+      alert('Error saving listing. Please try again.');
+    }
+  }
+
+  submitInstantSale() {
+    // Check if form has required data
+    if (!this.form.title || this.form.title.trim() === '') {
+      alert('Please enter a title for your item');
+      return;
+    }
+    
+    if (!this.form.startingPrice || this.form.startingPrice <= 0) {
+      alert('Please enter a valid starting price greater than 0');
+      return;
+    }
+
+    if (!this.form.buyNowPrice || this.form.buyNowPrice <= 0) {
+      alert('Please set an Instant Purchase for instant sale');
+      return;
+    }
+
+    // Check if Government ID is uploaded
+    if (!this.form.governmentIdUrl) {
+      alert('Please upload your government ID before listing an item');
+      return;
+    }
+
+    // Final ID verification confirmation
+    const idConfirmed = confirm(
+      'Final Legal Compliance Verification:\n\n' +
+      '• You confirm this is your own government-issued ID\n' +
+      '• The name on the ID matches your account information\n' +
+      '• You understand using someone else\'s ID is prohibited\n' +
+      '• You acknowledge this is required for legal compliance\n' +
+      '• You understand your ID information is encrypted and never shared publicly\n' +
+      '• Your ID will be verified by our security team\n\n' +
+      'Do you confirm these statements are true?'
+    );
+
+    if (!idConfirmed) {
+      alert('Please ensure you are uploading your own government ID before proceeding.');
+      return;
+    }
+
+    // Create instant sale listing
+    const newListing: Listing = {
+      id: this.dataService.generateId(),
+      sellerId: 'seller1',
+      sellerName: 'John Seller',
+      title: this.form.title.trim(),
+      description: this.form.description || '',
+      price: this.form.buyNowPrice,
+      brand: this.form.brand || undefined,
+      model: this.form.model || undefined,
+      year: this.form.year,
+      condition: this.form.condition,
+      startingPrice: this.form.startingPrice,
+      currentPrice: this.form.buyNowPrice,
+      buyNowPrice: this.form.buyNowPrice,
+      imageUrl: this.form.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIjk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==',
+      images: [],
+      createdAt: new Date(),
+      endTime: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 2 months from now
+      status: 'active',
+      bids: [],
+      counteroffers: [],
+      counterofferCount: 0
+    };
+
+    try {
+      // Save to persistent storage
+      this.dataService.saveListing(newListing);
+      
+      // Reload listings
+      this.loadActiveListings();
+      
+      // Reset form
+      this.form = { 
+        title: '', 
+        startingPrice: 0, 
+        buyNowPrice: undefined,
+        description: '',
+        brand: '',
+        model: '',
+        year: undefined,
+        condition: 'excellent',
+        originalPrice: undefined,
+        imageUrl: '',
+        governmentIdUrl: '',
+        scheduleType: 'immediate',
+        scheduleDate: '',
+        scheduleTime: '',
+        authenticationPartner: ''
+      };
+      
+      alert(`Item listed for instant sale successfully!\n\nInstant Purchase: $${newListing.buyNowPrice?.toLocaleString()}\n\nBuyers can purchase immediately at this price.`);
+    } catch (error) {
+      console.error('Error saving instant sale listing:', error);
       alert('Error saving listing. Please try again.');
     }
   }

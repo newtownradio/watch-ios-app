@@ -60,6 +60,7 @@ export interface Listing {
   price?: number;
   startingPrice: number;
   currentPrice: number;
+  buyNowPrice?: number; // Instant Purchase for immediate purchase
   brand?: string;
   model?: string;
   year?: number;

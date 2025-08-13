@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { DataPersistenceService } from './data-persistence.service';
 import { AuthenticationService } from './authentication.service';
 import { Bid } from '../models/bid.interface';
+import { Order } from './order.service';
 
 export interface BidResponse {
   success: boolean;
@@ -98,6 +99,9 @@ export class BidService {
       // Create notification for seller
       this.createBidNotification(bid, listing);
 
+      // Create a pending order for the bid (so buyer can track it)
+      this.createPendingOrderForBid(bid, listing);
+
       return {
         success: true,
         message: 'Bid placed successfully',
@@ -111,6 +115,36 @@ export class BidService {
         message: 'Failed to place bid',
         error: 'PLACE_BID_ERROR'
       };
+    }
+  }
+
+  /**
+   * Create a pending order for a bid so the buyer can track it
+   */
+  private createPendingOrderForBid(bid: Bid, listing: any): void {
+    try {
+      // Create a pending order
+      const order: Partial<Order> = {
+        id: this.generateId(),
+        listingId: listing.id,
+        buyerId: bid.bidderId,
+        buyerName: bid.bidderName,
+        sellerId: listing.sellerId,
+        sellerName: listing.sellerName || 'Unknown Seller',
+        watchTitle: listing.title,
+        finalPrice: bid.amount,
+        status: 'pending_bid',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      // Save the order using the data service
+      this.dataService.saveOrder(order as Order);
+      
+      console.log('Created pending order for bid:', order);
+    } catch (error) {
+      console.error('Error creating pending order for bid:', error);
+      // Don't fail the bid placement if order creation fails
     }
   }
 

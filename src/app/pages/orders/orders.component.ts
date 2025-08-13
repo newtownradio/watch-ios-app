@@ -192,6 +192,20 @@ export class OrdersComponent implements OnInit {
            order.status === 'inspection_period';
   }
 
+  startReturnWindow(order: Order): void {
+    console.log('Starting return window for order:', order);
+    const result = this.orderService.startReturnWindow(order.id);
+    console.log('Return window result:', result);
+    
+    if (result.success) {
+      // Refresh the orders to show the updated status
+      this.loadUserOrders();
+      alert('✅ 72-hour return window started successfully!\n\nBuyer now has 72 hours to inspect the item and decide whether to keep it or request a return.');
+    } else {
+      alert('❌ Failed to start return window: ' + result.message);
+    }
+  }
+
   // Debug method to create test orders
   createTestOrders() {
     console.log('Creating test orders...');

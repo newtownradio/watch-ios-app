@@ -1,7 +1,7 @@
 <div class="sell-page">
   <div class="page-header">
     <h1>Sell</h1>
-    <p>List your item for bidding - 3-month sale window</p>
+    <p>List your item for sale</p>
   </div>
 
   <div class="sell-form">
@@ -150,7 +150,10 @@
     <div class="form-group">
       <label for="starting-price">Starting Price</label>
       <input type="number" [(ngModel)]="form.startingPrice" placeholder="0" id="starting-price" min="0">
+      <small class="form-help">This is the minimum bid amount</small>
     </div>
+
+
 
     <div class="form-group">
       <label for="description">Description</label>
@@ -215,7 +218,63 @@
       <p class="authentication-note"><strong>Note:</strong> Authentication will commence once the item has been listed and a bid has been placed by the buyer and accepted by the seller.</p>
     </div>
 
+    <div class="buy-now-info">
+              <h3>🚀 Instant Sale Feature</h3>
+      <p>Enable immediate sales alongside your auction</p>
+      <div class="buy-now-benefits">
+        <div class="benefit-item">
+          <h4>💰 Immediate Revenue</h4>
+          <p>Get paid instantly when buyers choose to skip the auction</p>
+        </div>
+        <div class="benefit-item">
+          <h4>⏰ No Waiting</h4>
+          <p>Eliminate the 3-month auction period for buyers who want it now</p>
+        </div>
+        <div class="benefit-item">
+          <h4>🎯 Higher Price Potential</h4>
+          <p>Set a premium price (20-30% above starting price) for convenience</p>
+        </div>
+        <div class="benefit-item">
+          <h4>🔄 Dual Sales Channels</h4>
+          <p>Run auction and immediate purchase simultaneously</p>
+        </div>
+      </div>
+      
+      <div class="buy-now-terms">
+        <h4>📋 Instant Sale Terms</h4>
+        <ul>
+                      <li><strong>Same Policies Apply:</strong> Instant Sale purchases follow identical shipping, authentication, and return policies</li>
+          <li><strong>72-Hour Return Window:</strong> Buyers have 3 days to inspect and decide to keep or return</li>
+          <li><strong>Authentication Included:</strong> Professional verification before shipping</li>
+          <li><strong>Secure Payment:</strong> Funds held in escrow until delivery confirmation</li>
+          <li><strong>Immediate Processing:</strong> No waiting for auction end or bid acceptance</li>
+        </ul>
+      </div>
+
+      <div class="pricing-strategy">
+        <h4>💡 Pricing Strategy</h4>
+        <p><strong>Recommended Instant Sale Price:</strong> 20-30% above your starting price</p>
+        <div class="pricing-example">
+          <p><strong>Example:</strong></p>
+          <ul>
+            <li>Starting Price: $5,000</li>
+            <li>Instant Sale: $6,500 (30% premium)</li>
+            <li>Buyer pays extra for convenience and immediate purchase</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <button class="submit-btn" (click)="submitForm()" type="button">List Item for Bidding</button>
+    
+    <div class="form-group">
+      <label for="buy-now-price">Instant Sale Price (Optional)</label>
+      <input type="number" [(ngModel)]="form.buyNowPrice" placeholder="Leave empty for Bidding Sale only" id="buy-now-price" min="0">
+      <small class="form-help">
+        Set a price for immediate purchase. If left empty, item will be bidding-only. 
+        Recommended: 20-30% above your starting price for convenience.
+      </small>
+    </div>
   </div>
 
   <!-- Pricing Recommendation Modal -->
@@ -319,175 +378,7 @@
     </div>
   </div>
 
-  <!-- Legal Terms and Sale Process Section -->
-  <div class="legal-terms-section">
-    <h2>📋 Legal Terms & Sale Process</h2>
-    
-    <div class="terms-grid">
-      <!-- Seller Terms -->
-      <div class="terms-card seller-terms">
-        <h3>🛒 Seller Terms & Responsibilities</h3>
-        <div class="terms-content">
-          <h4>Before Listing:</h4>
-          <ul>
-            <li><strong>Authentication Required:</strong> All watches must be verified by our trusted third-party partners</li>
-            <li><strong>Government ID:</strong> Valid government ID upload is mandatory for legal compliance</li>
-            <li><strong>Ownership Verification:</strong> You must legally own the watch you're selling</li>
-            <li><strong>Accurate Description:</strong> Provide detailed, honest condition and history information</li>
-          </ul>
-          
-          <h4>During Sale:</h4>
-          <ul>
-            <li><strong>3-Month Window:</strong> Your listing is active for 3 months from creation date</li>
-            <li><strong>Bid Management:</strong> You can accept, decline, or make counteroffers (max 3)</li>
-            <li><strong>Communication:</strong> Respond to buyer inquiries within 24 hours</li>
-            <li><strong>Price Negotiation:</strong> Counteroffers must be reasonable and market-appropriate</li>
-          </ul>
-          
-          <h4>After Sale:</h4>
-          <ul>
-            <li><strong>Secure Shipping:</strong> Ship authenticated watch within 3 business days</li>
-            <li><strong>Insurance:</strong> Insure high-value items during transit</li>
-            <li><strong>Documentation:</strong> Provide tracking and authentication paperwork</li>
-            <li><strong>Funds Release:</strong> Funds held in escrow until buyer confirms receipt</li>
-          </ul>
-        </div>
-      </div>
 
-      <!-- Buyer Terms -->
-      <div class="terms-card buyer-terms">
-        <h3>🛍️ Buyer Terms & Protections</h3>
-        <div class="terms-content">
-          <h4>Before Purchase:</h4>
-          <ul>
-            <li><strong>Pre-Authenticated:</strong> All watches are verified by third-party experts</li>
-            <li><strong>Full Documentation:</strong> Access to authentication reports and condition details</li>
-            <li><strong>Seller Verification:</strong> View seller ratings and transaction history</li>
-            <li><strong>Market Research:</strong> Compare prices and verify authenticity independently</li>
-          </ul>
-          
-          <h4>During Purchase:</h4>
-          <ul>
-            <li><strong>Bidding Process:</strong> Place bids or make direct offers on listings</li>
-            <li><strong>Counteroffer Rights:</strong> Accept, decline, or counter seller offers</li>
-            <li><strong>Payment Security:</strong> Funds held securely in platform escrow</li>
-            <li><strong>Clear Terms:</strong> All sale terms and conditions clearly stated</li>
-          </ul>
-          
-          <h4>After Purchase:</h4>
-          <ul>
-            <li><strong>72-Hour Review:</strong> Inspect received watch and documentation</li>
-            <li><strong>Return Rights:</strong> Return policy applies if item doesn't match description</li>
-            <li><strong>Ownership Transfer:</strong> Receive full ownership documentation</li>
-            <li><strong>Dispute Resolution:</strong> Platform support for any issues or concerns</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Verification Process -->
-      <div class="terms-card verification-process">
-        <h3>🔒 Verification & Authentication Process</h3>
-        <div class="terms-content">
-          <h4>Third-Party Partners:</h4>
-          <ul>
-            <li><strong>Expert Network:</strong> Professional watchmakers and authentication specialists</li>
-            <li><strong>Multiple Methods:</strong> Physical inspection, movement analysis, documentation review</li>
-            <li><strong>Quality Standards:</strong> All partners meet our reliability and accuracy requirements</li>
-            <li><strong>Ongoing Monitoring:</strong> Regular performance reviews and quality assurance</li>
-          </ul>
-          
-          <h4>Authentication Requirements:</h4>
-          <ul>
-            <li><strong>Physical Examination:</strong> Detailed inspection of watch components</li>
-            <li><strong>Movement Analysis:</strong> Verification of internal mechanisms and authenticity</li>
-            <li><strong>Documentation Review:</strong> Analysis of papers, receipts, and service records</li>
-            <li><strong>Condition Assessment:</strong> Comprehensive evaluation of wear and modifications</li>
-          </ul>
-          
-          <h4>Post-Authentication:</h4>
-          <ul>
-            <li><strong>Detailed Reports:</strong> Comprehensive authentication documentation</li>
-            <li><strong>Condition Photos:</strong> High-quality images of verified condition</li>
-            <li><strong>Market Valuation:</strong> Professional assessment of current market value</li>
-            <li><strong>Legal Compliance:</strong> Verification of lawful ownership and acquisition</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Platform Protections -->
-      <div class="terms-card platform-protections">
-        <h3>🛡️ Platform Protections & Security</h3>
-        <div class="terms-content">
-          <h4>Transaction Security:</h4>
-          <ul>
-            <li><strong>Escrow Service:</strong> Funds held securely until transaction completion</li>
-            <li><strong>Fraud Detection:</strong> Advanced systems monitor for suspicious activity</li>
-            <li><strong>Identity Verification:</strong> Government ID required for all users</li>
-            <li><strong>Secure Communication:</strong> Encrypted messaging between buyers and sellers</li>
-          </ul>
-          
-          <h4>Dispute Resolution:</h4>
-          <ul>
-            <li><strong>24/7 Support:</strong> Platform assistance for any issues</li>
-            <li><strong>Mediation Services:</strong> Professional dispute resolution when needed</li>
-            <li><strong>Return Protection:</strong> Clear policies for returns and refunds</li>
-            <li><strong>Legal Compliance:</strong> All transactions comply with applicable laws</li>
-          </ul>
-          
-          <h4>Data Protection:</h4>
-          <ul>
-            <li><strong>Privacy Security:</strong> Personal information encrypted and protected</li>
-            <li><strong>Secure Storage:</strong> Government IDs and documents stored securely</li>
-            <li><strong>Limited Access:</strong> Only authorized personnel access sensitive data</li>
-            <li><strong>Compliance:</strong> Adherence to data protection and privacy laws</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Commission & Fee Structure -->
-      <div class="terms-card commission-fees">
-        <h3>💰 Commission & Fee Structure</h3>
-        <div class="terms-content">
-          <h4>Tiered Commission System:</h4>
-          <ul>
-            <li><strong>Standard Tier (0-$5,000):</strong> 15% commission on final sale price</li>
-            <li><strong>Premium Tier ($5,000-$15,000):</strong> 10% commission on final sale price</li>
-            <li><strong>Luxury Tier ($15,000+):</strong> 5% commission on final sale price</li>
-          </ul>
-          
-          <h4>Additional Fees:</h4>
-          <ul>
-            <li><strong>Authentication Cost:</strong> Paid by seller, varies by verification partner ($150-$250)</li>
-            <li><strong>Insurance:</strong> 2% of sale price, covers shipping and delivery protection</li>
-            <li><strong>Shipping:</strong> Fixed $25 shipping cost included in total</li>
-            <li><strong>Platform Fee:</strong> Included in commission percentage</li>
-          </ul>
-          
-          <h4>Fee Calculation Example:</h4>
-          <ul>
-            <li><strong>$3,000 Watch:</strong> 15% commission = $450 + $25 shipping + $150 verification + $60 insurance = $3,685 total</li>
-            <li><strong>$10,000 Watch:</strong> 10% commission = $1,000 + $25 shipping + $200 verification + $200 insurance = $11,425 total</li>
-            <li><strong>$25,000 Watch:</strong> 5% commission = $1,250 + $25 shipping + $250 verification + $500 insurance = $27,025 total</li>
-          </ul>
-          
-          <h4>Seller Payout:</h4>
-          <ul>
-            <li><strong>Net Payout:</strong> Sale price minus authentication cost</li>
-            <li><strong>Commission Deduction:</strong> Applied based on tiered structure</li>
-            <li><strong>Payment Processing:</strong> 3-5 business days after delivery confirmation</li>
-            <li><strong>Tax Responsibility:</strong> Sellers responsible for reporting income</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="legal-disclaimer">
-      <p><strong>Legal Disclaimer:</strong> By using this platform, you agree to all terms and conditions outlined above. 
-      All sales are subject to our complete Terms of Service and Privacy Policy. Authentication services are provided by 
-      independent third parties, and while we require verification, we do not guarantee authenticity. Users are responsible 
-      for compliance with all applicable laws and regulations.</p>
-    </div>
-  </div>
 
 
 

@@ -27,8 +27,10 @@ export class BidFormComponent implements OnInit {
   successMessage = '';
 
   ngOnInit() {
+    console.log('BidFormComponent initialized with listing:', this.listing);
     // Set minimum bid amount
     this.bidAmount = this.listing.currentPrice + 1;
+    console.log('Initial bid amount set to:', this.bidAmount);
   }
 
   async placeBid() {
@@ -60,13 +62,15 @@ export class BidFormComponent implements OnInit {
       );
 
       if (response.success) {
-        this.successMessage = response.message;
+        this.successMessage = `✅ ${response.message}\n\nRedirecting to Orders page in 3 seconds...`;
+        console.log('Bid successful, showing success message');
         this.bidPlaced.emit(response);
         
-        // Clear form after successful bid
+        // Clear form after successful bid - reduced to 3 seconds since we're redirecting
         setTimeout(() => {
+          console.log('Auto-closing bid form after success');
           this.cancelBid();
-        }, 2000);
+        }, 3000);
       } else {
         this.errorMessage = response.message;
       }

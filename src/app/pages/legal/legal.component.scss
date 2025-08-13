@@ -1,0 +1,388 @@
+.legal-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 16px;
+    
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 1.75rem;
+    }
+  }
+  
+  p {
+    font-size: 1.2rem;
+    color: #6b7280;
+    margin: 0;
+    
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 1rem;
+    }
+  }
+}
+
+.legal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  
+  @media (max-width: 768px) {
+    gap: 32px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 24px;
+  }
+}
+
+.legal-section {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px;
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    @media (max-width: 768px) {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+    }
+  }
+  
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 24px 0 16px 0;
+    
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+      margin: 20px 0 14px 0;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 1.1rem;
+      margin: 16px 0 12px 0;
+    }
+  }
+  
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin: 16px 0 8px 0;
+    
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      margin: 14px 0 6px 0;
+    }
+  }
+  
+  p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+  }
+  
+  ul, ol {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    padding-left: 24px;
+    
+    @media (max-width: 768px) {
+      padding-left: 20px;
+    }
+    
+    @media (max-width: 480px) {
+      padding-left: 16px;
+    }
+    
+    li {
+      margin-bottom: 8px;
+      font-size: 1rem;
+      
+      @media (max-width: 768px) {
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+      }
+      
+      strong {
+        color: #374151;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Commission Tiers
+.commission-tiers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 24px 0;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.tier {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  
+  h4 {
+    color: #1f2937;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+  }
+  
+  .percentage {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8b7355;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: #6b7280;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Return Types
+.return-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin: 20px 0;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.return-type {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  
+  h4 {
+    color: #1f2937;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  ul {
+    margin: 0;
+    padding-left: 20px;
+    
+    li {
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+// Fee Example
+.fee-example {
+  background: #f0f9ff;
+  border: 2px solid #0ea5e9;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  
+  p {
+    color: #0c4a6e;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  ul {
+    color: #0c4a6e;
+    margin: 0;
+    
+    li {
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      
+      strong {
+        color: #0c4a6e;
+      }
+    }
+  }
+}
+
+// Sales Process
+.sales-process {
+  h3 {
+    color: #8b7355;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-top: 32px;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  
+  ul {
+    margin-bottom: 24px;
+  }
+}
+
+// Terms Content
+.terms-content {
+  h3 {
+    color: #8b7355;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+  }
+}
+
+// Commission Content
+.commission-content {
+  h3 {
+    color: #8b7355;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+  }
+}
+
+// Return Content
+.return-content {
+  h3 {
+    color: #8b7355;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+  }
+}
+
+// Privacy Content
+.privacy-content {
+  h3 {
+    color: #8b7355;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+  }
+}
+
+// Dispute Content
+.dispute-content {
+  h3 {
+    color: #8b7355;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+  }
+  
+  ol {
+    padding-left: 24px;
+    
+    li {
+      margin-bottom: 12px;
+      
+      strong {
+        color: #374151;
+      }
+    }
+  }
+}
+
+// Contact Content
+.contact-content {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  
+  p {
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  
+  ul {
+    margin: 0;
+    
+    li {
+      margin-bottom: 8px;
+      font-size: 1rem;
+      
+      strong {
+        color: #1f2937;
+      }
+    }
+  }
+}

@@ -35,6 +35,7 @@ export class DiscoveryComponent implements OnInit {
   
   // Bid form state
   showBidForm = false;
+  showBuyNowForm = false;
   selectedListing: Listing | null = null;
 
   private dataService = inject(DataPersistenceService);
@@ -54,9 +55,15 @@ export class DiscoveryComponent implements OnInit {
     }
     
     console.log('Discovery: User authenticated, loading data');
+    
+    // Clear any existing demo data to force fresh load
+    this.clearDemoData();
+    
     this.loadListings();
     this.loadFavorites();
   }
+
+
 
   get filteredListings(): Listing[] {
     const now = new Date();
@@ -196,6 +203,87 @@ export class DiscoveryComponent implements OnInit {
     this.selectedListing = listing;
     this.showBidForm = true;
     console.log('showBidForm set to:', this.showBidForm);
+    
+    // Force a DOM update and check visibility
+    setTimeout(() => {
+      const bidFormSection = document.querySelector('.bid-form-section');
+      console.log('Bid form section element:', bidFormSection);
+      if (bidFormSection) {
+        console.log('Bid form display style:', window.getComputedStyle(bidFormSection).display);
+        console.log('Bid form visibility:', window.getComputedStyle(bidFormSection).visibility);
+        console.log('Bid form opacity:', window.getComputedStyle(bidFormSection).opacity);
+      } else {
+        console.log('Bid form section not found in DOM');
+      }
+    }, 100);
+  }
+
+  openBuyNowForm(listing: Listing) {
+    console.log('Opening buy now form for listing:', listing);
+    this.selectedListing = listing;
+    this.showBuyNowForm = true;
+    this.showBidForm = false; // Close bid form if open
+  }
+
+  closeBuyNowForm() {
+    console.log('Closing buy now form');
+    this.showBuyNowForm = false;
+    this.selectedListing = null;
+  }
+
+  async handleBuyNow(listing: Listing) {
+    try {
+      console.log('Processing buy now for listing:', listing);
+      
+      // Create an immediate order
+      const currentUser = this.dataService.getCurrentUser();
+      if (!currentUser) {
+        alert('You must be logged in to make a purchase');
+        return;
+      }
+
+      // Create the order with 'pending_payment' status
+      const order = {
+        id: this.generateId(),
+        listingId: listing.id,
+        buyerId: currentUser.id,
+        buyerName: currentUser.name,
+        sellerId: listing.sellerId,
+        sellerName: listing.sellerName,
+        watchTitle: listing.title,
+        finalPrice: listing.buyNowPrice || listing.currentPrice,
+        status: 'pending_payment',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Save the order
+      this.dataService.saveOrder(order);
+      
+      // Update listing status to sold
+      listing.status = 'sold';
+      listing.currentPrice = listing.buyNowPrice || listing.currentPrice;
+      this.dataService.updateListing(listing);
+
+      // Show success message and redirect to orders
+      alert(`✅ Purchase successful!\n\n💰 Amount: $${(listing.buyNowPrice || listing.currentPrice).toLocaleString()}\n\nRedirecting to Orders page...`);
+      
+      // Close the form
+      this.closeBuyNowForm();
+      
+      // Redirect to orders page
+      setTimeout(() => {
+        this.router.navigate(['/orders']);
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error processing buy now:', error);
+      alert('Failed to process purchase. Please try again.');
+    }
+  }
+
+  private generateId(): string {
+    return 'id_' + Math.random().toString(36).substr(2, 9);
   }
 
   closeBidForm() {
@@ -208,7 +296,19 @@ export class DiscoveryComponent implements OnInit {
   onBidPlaced(response: BidResponse) {
     console.log('Bid placed successfully:', response);
     this.closeBidForm();
-    // Optionally refresh listings or show success message
+    
+    // Show success message and redirect to orders page
+    if (response.success) {
+      // Show a brief success message with bid details
+      const bidAmount = response.bid?.amount || 0;
+      const message = `✅ ${response.message}\n\n💰 Bid Amount: $${bidAmount.toLocaleString()}\n\nRedirecting to Orders page to track your bid...`;
+      alert(message);
+      
+      // Redirect to orders page after a short delay
+      setTimeout(() => {
+        this.router.navigate(['/orders']);
+      }, 2000);
+    }
   }
 
   getTimeRemaining(endTime: Date): string {
@@ -305,16 +405,37 @@ export class DiscoveryComponent implements OnInit {
     // Get active listings from data service
     this.listings = this.dataService.getActiveListings();
     
+    console.log('Discovery: Loaded listings:', this.listings);
+    console.log('Discovery: Listings with Instant Purchase:', this.listings.filter(l => l.buyNowPrice));
+    
     // If no listings exist, create some demo data
     if (this.listings.length === 0) {
+      console.log('Discovery: No listings found, creating demo data...');
       this.createDemoListings();
       // After creating demo listings, reload them
       this.listings = this.dataService.getActiveListings();
+      console.log('Discovery: After demo creation, listings:', this.listings);
     }
   }
 
   private loadFavorites() {
     this.favorites = this.dataService.getUserFavorites(this.currentUserId);
+  }
+
+  private clearDemoData() {
+    // Clear any existing demo listings to force fresh data
+    const existingListings = this.dataService.getAllListings();
+    const demoListings = existingListings.filter(l => 
+      l.sellerId.startsWith('seller-') || 
+      l.sellerName.includes('LuxuryWatches') ||
+      l.sellerName.includes('TimepieceCollector')
+    );
+    
+    demoListings.forEach(listing => {
+      this.dataService.deleteListing(listing.id);
+    });
+    
+    console.log('Discovery: Cleared', demoListings.length, 'demo listings');
   }
 
   private createDemoListings() {
@@ -331,6 +452,7 @@ export class DiscoveryComponent implements OnInit {
         price: 8500,
         startingPrice: 8500,
         currentPrice: 8500,
+        buyNowPrice: 11000, // 29% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -352,6 +474,7 @@ export class DiscoveryComponent implements OnInit {
         price: 4200,
         startingPrice: 4200,
         currentPrice: 4200,
+        buyNowPrice: 5400, // 29% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -373,6 +496,7 @@ export class DiscoveryComponent implements OnInit {
         price: 6800,
         startingPrice: 6800,
         currentPrice: 6800,
+        buyNowPrice: 8700, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -394,6 +518,7 @@ export class DiscoveryComponent implements OnInit {
         price: 3200,
         startingPrice: 3200,
         currentPrice: 3200,
+        buyNowPrice: 4100, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -415,6 +540,7 @@ export class DiscoveryComponent implements OnInit {
         price: 450,
         startingPrice: 450,
         currentPrice: 450,
+        buyNowPrice: 580, // 29% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -436,6 +562,7 @@ export class DiscoveryComponent implements OnInit {
         price: 2800,
         startingPrice: 2800,
         currentPrice: 2800,
+        buyNowPrice: 3600, // 29% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -457,6 +584,7 @@ export class DiscoveryComponent implements OnInit {
         price: 5200,
         startingPrice: 5200,
         currentPrice: 5200,
+        buyNowPrice: 6700, // 29% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -478,6 +606,7 @@ export class DiscoveryComponent implements OnInit {
         price: 1800,
         startingPrice: 1800,
         currentPrice: 1800,
+        buyNowPrice: 2300, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -499,6 +628,7 @@ export class DiscoveryComponent implements OnInit {
         price: 8900,
         startingPrice: 8900,
         currentPrice: 8900,
+        buyNowPrice: 11400, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -520,6 +650,7 @@ export class DiscoveryComponent implements OnInit {
         price: 6500,
         startingPrice: 6500,
         currentPrice: 6500,
+        buyNowPrice: 8300, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -541,6 +672,7 @@ export class DiscoveryComponent implements OnInit {
         price: 28500,
         startingPrice: 28500,
         currentPrice: 28500,
+        buyNowPrice: 36500, // 28% premium for immediate purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -562,6 +694,7 @@ export class DiscoveryComponent implements OnInit {
         price: 18500,
         startingPrice: 18500,
         currentPrice: 18500,
+        buyNowPrice: 23700, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -583,6 +716,7 @@ export class DiscoveryComponent implements OnInit {
         price: 22500,
         startingPrice: 22500,
         currentPrice: 22500,
+        buyNowPrice: 28800, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -604,6 +738,7 @@ export class DiscoveryComponent implements OnInit {
         price: 8500,
         startingPrice: 8500,
         currentPrice: 8500,
+        buyNowPrice: 10900, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -625,6 +760,7 @@ export class DiscoveryComponent implements OnInit {
         price: 5800,
         startingPrice: 5800,
         currentPrice: 5800,
+        buyNowPrice: 7400, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -646,6 +782,7 @@ export class DiscoveryComponent implements OnInit {
         price: 7200,
         startingPrice: 7200,
         currentPrice: 7200,
+        buyNowPrice: 9200, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -667,6 +804,7 @@ export class DiscoveryComponent implements OnInit {
         price: 125000,
         startingPrice: 125000,
         currentPrice: 125000,
+        buyNowPrice: 160000, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -688,6 +826,7 @@ export class DiscoveryComponent implements OnInit {
         price: 18500,
         startingPrice: 18500,
         currentPrice: 18500,
+        buyNowPrice: 23700, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -709,6 +848,7 @@ export class DiscoveryComponent implements OnInit {
         price: 15800,
         startingPrice: 15800,
         currentPrice: 15800,
+        buyNowPrice: 20200, // 28% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),
@@ -730,6 +870,7 @@ export class DiscoveryComponent implements OnInit {
         price: 4200,
         startingPrice: 4200,
         currentPrice: 4200,
+        buyNowPrice: 5400, // 29% premium for Instant Purchase
         imageUrl: '',
         images: [],
         createdAt: new Date(),

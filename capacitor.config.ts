@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.colinilgen.watchios',
-  appName: 'Watch iOS App',
+  appName: 'WatchStyle - Luxury Watch Marketplace',
   webDir: 'dist/watch-ios/browser',
   ios: {
     contentInset: 'automatic',

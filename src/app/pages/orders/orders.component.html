@@ -89,7 +89,7 @@
         <!-- Return Window Actions -->
         <button class="action-btn return-btn" 
                 *ngIf="canStartReturnWindow(order)"
-                (click)="orderService.startReturnWindow(order.id); loadUserOrders()">
+                (click)="startReturnWindow(order)">
           ⏰ Start 72-Hour Return Window
         </button>
 

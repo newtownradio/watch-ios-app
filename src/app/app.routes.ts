@@ -6,6 +6,7 @@ import { OrdersComponent } from './pages/orders/orders.component';
 import { SplashComponent } from './pages/splash/splash.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { MessagesComponent } from './pages/messages/messages.component';
+import { LegalComponent } from './pages/legal/legal.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 
@@ -35,5 +36,6 @@ export const routes: Routes = [
     component: MessagesComponent,
     canActivate: [AuthGuard]
   },
+  { path: 'legal', component: LegalComponent },
   { path: '**', redirectTo: '' }
 ];

@@ -15,7 +15,7 @@ export interface Order {
   watchModel?: string;
   finalPrice: number;
   authenticationRequestId: string;
-  status: 'pending_payment' | 'payment_confirmed' | 'authentication_in_progress' | 'authenticated' | 'shipped' | 'delivered' | 'inspection_period' | 'completed' | 'cancelled' | 'return_requested' | 'returned';
+  status: 'pending_bid' | 'pending_payment' | 'payment_confirmed' | 'authentication_in_progress' | 'authenticated' | 'shipped' | 'delivered' | 'inspection_period' | 'completed' | 'cancelled' | 'return_requested' | 'returned';
   createdAt: Date;
   updatedAt: Date;
   paymentConfirmedAt?: Date;

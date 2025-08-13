@@ -121,18 +121,27 @@
     <div class="favorite-listings">
       <div class="favorite-card" *ngFor="let listing of getFavoriteListings()">
         <div class="favorite-image">
-          <img [src]="listing.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPldhdGNoPC90ZXh0Pjwvc3ZnPg=='" [alt]="listing.title">
+          <img [src]="listing.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPldhdGNoPC90ZXh0Pjwvc3ZnPg=='" [alt]="listing.title">
         </div>
         <div class="favorite-info">
-          <h3>{{ listing.title }}</h3>
+          <div class="title-row">
+            <h3>{{ listing.title }}</h3>
+            <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
+              📤 Share
+            </button>
+          </div>
           <p class="current-bid">Current Bid: ${{ listing.currentPrice.toLocaleString() }}</p>
           <p class="time-left">{{ getTimeRemaining(listing.endTime) }} left</p>
           <div class="favorite-actions">
             <button class="favorite-bid-btn" (click)="openBidForm(listing)" title="Place a bid">
               💰 Place Bid
             </button>
-            <button class="favorite-share-btn" (click)="shareListing(listing)" title="Share this listing">
-              📤 Share
+            <button 
+              class="favorite-buy-now-btn" 
+              *ngIf="listing.buyNowPrice" 
+              (click)="openBuyNowForm(listing)" 
+              title="Purchase for immediate delivery">
+              🚀 Purchase ${{ listing.buyNowPrice.toLocaleString() }}
             </button>
           </div>
         </div>
@@ -155,7 +164,12 @@
         </button>
       </div>
       <div class="product-info">
-        <h3>{{ listing.title }}</h3>
+        <div class="title-row">
+          <h3>{{ listing.title }}</h3>
+          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
+            📤 Share
+          </button>
+        </div>
         <p class="price">${{ listing.currentPrice.toLocaleString() }}</p>
         <p class="description">{{ listing.description }}</p>
         <div class="watch-details" *ngIf="listing.brand || listing.model">
@@ -190,8 +204,12 @@
           <button class="bid-btn" (click)="openBidForm(listing)" title="Place a bid">
             💰 Place Bid
           </button>
-          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
-            📤 Share
+          <button 
+            class="buy-now-btn" 
+            *ngIf="listing.buyNowPrice" 
+            (click)="openBuyNowForm(listing)" 
+            title="Purchase for immediate delivery">
+            🚀 Purchase ${{ listing.buyNowPrice.toLocaleString() }}
           </button>
         </div>
       </div>
@@ -216,6 +234,47 @@
         (bidPlaced)="onBidPlaced($event)"
         (cancelled)="closeBidForm()"
       ></app-bid-form>
+    </div>
+  </div>
+
+  <!-- Instant Purchase Form Modal -->
+  <div class="buy-now-form-section" *ngIf="showBuyNowForm && selectedListing">
+    <div class="buy-now-form-container">
+      <div class="buy-now-form-header">
+        <h3>🚀 Instant Purchase - Immediate Delivery</h3>
+        <button class="close-btn" (click)="closeBuyNowForm()">✕</button>
+      </div>
+      
+      <div class="buy-now-content">
+        <div class="listing-summary">
+          <img [src]="selectedListing.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIjk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPldhdGNoPC90ZXh0Pjwvc3ZnPg=='" [alt]="selectedListing.title">
+          <div class="listing-details">
+            <h4>{{ selectedListing.title }}</h4>
+            <p class="buy-now-price">💰 Instant Purchase: ${{ (selectedListing.buyNowPrice || selectedListing.currentPrice).toLocaleString() }}</p>
+            <p class="seller-info">Seller: {{ selectedListing.sellerName }}</p>
+          </div>
+        </div>
+        
+        <div class="purchase-terms">
+          <h5>📋 Purchase Terms</h5>
+          <ul>
+            <li>✅ Immediate purchase - no waiting for auction</li>
+            <li>🚚 Same shipping and return policies apply</li>
+            <li>⏰ 72-hour return window after delivery</li>
+            <li>🔒 Secure payment processing</li>
+            <li>📦 Authentication included</li>
+          </ul>
+        </div>
+        
+        <div class="buy-now-actions">
+          <button class="btn-cancel" (click)="closeBuyNowForm()">
+            Cancel
+          </button>
+          <button class="btn-confirm-purchase" (click)="handleBuyNow(selectedListing)">
+            🚀 Confirm Purchase
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
