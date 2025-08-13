@@ -276,6 +276,10 @@ export class UpsApiTestComponent implements OnInit {
   }
 
   // Helper methods for template
+  getTotalCount(): number {
+    return this.testResults.length;
+  }
+
   getSuccessCount(): number {
     return this.testResults.filter(r => r.status === 'success').length;
   }

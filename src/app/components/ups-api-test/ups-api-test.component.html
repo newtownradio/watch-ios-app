@@ -64,7 +64,7 @@
       <div class="package-display">
         <p><strong>Weight:</strong> {{ testPackage.weight }} lbs</p>
         <p><strong>Dimensions:</strong> {{ testPackage.length }}" × {{ testPackage.width }}" × {{ testPackage.height }}"</p>
-        <p><strong>Declared Value:</strong> ${{ testPackage.declaredValue.toLocaleString() }}</p>
+        <p><strong>Declared Value:</strong> ${{ testPackage.declaredValue?.toLocaleString() || '0' }}</p>
       </div>
     </div>
   </div>
@@ -122,7 +122,7 @@
     <div class="results-summary">
       <div class="summary-item">
         <span class="summary-label">Total Tests:</span>
-        <span class="summary-value">{{ testResults.length }}</span>
+        <span class="summary-value">{{ getTotalCount() }}</span>
       </div>
       <div class="summary-item">
         <span class="summary-label">Passed:</span>
