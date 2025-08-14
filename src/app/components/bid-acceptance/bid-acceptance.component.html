@@ -1,0 +1,335 @@
+<div class="bid-acceptance-container">
+  <!-- Header -->
+  <div class="header">
+    <h2>Accept Bid</h2>
+    <p class="subtitle">Complete the bid acceptance process to proceed with the sale</p>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+    </div>
+    <div class="progress-steps">
+      <div class="step" [class]="getStepStatus(1)">
+        <div class="step-number">1</div>
+        <div class="step-label">Bid Review</div>
+      </div>
+      <div class="step" [class]="getStepStatus(2)">
+        <div class="step-number">2</div>
+        <div class="step-label">Shipping</div>
+      </div>
+      <div class="step" [class]="getStepStatus(3)">
+        <div class="step-number">3</div>
+        <div class="step-label">Verification</div>
+      </div>
+      <div class="step" [class]="getStepStatus(4)">
+        <div class="step-number">4</div>
+        <div class="step-label">Confirm</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Bid Review -->
+  <div class="step-content" *ngIf="currentStep === 1">
+    <div class="step-header">
+      <h3>Step 1: Review Bid</h3>
+      <p>Review the bid details and confirm acceptance</p>
+    </div>
+
+    <div class="bid-details">
+      <div class="bid-summary">
+        <h4>Bid Summary</h4>
+        <div class="bid-info">
+          <div class="info-row">
+            <span class="label">Bid Amount:</span>
+            <span class="value">${{ bid?.amount?.toLocaleString() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Buyer:</span>
+            <span class="value">{{ bid?.bidderName || 'Unknown Buyer' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Watch ID:</span>
+            <span class="value">{{ bid?.itemId || 'Luxury Timepiece' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="acceptance-section">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="isBidAccepted" (change)="updateTotalCost()">
+          <span class="checkmark"></span>
+          I accept this bid and agree to proceed with the sale
+        </label>
+
+        <div class="notes-section">
+          <label for="sellerNotes">Additional Notes (Optional):</label>
+          <textarea 
+            id="sellerNotes"
+            [(ngModel)]="sellerNotes" 
+            placeholder="Add any special instructions or notes for the buyer..."
+            rows="3">
+          </textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Shipping Setup -->
+  <div class="step-content" *ngIf="currentStep === 2">
+    <div class="step-header">
+      <h3>Step 2: Shipping Setup</h3>
+      <p>Configure shipping details and calculate costs</p>
+    </div>
+
+    <div class="shipping-form">
+      <div class="form-section">
+        <h4>Shipping Address</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" [(ngModel)]="shippingAddress.name" required>
+          </div>
+          <div class="form-group">
+            <label for="company">Company</label>
+            <input type="text" id="company" [(ngModel)]="shippingAddress.company">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="address1">Address Line 1 *</label>
+          <input type="text" id="address1" [(ngModel)]="shippingAddress.address1" required>
+        </div>
+        <div class="form-group">
+          <label for="address2">Address Line 2</label>
+          <input type="text" id="address2" [(ngModel)]="shippingAddress.address2">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City *</label>
+            <input type="text" id="city" [(ngModel)]="shippingAddress.city" required>
+          </div>
+          <div class="form-group">
+            <label for="state">State *</label>
+            <input type="text" id="state" [(ngModel)]="shippingAddress.state" required>
+          </div>
+          <div class="form-group">
+            <label for="postalCode">ZIP Code *</label>
+            <input type="text" id="postalCode" [(ngModel)]="shippingAddress.postalCode" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="country">Country</label>
+            <select id="country" [(ngModel)]="shippingAddress.country">
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+              <option value="UK">United Kingdom</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" [(ngModel)]="shippingAddress.phone">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4>Package Details</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="weight">Weight (lbs) *</label>
+            <input type="number" id="weight" [(ngModel)]="packageDetails.weight" step="0.1" min="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="declaredValue">Declared Value *</label>
+            <input type="number" id="declaredValue" [(ngModel)]="packageDetails.declaredValue" min="0" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="length">Length (in) *</label>
+            <input type="number" id="length" [(ngModel)]="packageDetails.length" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="width">Width (in) *</label>
+            <input type="number" id="width" [(ngModel)]="packageDetails.width" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="height">Height (in) *</label>
+            <input type="number" id="height" [(ngModel)]="packageDetails.height" min="1" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="shipping-calculator">
+        <button type="button" class="btn-calculate" (click)="calculateShippingCosts()">
+          Calculate Shipping Costs
+        </button>
+        
+        <div class="shipping-rates" *ngIf="shippingRates.length > 0">
+          <h4>Available Shipping Options</h4>
+          <div class="rate-options">
+            <div class="rate-option" 
+                 *ngFor="let rate of shippingRates" 
+                 [class.selected]="selectedShippingRate === rate"
+                 (click)="selectedShippingRate = rate; shippingCost = rate.totalCharges; updateTotalCost()">
+              <div class="rate-info">
+                <div class="service-name">{{ rate.serviceName }}</div>
+                <div class="delivery-date">Est. Delivery: {{ rate.estimatedDelivery }}</div>
+              </div>
+              <div class="rate-price">${{ rate.totalCharges }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="shipping-cost" *ngIf="shippingCost > 0">
+          <strong>Selected Shipping Cost: ${{ shippingCost }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Verification Setup -->
+  <div class="step-content" *ngIf="currentStep === 3">
+    <div class="step-header">
+      <h3>Step 3: Verification Setup</h3>
+      <p>Select verification partner and additional services</p>
+    </div>
+
+    <div class="verification-form">
+      <div class="form-section">
+        <h4>Verification Partner</h4>
+        <div class="partner-selection">
+          <div class="partner-option" 
+               *ngFor="let partner of verificationPartners" 
+               [class.selected]="verificationPartnerId === partner.id"
+               (click)="verificationPartnerId = partner.id; onVerificationPartnerChange()">
+            <div class="partner-info">
+              <div class="partner-name">{{ partner.name }}</div>
+              <div class="partner-specialty">{{ partner.specialty }}</div>
+            </div>
+            <div class="partner-fee">${{ partner.fee }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4>Additional Services</h4>
+        <div class="service-options">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="rushService" (change)="onRushServiceChange()">
+            <span class="checkmark"></span>
+            Rush Service (+$50) - Expedited verification within 24-48 hours
+          </label>
+        </div>
+      </div>
+
+      <div class="cost-breakdown">
+        <h4>Cost Breakdown</h4>
+        <div class="cost-item">
+          <span>Verification Fee:</span>
+          <span>${{ breakdown.verificationFee }}</span>
+        </div>
+        <div class="cost-item" *ngIf="rushService">
+          <span>Rush Service:</span>
+          <span>${{ breakdown.rushFee }}</span>
+        </div>
+        <div class="cost-item">
+          <span>Total Verification Cost:</span>
+          <span><strong>${{ breakdown.verificationFee + breakdown.rushFee }}</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Review & Confirm -->
+  <div class="step-content" *ngIf="currentStep === 4">
+    <div class="step-header">
+      <h3>Step 4: Review & Confirm</h3>
+      <p>Review all details before finalizing the bid acceptance</p>
+    </div>
+
+    <div class="review-summary">
+      <div class="summary-section">
+        <h4>Order Summary</h4>
+        <div class="summary-item">
+          <span>Bid Amount:</span>
+          <span>${{ breakdown.bidAmount?.toLocaleString() }}</span>
+        </div>
+        <div class="summary-item">
+          <span>Shipping Cost:</span>
+          <span>${{ breakdown.shippingCost }}</span>
+        </div>
+        <div class="summary-item">
+          <span>Verification Fee:</span>
+          <span>${{ breakdown.verificationFee }}</span>
+        </div>
+        <div class="summary-item" *ngIf="rushService">
+          <span>Rush Service:</span>
+          <span>${{ breakdown.rushFee }}</span>
+        </div>
+        <div class="summary-item total">
+          <span>Total Cost:</span>
+          <span>${{ totalCost?.toLocaleString() }}</span>
+        </div>
+      </div>
+
+      <div class="summary-section">
+        <h4>Commission</h4>
+        <div class="summary-item">
+          <span>Platform Commission:</span>
+          <span>${{ breakdown.commission?.toLocaleString() }}</span>
+        </div>
+        <div class="summary-item">
+          <span>Your Net Proceeds:</span>
+          <span><strong>${{ (breakdown.bidAmount - breakdown.commission)?.toLocaleString() }}</strong></span>
+        </div>
+      </div>
+
+      <div class="summary-section">
+        <h4>Next Steps</h4>
+        <ol class="next-steps">
+          <li>Order will be created and sent to verification partner</li>
+          <li>Verification process will begin (typically 3-5 business days)</li>
+          <li>Once verified, watch will be shipped to buyer</li>
+          <li>Payment will be processed after successful delivery</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="navigation-buttons">
+    <button type="button" 
+            class="btn-secondary" 
+            (click)="previousStep()" 
+            [disabled]="currentStep === 1">
+      Previous
+    </button>
+    
+    <button type="button" 
+            class="btn-primary" 
+            (click)="nextStep()" 
+            [disabled]="!canProceedToNextStep()" 
+            *ngIf="currentStep < totalSteps">
+      Next
+    </button>
+    
+    <button type="button" 
+            class="btn-success" 
+            (click)="submitBidAcceptance()" 
+            [disabled]="!canProceedToNextStep() || isSubmitting" 
+            *ngIf="currentStep === totalSteps">
+      <span *ngIf="!isSubmitting">Accept Bid & Create Order</span>
+      <span *ngIf="isSubmitting">Processing...</span>
+    </button>
+  </div>
+
+  <!-- Reject Bid Button -->
+  <div class="reject-section">
+    <button type="button" class="btn-danger" (click)="rejectBid()">
+      Reject Bid
+    </button>
+  </div>
+</div>
