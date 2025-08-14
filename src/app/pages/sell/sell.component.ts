@@ -23,6 +23,7 @@ import { Subscription } from 'rxjs';
 export class SellComponent implements OnInit, OnDestroy {
   form = {
     title: '',
+    watchType: '' as 'analog' | 'digital' | 'apple-watch',
     startingPrice: 0,
     buyNowPrice: undefined as number | undefined,
     description: '',
@@ -36,7 +37,10 @@ export class SellComponent implements OnInit, OnDestroy {
     scheduleType: 'immediate' as 'immediate' | 'scheduled',
     scheduleDate: '',
     scheduleTime: '',
-    authenticationPartner: ''
+    authenticationPartner: '',
+    allowBidding: true,
+    allowInstantSale: false,
+    instantSalePrice: undefined as number | undefined
   };
 
   activeListings: Listing[] = [];
@@ -235,6 +239,7 @@ export class SellComponent implements OnInit, OnDestroy {
       // Reset form
       this.form = { 
         title: '', 
+        watchType: '' as 'analog' | 'digital' | 'apple-watch',
         startingPrice: 0, 
         buyNowPrice: undefined,
         description: '',
@@ -248,7 +253,10 @@ export class SellComponent implements OnInit, OnDestroy {
         scheduleType: 'immediate',
         scheduleDate: '',
         scheduleTime: '',
-        authenticationPartner: ''
+        authenticationPartner: '',
+        allowBidding: false,
+        allowInstantSale: false,
+        instantSalePrice: undefined
       };
       
       // Show success message with times
@@ -342,6 +350,7 @@ export class SellComponent implements OnInit, OnDestroy {
       // Reset form
       this.form = { 
         title: '', 
+        watchType: '' as 'analog' | 'digital' | 'apple-watch',
         startingPrice: 0, 
         buyNowPrice: undefined,
         description: '',
@@ -355,7 +364,10 @@ export class SellComponent implements OnInit, OnDestroy {
         scheduleType: 'immediate',
         scheduleDate: '',
         scheduleTime: '',
-        authenticationPartner: ''
+        authenticationPartner: '',
+        allowBidding: false,
+        allowInstantSale: false,
+        instantSalePrice: undefined
       };
       
       alert(`Item listed for instant sale successfully!\n\nInstant Purchase: $${newListing.buyNowPrice?.toLocaleString()}\n\nBuyers can purchase immediately at this price.`);

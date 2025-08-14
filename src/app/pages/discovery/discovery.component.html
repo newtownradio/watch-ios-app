@@ -166,9 +166,6 @@
       <div class="product-info">
         <div class="title-row">
           <h3>{{ listing.title }}</h3>
-          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
-            📤 Share
-          </button>
         </div>
         <p class="price">${{ listing.currentPrice.toLocaleString() }}</p>
         <p class="description">{{ listing.description }}</p>
@@ -201,15 +198,18 @@
           </span>
         </div>
         <div class="listing-actions">
+          <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
+            Share
+          </button>
           <button class="bid-btn" (click)="openBidForm(listing)" title="Place a bid">
-            💰 Place Bid
+            Place Bid
           </button>
           <button 
             class="buy-now-btn" 
             *ngIf="listing.buyNowPrice" 
             (click)="openBuyNowForm(listing)" 
-            title="Purchase for immediate delivery">
-            🚀 Purchase ${{ listing.buyNowPrice.toLocaleString() }}
+            title="Purchase immediately">
+            Purchase
           </button>
         </div>
       </div>

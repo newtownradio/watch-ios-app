@@ -5,6 +5,18 @@
   </div>
 
   <div class="sell-form">
+    <!-- Watch Type Selection -->
+    <div class="form-group watch-type-selection">
+      <label for="watch-type">Watch Type *</label>
+      <select [(ngModel)]="form.watchType" id="watch-type" required>
+        <option value="">Select Watch Type</option>
+        <option value="analog">Analog/Mechanical Watch</option>
+        <option value="digital">Digital/Smartwatch</option>
+        <option value="apple-watch">Apple Watch</option>
+      </select>
+      <small class="form-help">Choose the type of watch you're selling</small>
+    </div>
+
     <div class="form-group">
       <label for="title">Title</label>
       <input type="text" [(ngModel)]="form.title" placeholder="e.g., Rolex Submariner" id="title">
@@ -177,6 +189,43 @@
       </app-authentication-partners>
     </div>
 
+    <!-- Sale Options -->
+    <div class="sale-options">
+      <h3>Sale Options</h3>
+      <p>Choose how you want to sell your item</p>
+      
+      <div class="sale-option">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="form.allowBidding" id="allow-bidding">
+          <span class="checkmark"></span>
+          Allow Bidding
+        </label>
+        <small class="form-help">Enable traditional bidding with a 3-month sale window</small>
+      </div>
+      
+      <div class="sale-option">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="form.allowInstantSale" id="allow-instant-sale">
+          <span class="checkmark"></span>
+          Allow Instant Sale
+        </label>
+        <small class="form-help">Enable immediate purchase at a set price</small>
+        
+        <div class="instant-sale-price" *ngIf="form.allowInstantSale">
+          <label for="instant-sale-price">Instant Sale Price *</label>
+          <input 
+            type="number" 
+            [(ngModel)]="form.instantSalePrice" 
+            id="instant-sale-price" 
+            placeholder="Enter price for immediate purchase"
+            min="0"
+            required>
+          <small class="form-help">Recommended: 20-30% above your starting price for convenience</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule Listing Section -->
     <div class="form-group">
       <label for="schedule-listing">Schedule Listing</label>
       <div class="schedule-options">
@@ -205,75 +254,11 @@
       </div>
     </div>
 
-    <div class="sale-window-info">
-      <h3>Sale Window</h3>
-      <p>Your item will be available for bidding for 3 months</p>
-      <ul>
-        <li>Bidders can place offers during this time</li>
-        <li>You'll receive notifications for new bids</li>
-        <li>You have 3 months to accept or decline the highest bid</li>
-        <li>You can make 3 counteroffers per listing</li>
-        <li>Counteroffers may continue until a sale is reached</li>
-      </ul>
-      <p class="authentication-note"><strong>Note:</strong> Authentication will commence once the item has been listed and a bid has been placed by the buyer and accepted by the seller.</p>
-    </div>
-
-    <div class="buy-now-info">
-              <h3>🚀 Instant Sale Feature</h3>
-      <p>Enable immediate sales alongside your auction</p>
-      <div class="buy-now-benefits">
-        <div class="benefit-item">
-          <h4>💰 Immediate Revenue</h4>
-          <p>Get paid instantly when buyers choose to skip the auction</p>
-        </div>
-        <div class="benefit-item">
-          <h4>⏰ No Waiting</h4>
-          <p>Eliminate the 3-month auction period for buyers who want it now</p>
-        </div>
-        <div class="benefit-item">
-          <h4>🎯 Higher Price Potential</h4>
-          <p>Set a premium price (20-30% above starting price) for convenience</p>
-        </div>
-        <div class="benefit-item">
-          <h4>🔄 Dual Sales Channels</h4>
-          <p>Run auction and immediate purchase simultaneously</p>
-        </div>
-      </div>
-      
-      <div class="buy-now-terms">
-        <h4>📋 Instant Sale Terms</h4>
-        <ul>
-                      <li><strong>Same Policies Apply:</strong> Instant Sale purchases follow identical shipping, authentication, and return policies</li>
-          <li><strong>72-Hour Return Window:</strong> Buyers have 3 days to inspect and decide to keep or return</li>
-          <li><strong>Authentication Included:</strong> Professional verification before shipping</li>
-          <li><strong>Secure Payment:</strong> Funds held in escrow until delivery confirmation</li>
-          <li><strong>Immediate Processing:</strong> No waiting for auction end or bid acceptance</li>
-        </ul>
-      </div>
-
-      <div class="pricing-strategy">
-        <h4>💡 Pricing Strategy</h4>
-        <p><strong>Recommended Instant Sale Price:</strong> 20-30% above your starting price</p>
-        <div class="pricing-example">
-          <p><strong>Example:</strong></p>
-          <ul>
-            <li>Starting Price: $5,000</li>
-            <li>Instant Sale: $6,500 (30% premium)</li>
-            <li>Buyer pays extra for convenience and immediate purchase</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <button class="submit-btn" (click)="submitForm()" type="button">List Item for Bidding</button>
-    
-    <div class="form-group">
-      <label for="buy-now-price">Instant Sale Price (Optional)</label>
-      <input type="number" [(ngModel)]="form.buyNowPrice" placeholder="Leave empty for Bidding Sale only" id="buy-now-price" min="0">
-      <small class="form-help">
-        Set a price for immediate purchase. If left empty, item will be bidding-only. 
-        Recommended: 20-30% above your starting price for convenience.
-      </small>
+    <!-- Final List Button -->
+    <div class="final-actions">
+      <button class="list-btn" (click)="submitForm()" type="button">
+        List Item for Sale
+      </button>
     </div>
   </div>
 

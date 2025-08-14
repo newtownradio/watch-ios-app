@@ -1,23 +1,11 @@
 <div class="orders-container">
   <div class="orders-header">
-    <h1>📦 Order Management</h1>
+    <h1>Order Management</h1>
     <p class="subtitle">
       {{ userRole === 'seller' ? 'Manage your watch sales and shipping' : 'Track your watch purchases and deliveries' }}
     </p>
     
-    <!-- Debug Buttons -->
-    <div class="debug-buttons" style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
-      <h4>🔧 Debug Tools</h4>
-      <button class="debug-btn" (click)="createTestOrders()" style="margin-right: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-        Create Test Orders
-      </button>
-      <button class="debug-btn" (click)="startReturnWindowForTest()" style="margin-right: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
-        Start Return Window
-      </button>
-      <button class="debug-btn" (click)="loadUserOrders()" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
-        Refresh Orders
-      </button>
-    </div>
+
   </div>
 
   <!-- Orders List -->
@@ -39,7 +27,7 @@
         <div class="order-status">
           <span class="status-badge" 
                 [style.background-color]="getStatusColor(order.status)">
-            {{ getStatusIcon(order.status) }} {{ order.status.replace('_', ' ').toUpperCase() }}
+            {{ order.status.replace('_', ' ').toUpperCase() }}
           </span>
         </div>
       </div>
@@ -57,7 +45,6 @@
         <!-- Return Window Status -->
         <div class="return-window-status" *ngIf="order.status === 'inspection_period' || order.status === 'delivered'">
           <div class="status-info">
-            <span class="status-icon">⏰</span>
             <span class="status-text">{{ getReturnWindowStatus(order).status }}</span>
             <span class="time-remaining" *ngIf="getReturnWindowStatus(order).timeRemaining">
               {{ getReturnWindowStatus(order).timeRemaining }}
@@ -71,44 +58,44 @@
         <button class="action-btn payment-btn" 
                 *ngIf="order.status === 'pending_payment' && userRole === 'buyer'"
                 (click)="initiatePayment(order)">
-          💳 Complete Payment
+          Complete Payment
         </button>
         
         <button class="action-btn" 
                 *ngIf="canShowShippingCalculator(order)"
                 (click)="toggleShippingCalculator()">
-          🚚 {{ showShippingCalculator ? 'Hide' : 'Show' }} Shipping Calculator
+          {{ showShippingCalculator ? 'Hide' : 'Show' }} Shipping Calculator
         </button>
         
         <button class="action-btn" 
                 *ngIf="canShowPackageTracking(order)"
                 (click)="togglePackageTracking()">
-          📍 {{ showPackageTracking ? 'Hide' : 'Show' }} Package Tracking
+          {{ showPackageTracking ? 'Hide' : 'Show' }} Package Tracking
         </button>
 
         <!-- Return Window Actions -->
         <button class="action-btn return-btn" 
                 *ngIf="canStartReturnWindow(order)"
                 (click)="startReturnWindow(order)">
-          ⏰ Start 72-Hour Return Window
+          Start 72-Hour Return Window
         </button>
 
         <button class="action-btn return-btn" 
                 *ngIf="canShowReturnActions(order)"
                 (click)="toggleReturnForm()">
-          ⏰ {{ showReturnForm ? 'Hide' : 'Show' }} Return Actions
+          {{ showReturnForm ? 'Hide' : 'Show' }} Return Actions
         </button>
       </div>
 
       <!-- Shipping Calculator (for sellers) -->
       <div class="shipping-section" *ngIf="selectedOrder?.id === order.id && showShippingCalculator">
-        <h4>🚚 Calculate Shipping</h4>
+        <h4>Calculate Shipping</h4>
         <app-shipping-calculator></app-shipping-calculator>
       </div>
 
       <!-- Package Tracking -->
       <div class="tracking-section" *ngIf="selectedOrder?.id === order.id && showPackageTracking">
-        <h4>📍 Track Package</h4>
+        <h4>Track Package</h4>
         <app-package-tracking 
           [trackingNumber]="order.trackingNumber || ''"
           [showTrackingForm]="false">
@@ -120,7 +107,7 @@
   <!-- No Orders Message -->
   <div class="no-orders" *ngIf="orders.length === 0">
     <div class="empty-state">
-      <h2>📦 No Orders Yet</h2>
+      <h2>No Orders Yet</h2>
       <p *ngIf="userRole === 'seller'">
         You haven't sold any watches yet. Start by creating a listing in the Sell section!
       </p>
@@ -129,10 +116,10 @@
       </p>
       <div class="action-buttons">
         <a routerLink="/sell" class="btn-primary" *ngIf="userRole === 'seller'">
-          🚀 Start Selling
+          Start Selling
         </a>
         <a routerLink="/discovery" class="btn-primary" *ngIf="userRole === 'buyer'">
-          🔍 Browse Watches
+          Browse Watches
         </a>
       </div>
     </div>
@@ -191,7 +178,7 @@
 
   <!-- Stripe Payment Form -->
   <div class="payment-section" *ngIf="showPaymentForm && selectedOrder">
-    <h4>💳 Complete Payment</h4>
+    <h4>Complete Payment</h4>
     <app-stripe-payment
       [paymentTitle]="'Payment for ' + selectedOrder.watchTitle"
       [paymentAmount]="currentPaymentAmount"
@@ -204,7 +191,7 @@
 
   <!-- Return Window Form -->
   <div class="return-section" *ngIf="showReturnForm && selectedOrder">
-    <h4>⏰ 72-Hour Return Window</h4>
+    <h4>72-Hour Return Window</h4>
     
     <div class="return-window-info">
       <div class="return-status">
@@ -216,7 +203,7 @@
 
       <div class="return-actions" *ngIf="getReturnWindowStatus(selectedOrder).canConfirm">
         <button class="btn-confirm" (click)="confirmItemReceived()">
-          ✅ Confirm Item Received as Intended
+          Confirm Item Received as Intended
         </button>
         <p class="confirm-note">
           <strong>Note:</strong> Confirming will complete the order and release funds to the seller.
@@ -249,20 +236,19 @@
 
         <div class="shipping-info" *ngIf="selectedReturnType">
           <div class="shipping-note" [class.seller-pays]="selectedReturnType === 'item_mismatch' || selectedReturnType === 'not_as_described'">
-            <span class="shipping-icon">🚚</span>
             <span class="shipping-text">
               <strong *ngIf="selectedReturnType === 'item_mismatch' || selectedReturnType === 'not_as_described'">
-                ✅ Seller pays return shipping ($$25)
+                Seller pays return shipping ($25)
               </strong>
               <strong *ngIf="selectedReturnType === 'buyer_remorse' || selectedReturnType === 'damaged_in_transit'">
-                💳 Buyer pays return shipping ($$25)
+                Buyer pays return shipping ($25)
               </strong>
             </span>
           </div>
         </div>
 
         <button class="btn-return" (click)="requestReturn()" [disabled]="!returnReason.trim()">
-          ↩️ Request Return
+          Request Return
         </button>
         <p class="return-note">
           <strong>Note:</strong> Return requests must be made within the 72-hour window.

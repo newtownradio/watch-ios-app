@@ -1997,6 +1997,43 @@
   color: #2e7d32;
 }
 
+/* Final Actions - List Button */
+.final-actions {
+  margin-top: 40px;
+  text-align: center;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #8b7355;
+}
+
+.list-btn {
+  background: #8b7355;
+  color: white;
+  border: none;
+  padding: 18px 36px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 280px;
+  
+  &:hover {
+    background: #7a6344;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 115, 85, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
+  }
+}
+
 /* Step Actions */
 .step-actions {
   display: flex;
