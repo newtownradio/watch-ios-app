@@ -167,6 +167,50 @@ export class AiPricingService {
       demandLevel: 'medium',
       recentSales: 15,
       daysOnMarket: 40
+    },
+    'apple-watch-ultra': {
+      brand: 'Apple Watch',
+      model: 'Ultra',
+      condition: 'excellent',
+      averagePrice: 799,
+      priceRange: { min: 650, max: 899 },
+      marketTrend: 'stable',
+      demandLevel: 'high',
+      recentSales: 89,
+      daysOnMarket: 5
+    },
+    'apple-watch-series-9': {
+      brand: 'Apple Watch',
+      model: 'Series 9',
+      condition: 'excellent',
+      averagePrice: 399,
+      priceRange: { min: 350, max: 449 },
+      marketTrend: 'stable',
+      demandLevel: 'high',
+      recentSales: 156,
+      daysOnMarket: 3
+    },
+    'suunto-9-baro': {
+      brand: 'Suunto',
+      model: '9 Baro',
+      condition: 'excellent',
+      averagePrice: 799,
+      priceRange: { min: 650, max: 899 },
+      marketTrend: 'stable',
+      demandLevel: 'medium',
+      recentSales: 23,
+      daysOnMarket: 12
+    },
+    'garmin-fenix-7': {
+      brand: 'Garmin',
+      model: 'Fenix 7',
+      condition: 'excellent',
+      averagePrice: 699,
+      priceRange: { min: 600, max: 799 },
+      marketTrend: 'stable',
+      demandLevel: 'high',
+      recentSales: 67,
+      daysOnMarket: 8
     }
   };
 
@@ -247,7 +291,7 @@ export class AiPricingService {
     const additionalBrands = [
       'Rolex', 'Omega', 'Cartier', 'Tudor', 'Seiko', 'Tag Heuer', 'Breitling', 'IWC', 'Panerai',
       'Audemars Piguet', 'Patek Philippe', 'Vacheron Constantin', 'Longines', 'Tissot', 'Hamilton',
-      'Mido', 'Swatch', 'Casio', 'Citizen', 'Bulova', 'Timex'
+      'Mido', 'Swatch', 'Casio', 'Citizen', 'Bulova', 'Timex', 'Apple Watch'
     ];
     
     additionalBrands.forEach(brand => brands.add(brand));
@@ -328,7 +372,14 @@ export class AiPricingService {
       'panerai': 1.0,
       'tudor': 0.9,
       'tag heuer': 0.85,
-      'seiko': 0.7
+      'seiko': 0.7,
+      'apple watch': 1.0,
+      'suunto': 0.8,
+      'garmin': 0.9,
+      'samsung': 0.8,
+      'fossil': 0.6,
+      'fitbit': 0.7,
+      'polar': 0.8
     };
     
     const brandLower = brand.toLowerCase();
@@ -508,6 +559,28 @@ export class AiPricingService {
       'Timex': [
         'Expedition', 'Weekender', 'Ironman', 'Easy Reader',
         'Waterbury', 'Fairfield', 'South Street', 'Marlin'
+      ],
+      'Apple Watch': [
+        'Series 9', 'Series 8', 'Series 7', 'Series 6', 'Series 5', 'Series 4', 'Series 3', 'Series 2', 'Series 1',
+        'SE (1st generation)', 'SE (2nd generation)', 'Ultra', 'Ultra 2', 'Hermès', 'Nike+'
+      ],
+      'Suunto': [
+        '9 Baro', '9 Peak', '7', '5', '3', 'Ambit3', 'Traverse', 'Spartan', 'Core', 'Vector'
+      ],
+      'Garmin': [
+        'Fenix 7', 'Fenix 6', 'Forerunner 965', 'Forerunner 955', 'Vivoactive 4', 'Venu 2', 'Instinct 2', 'Approach S62'
+      ],
+      'Samsung': [
+        'Galaxy Watch 6', 'Galaxy Watch 5', 'Galaxy Watch 4', 'Galaxy Watch 3', 'Galaxy Watch Active 2', 'Gear S3'
+      ],
+      'Fossil': [
+        'Gen 6', 'Gen 5', 'Gen 4', 'Hybrid HR', 'Sport', 'Q Venture', 'Q Marshal', 'Machine'
+      ],
+      'Fitbit': [
+        'Sense 2', 'Versa 4', 'Charge 6', 'Inspire 3', 'Luxe', 'Ace 3', 'Ionic', 'Blaze'
+      ],
+      'Polar': [
+        'Vantage V3', 'Vantage V2', 'Vantage M2', 'Grit X Pro', 'Ignite 3', 'Unite', 'A370', 'M430'
       ]
     };
     
