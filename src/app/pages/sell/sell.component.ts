@@ -8,6 +8,7 @@ import { DataPersistenceService } from '../../services/data-persistence.service'
 import { AiPricingService, PricingRecommendation } from '../../services/ai-pricing.service';
 import { AuthenticationPartnersComponent } from '../../components/authentication-partners/authentication-partners.component';
 import { ShippingCalculatorComponent } from '../../components/shipping-calculator/shipping-calculator.component';
+import { InsuranceService, InsuranceProvider, InsuranceQuote } from '../../services/insurance.service';
 
 import { Share } from '@capacitor/share';
 import { Subscription } from 'rxjs';
@@ -40,7 +41,12 @@ export class SellComponent implements OnInit, OnDestroy {
     authenticationPartner: '',
     allowBidding: true,
     allowInstantSale: false,
-    instantSalePrice: undefined as number | undefined
+    instantSalePrice: undefined as number | undefined,
+    // Insurance fields
+    insuranceRequired: false,
+    insuranceValue: undefined as number | undefined,
+    selectedInsuranceProvider: '',
+    insuranceCoverageType: 'all_risks' as 'all_risks' | 'theft' | 'damage' | 'loss' | 'mysterious_disappearance'
   };
 
   activeListings: Listing[] = [];
@@ -62,6 +68,11 @@ export class SellComponent implements OnInit, OnDestroy {
   selectedPartner: AuthenticationPartner | null = null;
   userCountry = 'US';
 
+  // Insurance
+  insuranceProviders: InsuranceProvider[] = [];
+  selectedInsuranceProviderId: string = '';
+  insuranceQuote: InsuranceQuote | null = null;
+
   // Timer subscriptions for cleanup
   private timerSubscriptions: Subscription[] = [];
 
@@ -69,7 +80,8 @@ export class SellComponent implements OnInit, OnDestroy {
     private dataService: DataPersistenceService,
     private aiPricingService: AiPricingService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private insuranceService: InsuranceService
   ) {}
 
   ngOnInit() {
@@ -81,6 +93,12 @@ export class SellComponent implements OnInit, OnDestroy {
     
     this.loadActiveListings();
     this.loadAvailableBrands();
+    // Load insurance providers
+    try {
+      this.insuranceProviders = this.insuranceService.getInsuranceProviders();
+    } catch (error) {
+      console.error('Error loading insurance providers:', error);
+    }
   }
 
   loadAvailableBrands() {
@@ -256,7 +274,12 @@ export class SellComponent implements OnInit, OnDestroy {
         authenticationPartner: '',
         allowBidding: false,
         allowInstantSale: false,
-        instantSalePrice: undefined
+        instantSalePrice: undefined,
+        // Insurance fields
+        insuranceRequired: false,
+        insuranceValue: undefined,
+        selectedInsuranceProvider: '',
+        insuranceCoverageType: 'all_risks' as 'all_risks' | 'theft' | 'damage' | 'loss' | 'mysterious_disappearance'
       };
       
       // Show success message with times
@@ -367,7 +390,12 @@ export class SellComponent implements OnInit, OnDestroy {
         authenticationPartner: '',
         allowBidding: false,
         allowInstantSale: false,
-        instantSalePrice: undefined
+        instantSalePrice: undefined,
+        // Insurance fields
+        insuranceRequired: false,
+        insuranceValue: undefined,
+        selectedInsuranceProvider: '',
+        insuranceCoverageType: 'all_risks' as 'all_risks' | 'theft' | 'damage' | 'loss' | 'mysterious_disappearance'
       };
       
       alert(`Item listed for instant sale successfully!\n\nInstant Purchase: $${newListing.buyNowPrice?.toLocaleString()}\n\nBuyers can purchase immediately at this price.`);
@@ -825,6 +853,81 @@ export class SellComponent implements OnInit, OnDestroy {
       this.form.authenticationPartner = partner;
     } else {
       this.form.authenticationPartner = partner.id;
+    }
+  }
+
+  // Insurance helpers
+  getInsuranceQuote() {
+    // Get the item value - prioritize insurance value, then starting price, then instant sale price
+    const itemValue = this.form.insuranceValue && this.form.insuranceValue > 0
+      ? this.form.insuranceValue
+      : this.form.startingPrice && this.form.startingPrice > 0
+      ? this.form.startingPrice
+      : this.form.instantSalePrice && this.form.instantSalePrice > 0
+      ? this.form.instantSalePrice
+      : 0;
+
+    if (itemValue <= 0) {
+      alert('Please enter a valid value for insurance calculation. You can use your starting price, instant sale price, or enter a custom insurance value.');
+      return;
+    }
+
+    try {
+      // Use the selected provider from the form, or get the best provider if none selected
+      const providerId = this.form.selectedInsuranceProvider || undefined;
+      const quote = this.insuranceService.getInsuranceQuote(itemValue, providerId);
+      this.insuranceQuote = quote;
+      
+      // Update the form with the selected provider if none was selected
+      if (!this.form.selectedInsuranceProvider) {
+        this.form.selectedInsuranceProvider = quote.providerId;
+      }
+      
+      this.cdr.detectChanges();
+      
+      // Show success message
+      console.log('Insurance quote generated successfully:', quote);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to get insurance quote';
+      console.error('Error getting insurance quote:', error);
+      alert(`Error: ${message}`);
+      this.insuranceQuote = null;
+    }
+  }
+
+  selectInsuranceProvider() {
+    if (!this.insuranceQuote) {
+      alert('Please generate an insurance quote first.');
+      return;
+    }
+    
+    // Update the form with the selected provider
+    this.form.selectedInsuranceProvider = this.insuranceQuote.providerId;
+    
+    // Store selected provider/quote data into persistence for order creation flow
+    try {
+      const currentUser = this.dataService.getCurrentUser();
+      const key = 'watch_ios_selected_insurance_quote';
+      const payload = {
+        userId: currentUser?.id || 'anonymous',
+        providerId: this.insuranceQuote.providerId,
+        providerName: this.insuranceQuote.providerName,
+        coverageAmount: this.insuranceQuote.coverageAmount,
+        premium: this.insuranceQuote.premium,
+        deductible: this.insuranceQuote.deductible,
+        coverageType: this.form.insuranceCoverageType,
+        effectiveDate: this.insuranceQuote.effectiveDate,
+        expiryDate: this.insuranceQuote.expiryDate
+      };
+      localStorage.setItem(key, JSON.stringify(payload));
+      
+      // Show success message with details
+      alert(`✅ Insurance provider selected successfully!\n\nProvider: ${this.insuranceQuote.providerName}\nCoverage: $${this.insuranceQuote.coverageAmount.toLocaleString()}\nPremium: $${this.insuranceQuote.premium.toLocaleString()}\nDeductible: $${this.insuranceQuote.deductible.toLocaleString()}\n\nThis selection has been saved and will be included with your listing.`);
+      
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error saving insurance selection:', error);
+      alert('Could not save insurance selection. Please try again.');
     }
   }
 

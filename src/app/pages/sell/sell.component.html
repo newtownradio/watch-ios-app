@@ -260,6 +260,144 @@
       </div>
     </div>
 
+    <!-- Insurance Section -->
+    <div class="form-group insurance-section">
+      <h3>🛡️ Insurance & Protection</h3>
+      <p>Choose insurance coverage to protect your luxury timepiece during the sale process</p>
+      
+      <div class="insurance-options">
+        <div class="insurance-option">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="form.insuranceRequired" id="insurance-required">
+            <span class="checkmark"></span>
+            Require Insurance Coverage
+          </label>
+          <small class="form-help">Buyers must purchase insurance to protect your watch during shipping and inspection</small>
+        </div>
+        
+        <div class="insurance-details" *ngIf="form.insuranceRequired">
+          <div class="insurance-providers">
+            <h4>Available Insurance Providers</h4>
+            <div class="provider-cards">
+              <div class="provider-card" *ngFor="let provider of insuranceProviders">
+                <div class="provider-header">
+                  <h5>{{ provider.name }}</h5>
+                  <span class="provider-type">{{ provider.type | titlecase }}</span>
+                </div>
+                <div class="provider-features">
+                  <div class="feature" *ngFor="let feature of provider.features.slice(0, 3)">
+                    <span class="feature-icon">✓</span>
+                    {{ feature }}
+                  </div>
+                </div>
+                <div class="provider-coverage">
+                  <span class="coverage-label">Max Coverage:</span>
+                  <span class="coverage-amount">${{ provider.maxCoverage.toLocaleString() }}</span>
+                </div>
+                <div class="provider-rate">
+                  <span class="rate-label">Rate:</span>
+                  <span class="rate-amount">{{ (provider.rate * 100).toFixed(1) }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="insurance-calculator">
+            <h4>Insurance Cost Calculator</h4>
+            <div class="calculator-inputs">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="insurance-value">Declared Value</label>
+                  <input 
+                    type="number" 
+                    [(ngModel)]="form.insuranceValue" 
+                    id="insurance-value" 
+                    placeholder="Enter watch value for insurance"
+                    min="0"
+                    [value]="form.startingPrice || form.instantSalePrice || 0">
+                  <small class="form-help">This is the value that will be insured</small>
+                </div>
+                <div class="form-group">
+                  <label for="insurance-coverage">Coverage Type</label>
+                  <select [(ngModel)]="form.insuranceCoverageType" id="insurance-coverage">
+                    <option value="all_risks">All Risks Coverage</option>
+                    <option value="theft">Theft Protection</option>
+                    <option value="damage">Damage Protection</option>
+                    <option value="loss">Loss Protection</option>
+                  </select>
+                  <small class="form-help">Choose the type of coverage you want</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="insurance-quote" *ngIf="insuranceQuote">
+              <div class="quote-summary">
+                <h5>Insurance Quote</h5>
+                <div class="quote-details">
+                  <div class="quote-row">
+                    <span class="label">Provider:</span>
+                    <span class="value">{{ insuranceQuote.providerName }}</span>
+                  </div>
+                  <div class="quote-row">
+                    <span class="label">Coverage Amount:</span>
+                    <span class="value">${{ insuranceQuote.coverageAmount.toLocaleString() }}</span>
+                  </div>
+                  <div class="quote-row">
+                    <span class="label">Premium:</span>
+                    <span class="value premium">${{ insuranceQuote.premium.toLocaleString() }}</span>
+                  </div>
+                  <div class="quote-row">
+                    <span class="label">Deductible:</span>
+                    <span class="value">${{ insuranceQuote.deductible.toLocaleString() }}</span>
+                  </div>
+                </div>
+                <div class="quote-actions">
+                  <button class="btn-secondary" (click)="getInsuranceQuote()" type="button">
+                    🔄 Refresh Quote
+                  </button>
+                  <button class="btn-primary" (click)="selectInsuranceProvider()" type="button">
+                    ✅ Select This Provider
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="insurance-actions">
+              <button class="btn-secondary" (click)="getInsuranceQuote()" type="button" [disabled]="!form.insuranceValue">
+                💰 Get Insurance Quote
+              </button>
+            </div>
+          </div>
+          
+          <div class="insurance-benefits">
+            <h4>Why Insurance Matters</h4>
+            <div class="benefits-grid">
+              <div class="benefit-item">
+                <span class="benefit-icon">🛡️</span>
+                <h5>Full Protection</h5>
+                <p>Covers damage, theft, and loss during shipping and inspection</p>
+              </div>
+              <div class="benefit-item">
+                <span class="benefit-icon">💰</span>
+                <h5>Replacement Value</h5>
+                <p>Get the full value of your watch if something goes wrong</p>
+              </div>
+              <div class="benefit-item">
+                <span class="benefit-icon">🌍</span>
+                <h5>Worldwide Coverage</h5>
+                <p>Protected no matter where your watch travels</p>
+              </div>
+              <div class="benefit-item">
+                <span class="benefit-icon">⚡</span>
+                <h5>Fast Claims</h5>
+                <p>Quick processing and payment for covered incidents</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Final List Button -->
     <div class="final-actions">
       <button class="list-btn" (click)="submitForm()" type="button">

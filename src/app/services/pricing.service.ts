@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { PricingBreakdown, VerificationPartner } from '../models/bid.interface';
+import { InsuranceService } from './insurance.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PricingService {
+  
+  constructor(private insuranceService: InsuranceService) {}
   private verificationPartners: VerificationPartner[] = [
     {
       id: 'watchcsa',
@@ -94,7 +97,7 @@ export class PricingService {
     const commissionInfo = this.calculateCommissionFee(itemPrice);
     const commissionFee = commissionInfo.amount;
     
-    const insuranceCost = itemPrice * 0.02; // 2% insurance
+    const insuranceCost = this.insuranceService.calculateInsuranceCost(itemPrice);
     const totalAmount = itemPrice + shippingCost + verificationCost + commissionFee + insuranceCost;
 
     return {
