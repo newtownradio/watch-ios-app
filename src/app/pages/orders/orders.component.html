@@ -5,7 +5,162 @@
       {{ userRole === 'seller' ? 'Manage your watch sales and shipping' : 'Track your watch purchases and deliveries' }}
     </p>
     
+    <!-- Testing Panel Toggle - EASILY REMOVABLE FOR PRODUCTION -->
+    <div class="testing-toggle">
+      <button class="testing-btn" (click)="toggleTestingPanel()">
+        🧪 {{ showTestingPanel ? 'Hide' : 'Show' }} Testing Panel
+      </button>
+    </div>
+  </div>
 
+  <!-- Testing Panel - EASILY REMOVABLE FOR PRODUCTION -->
+  <div class="testing-panel" *ngIf="showTestingPanel">
+    <div class="testing-header">
+      <h3>🧪 Bid & Sale Flow Testing</h3>
+      <p>Test the complete transaction flows including bidding, immediate sales, shipping, and authentication</p>
+    </div>
+
+    <div class="testing-controls">
+      <button class="test-btn primary" (click)="runComprehensiveTests()" [disabled]="isRunningTests">
+        🚀 {{ isRunningTests ? 'Running Tests...' : 'Run Comprehensive Tests' }}
+      </button>
+      
+      <button class="test-btn" (click)="testTraditionalBiddingFlow()" [disabled]="isRunningTests">
+        🏷️ Test Bidding Flow
+      </button>
+      
+      <button class="test-btn" (click)="testImmediateSaleFlow()" [disabled]="isRunningTests">
+        ⚡ Test Immediate Sale
+      </button>
+      
+      <button class="test-btn" (click)="testShippingCalculator()" [disabled]="isRunningTests">
+        🚚 Test Shipping
+      </button>
+      
+      <button class="test-btn" (click)="testCompleteTransactionFlow()" [disabled]="isRunningTests">
+        🔄 Test Complete Transaction
+      </button>
+      
+      <button class="test-btn" (click)="testShippingFlowSuccess()" [disabled]="isRunningTests">
+        📦 Test Shipping Success
+      </button>
+      
+      <button class="test-btn" (click)="testShippingFlowFailure()" [disabled]="isRunningTests">
+        ❌ Test Shipping Failure
+      </button>
+      
+      <button class="test-btn" (click)="testPaymentEscrowSuccess()" [disabled]="isRunningTests">
+        💳 Test Payment Success
+      </button>
+      
+      <button class="test-btn" (click)="testPaymentEscrowFailure()" [disabled]="isRunningTests">
+        🚫 Test Payment Failure
+      </button>
+      
+      <button class="test-btn" (click)="testBuyerSellerFlow()" [disabled]="isRunningTests">
+        🤝 Test Buyer-Seller Flow
+      </button>
+    </div>
+
+    <!-- Test Progress -->
+    <div class="test-progress" *ngIf="isRunningTests">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="testProgress"></div>
+      </div>
+      <p class="progress-text">{{ currentTest }} - {{ testProgress }}%</p>
+    </div>
+
+    <!-- Test Results -->
+    <div class="test-results" *ngIf="testResults">
+      <h4>📊 Test Results</h4>
+      
+      <div class="result-summary" [class]="testResults.success ? 'success' : 'error'">
+        <span class="result-icon">{{ testResults.success ? '✅' : '❌' }}</span>
+        <span class="result-text">
+          {{ testResults.success ? 'All tests completed successfully!' : 'Some tests failed' }}
+        </span>
+      </div>
+
+      <div class="result-details" *ngIf="testResults.error">
+        <p class="error-message">❌ Error: {{ testResults.error }}</p>
+      </div>
+
+      <div class="result-breakdown" *ngIf="testResults.success">
+        <div class="breakdown-item" *ngIf="testResults.traditionalBidding">
+          <span class="label">🏷️ Bidding Flow:</span>
+          <span class="status" [class]="testResults.traditionalBidding.success ? 'success' : 'error'">
+            {{ testResults.traditionalBidding.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.immediateSale">
+          <span class="label">⚡ Immediate Sale:</span>
+          <span class="status" [class]="testResults.immediateSale.success ? 'success' : 'error'">
+            {{ testResults.immediateSale.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.shippingCalculator">
+          <span class="label">🚚 Shipping Calculator:</span>
+          <span class="status" [class]="testResults.shippingCalculator.success ? 'success' : 'error'">
+            {{ testResults.shippingCalculator.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.completeTransaction">
+          <span class="label">🔄 Complete Transaction:</span>
+          <span class="status" [class]="testResults.completeTransaction.success ? 'success' : 'error'">
+            {{ testResults.completeTransaction.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <!-- Comprehensive Flow Tests -->
+        <div class="breakdown-item" *ngIf="testResults.shippingSuccess">
+          <span class="label">📦 Shipping Success:</span>
+          <span class="status" [class]="testResults.shippingSuccess.success ? 'success' : 'error'">
+            {{ testResults.shippingSuccess.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.shippingFailure">
+          <span class="label">❌ Shipping Failure:</span>
+          <span class="status" [class]="testResults.shippingFailure.success ? 'success' : 'error'">
+            {{ testResults.shippingFailure.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.paymentSuccess">
+          <span class="label">💳 Payment Success:</span>
+          <span class="status" [class]="testResults.paymentSuccess.success ? 'success' : 'error'">
+            {{ testResults.paymentSuccess.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.paymentFailure">
+          <span class="label">🚫 Payment Failure:</span>
+          <span class="status" [class]="testResults.paymentFailure.success ? 'success' : 'error'">
+            {{ testResults.paymentFailure.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.buyerSellerFlow">
+          <span class="label">🤝 Buyer-Seller Flow:</span>
+          <span class="status" [class]="testResults.buyerSellerFlow.success ? 'success' : 'error'">
+            {{ testResults.buyerSellerFlow.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="testing-actions">
+        <button class="action-btn" (click)="getTestData()">
+          📊 View Test Data
+        </button>
+        
+        <button class="action-btn danger" (click)="clearTestData()">
+          🗑️ Clear Test Data
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Orders List -->

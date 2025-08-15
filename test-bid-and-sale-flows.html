@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch iOS - Bid & Sale Flow Testing</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #1f2937;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .test-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .test-card h3 {
+            color: #1e40af;
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }
+        .test-data {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 4px;
+        }
+        .btn:hover {
+            background: #2563eb;
+        }
+        .btn-success {
+            background: #10b981;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-warning {
+            background: #f59e0b;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-danger {
+            background: #ef4444;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .flow-diagram {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+        }
+        .flow-step .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        .shipping-test {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .shipping-test h4 {
+            color: #92400e;
+            margin: 0 0 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Watch iOS - Bid & Sale Flow Testing</h1>
+    
+    <!-- Test Overview -->
+    <div class="test-section">
+        <h2>📋 Test Overview</h2>
+        <p>This test suite covers the complete bid and immediate sale flows including shipping calculations, authentication, and payment processing.</p>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>🎯 Test Scenarios</h3>
+                <ul>
+                    <li>Traditional Bidding Flow</li>
+                    <li>Immediate Sale Flow</li>
+                    <li>Shipping Cost Calculations</li>
+                    <li>Authentication Partner Integration</li>
+                    <li>Payment Processing</li>
+                    <li>Counteroffer Handling</li>
+                </ul>
+            </div>
+            <div class="test-card">
+                <h3>🔧 Test Data</h3>
+                <ul>
+                    <li>Sample Watch Listings</li>
+                    <li>Test User Accounts</li>
+                    <li>Shipping Addresses</li>
+                    <li>Authentication Partners</li>
+                    <li>Payment Methods</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Data Setup -->
+    <div class="test-section">
+        <h2>📊 Test Data Setup</h2>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>👤 Test Users</h3>
+                <button class="btn" onclick="createTestUsers()">Create Test Users</button>
+                <button class="btn btn-success" onclick="viewTestUsers()">View Users</button>
+                <div id="users-status"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>⌚ Sample Listings</h3>
+                <button class="btn" onclick="createSampleListings()">Create Listings</button>
+                <button class="btn btn-success" onclick="viewListings()">View Listings</button>
+                <div id="listings-status"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Traditional Bidding Flow Test -->
+    <div class="test-section">
+        <h2>🏷️ Traditional Bidding Flow Test</h2>
+        
+        <div class="flow-diagram">
+            <h4>Bidding Flow Steps:</h4>
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div>User creates listing with bidding enabled</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div>Buyer places bid on listing</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">3</div>
+                <div>Seller receives bid notification</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">4</div>
+                <div>Seller accepts/declines/counteroffers</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">5</div>
+                <div>Authentication process initiated</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">6</div>
+                <div>Shipping costs calculated</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">7</div>
+                <div>Payment processing</div>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>📝 Create Bidding Listing</h3>
+                <button class="btn" onclick="createBiddingListing()">Create Bidding Listing</button>
+                <div id="bidding-listing-status"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>💰 Place Test Bid</h3>
+                <button class="btn" onclick="placeTestBid()">Place Bid</button>
+                <div id="bid-status"></div>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>📊 Bidding Test Results</h3>
+            <button class="btn btn-success" onclick="viewBiddingResults()">View Results</button>
+            <div id="bidding-results"></div>
+        </div>
+    </div>
+
+    <!-- Immediate Sale Flow Test -->
+    <div class="test-section">
+        <h2>⚡ Immediate Sale Flow Test</h2>
+        
+        <div class="flow-diagram">
+            <h4>Immediate Sale Flow Steps:</h4>
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div>User creates listing with instant sale price</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div>Buyer purchases immediately at set price</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">3</div>
+                <div>Authentication process initiated</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">4</div>
+                <div>Shipping costs calculated</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">5</div>
+                <div>Payment processing</div>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>📝 Create Instant Sale Listing</h3>
+                <button class="btn" onclick="createInstantSaleListing()">Create Instant Sale</button>
+                <div id="instant-sale-status"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>🛒 Test Immediate Purchase</h3>
+                <button class="btn" onclick="testImmediatePurchase()">Test Purchase</button>
+                <div id="purchase-status"></div>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>📊 Immediate Sale Test Results</h3>
+            <button class="btn btn-success" onclick="viewImmediateSaleResults()">View Results</button>
+            <div id="immediate-sale-results"></div>
+        </div>
+    </div>
+
+    <!-- Shipping Test Data -->
+    <div class="test-section">
+        <h2>🚚 Shipping Test Data</h2>
+        
+        <div class="shipping-test">
+            <h4>Shipping Addresses for Testing</h4>
+            <div class="test-data">
+// Test Shipping Addresses
+const testAddresses = {
+  seller: {
+    name: "John Seller",
+    street: "123 Main Street",
+    city: "New York",
+    state: "NY",
+    zipCode: "10001",
+    country: "USA",
+    phone: "+1-555-0123"
+  },
+  buyer1: {
+    name: "Alice Buyer",
+    street: "456 Oak Avenue",
+    city: "Los Angeles",
+    state: "CA",
+    zipCode: "90210",
+    country: "USA",
+    phone: "+1-555-0456"
+  },
+  buyer2: {
+    name: "Bob Customer",
+    street: "789 Pine Street",
+    city: "Chicago",
+    state: "IL",
+    zipCode: "60601",
+    country: "USA",
+    phone: "+1-555-0789"
+  },
+  international: {
+    name: "Carlos Rodriguez",
+    street: "Calle Principal 123",
+    city: "Madrid",
+    state: "Madrid",
+    zipCode: "28001",
+    country: "Spain",
+    phone: "+34-91-123-4567"
+  }
+};
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>📦 Package Details</h3>
+                <button class="btn" onclick="viewPackageDetails()">View Package Info</button>
+                <div id="package-details"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>💰 Shipping Cost Calculator</h3>
+                <button class="btn" onclick="testShippingCalculator()">Test Calculator</button>
+                <div id="shipping-calculator-results"></div>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>🌍 International Shipping Test</h3>
+            <button class="btn btn-warning" onclick="testInternationalShipping()">Test International</button>
+            <div id="international-shipping-results"></div>
+        </div>
+    </div>
+
+    <!-- Authentication & Payment Test -->
+    <div class="test-section">
+        <h2>🔐 Authentication & Payment Test</h2>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>🏢 Authentication Partners</h3>
+                <button class="btn" onclick="viewAuthPartners()">View Partners</button>
+                <div id="auth-partners"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>💳 Payment Methods</h3>
+                <button class="btn" onclick="viewPaymentMethods()">View Methods</button>
+                <div id="payment-methods"></div>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>📋 Complete Transaction Test</h3>
+            <button class="btn btn-success" onclick="testCompleteTransaction()">Test Full Transaction</button>
+            <div id="transaction-results"></div>
+        </div>
+    </div>
+
+    <!-- Test Results & Cleanup -->
+    <div class="test-section">
+        <h2>🧹 Test Results & Cleanup</h2>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>📊 View All Test Data</h3>
+                <button class="btn btn-success" onclick="viewAllTestData()">View All Data</button>
+                <div id="all-test-data"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>🗑️ Cleanup Test Data</h3>
+                <button class="btn btn-danger" onclick="cleanupTestData()">Clear All Test Data</button>
+                <div id="cleanup-status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test Data Storage
+        const TEST_STORAGE_KEY = 'watch_ios_test_data';
+        
+        // Initialize test environment
+        function initializeTestEnvironment() {
+            console.log('🧪 Initializing Watch iOS Test Environment...');
+            
+            // Check if test data exists
+            if (!localStorage.getItem(TEST_STORAGE_KEY)) {
+                localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify({
+                    users: [],
+                    listings: [],
+                    bids: [],
+                    transactions: [],
+                    shipping: [],
+                    authRequests: []
+                }));
+            }
+            
+            console.log('✅ Test environment initialized');
+        }
+
+        // Test Users Management
+        function createTestUsers() {
+            const testUsers = [
+                {
+                    id: 'test-seller-001',
+                    name: 'John Seller',
+                    email: 'john.seller@test.com',
+                    type: 'seller',
+                    verified: true,
+                    createdAt: new Date()
+                },
+                {
+                    id: 'test-buyer-001',
+                    name: 'Alice Buyer',
+                    email: 'alice.buyer@test.com',
+                    type: 'buyer',
+                    verified: true,
+                    createdAt: new Date()
+                },
+                {
+                    id: 'test-buyer-002',
+                    name: 'Bob Customer',
+                    email: 'bob.customer@test.com',
+                    type: 'buyer',
+                    verified: true,
+                    createdAt: new Date()
+                }
+            ];
+            
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            testData.users = testUsers;
+            localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(testData));
+            
+            document.getElementById('users-status').innerHTML = 
+                '<div class="status success">✅ Test users created successfully</div>';
+        }
+
+        function viewTestUsers() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const users = testData.users || [];
+            
+            document.getElementById('users-status').innerHTML = `
+                <div class="status info">👥 ${users.length} test users found</div>
+                <div class="test-data">${JSON.stringify(users, null, 2)}</div>
+            `;
+        }
+
+        // Sample Listings Management
+        function createSampleListings() {
+            const sampleListings = [
+                {
+                    id: 'listing-001',
+                    sellerId: 'test-seller-001',
+                    sellerName: 'John Seller',
+                    title: 'Rolex Submariner Date',
+                    description: 'Excellent condition Rolex Submariner with original box and papers',
+                    brand: 'Rolex',
+                    model: 'Submariner',
+                    year: 2020,
+                    condition: 'excellent',
+                    startingPrice: 8500,
+                    currentPrice: 8500,
+                    instantSalePrice: 9500,
+                    allowBidding: true,
+                    allowInstantSale: true,
+                    status: 'active',
+                    createdAt: new Date(),
+                    endTime: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
+                    bids: [],
+                    imageUrl: 'https://example.com/rolex-submariner.jpg'
+                },
+                {
+                    id: 'listing-002',
+                    sellerId: 'test-seller-001',
+                    sellerName: 'John Seller',
+                    title: 'Apple Watch Series 8',
+                    description: 'Like new Apple Watch Series 8, 45mm, GPS + Cellular',
+                    brand: 'Apple',
+                    model: 'Watch Series 8',
+                    year: 2023,
+                    condition: 'excellent',
+                    startingPrice: 350,
+                    currentPrice: 350,
+                    instantSalePrice: 400,
+                    allowBidding: true,
+                    allowInstantSale: true,
+                    status: 'active',
+                    createdAt: new Date(),
+                    endTime: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+                    bids: [],
+                    imageUrl: 'https://example.com/apple-watch-8.jpg'
+                }
+            ];
+            
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            testData.listings = sampleListings;
+            localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(testData));
+            
+            document.getElementById('listings-status').innerHTML = 
+                '<div class="status success">✅ Sample listings created successfully</div>';
+        }
+
+        function viewListings() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const listings = testData.listings || [];
+            
+            document.getElementById('listings-status').innerHTML = `
+                <div class="status info">⌚ ${listings.length} sample listings found</div>
+                <div class="test-data">${JSON.stringify(listings, null, 2)}</div>
+            `;
+        }
+
+        // Bidding Flow Tests
+        function createBiddingListing() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const newListing = {
+                id: 'bidding-listing-' + Date.now(),
+                sellerId: 'test-seller-001',
+                sellerName: 'John Seller',
+                title: 'Test Bidding Watch',
+                description: 'This is a test listing for bidding flow testing',
+                brand: 'Omega',
+                model: 'Speedmaster',
+                year: 2021,
+                condition: 'very-good',
+                startingPrice: 5000,
+                currentPrice: 5000,
+                allowBidding: true,
+                allowInstantSale: false,
+                status: 'active',
+                createdAt: new Date(),
+                endTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+                bids: []
+            };
+            
+            testData.listings.push(newListing);
+            localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(testData));
+            
+            document.getElementById('bidding-listing-status').innerHTML = 
+                '<div class="status success">✅ Bidding listing created: ' + newListing.title + '</div>';
+        }
+
+        function placeTestBid() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const listings = testData.listings.filter(l => l.allowBidding && l.status === 'active');
+            
+            if (listings.length === 0) {
+                document.getElementById('bid-status').innerHTML = 
+                    '<div class="status error">❌ No active bidding listings found</div>';
+                return;
+            }
+            
+            const listing = listings[0];
+            const newBid = {
+                id: 'bid-' + Date.now(),
+                listingId: listing.id,
+                bidderId: 'test-buyer-001',
+                bidderName: 'Alice Buyer',
+                amount: listing.currentPrice + 100,
+                timestamp: new Date(),
+                status: 'pending'
+            };
+            
+            // Update listing with new bid
+            listing.bids.push(newBid);
+            listing.currentPrice = newBid.amount;
+            
+            // Save bid to test data
+            testData.bids.push(newBid);
+            localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(testData));
+            
+            document.getElementById('bid-status').innerHTML = `
+                <div class="status success">✅ Bid placed successfully</div>
+                <div class="test-data">Bid Amount: $${newBid.amount}<br>Listing: ${listing.title}</div>
+            `;
+        }
+
+        function viewBiddingResults() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const bids = testData.bids || [];
+            const listings = testData.listings || [];
+            
+            document.getElementById('bidding-results').innerHTML = `
+                <div class="status info">📊 Bidding Test Results</div>
+                <div class="test-data">
+Bids Placed: ${bids.length}
+Active Listings: ${listings.filter(l => l.allowBidding).length}
+Latest Bid: ${bids.length > 0 ? '$' + bids[bids.length - 1].amount : 'None'}
+                </div>
+            `;
+        }
+
+        // Immediate Sale Flow Tests
+        function createInstantSaleListing() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const newListing = {
+                id: 'instant-sale-' + Date.now(),
+                sellerId: 'test-seller-001',
+                sellerName: 'John Seller',
+                title: 'Test Instant Sale Watch',
+                description: 'This is a test listing for immediate sale testing',
+                brand: 'Tag Heuer',
+                model: 'Carrera',
+                year: 2022,
+                condition: 'excellent',
+                startingPrice: 3000,
+                currentPrice: 3000,
+                instantSalePrice: 3500,
+                allowBidding: false,
+                allowInstantSale: true,
+                status: 'active',
+                createdAt: new Date(),
+                endTime: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+                bids: []
+            };
+            
+            testData.listings.push(newListing);
+            localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(testData));
+            
+            document.getElementById('instant-sale-status').innerHTML = 
+                '<div class="status success">✅ Instant sale listing created: ' + newListing.title + '</div>';
+        }
+
+        function testImmediatePurchase() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const listings = testData.listings.filter(l => l.allowInstantSale && l.status === 'active');
+            
+            if (listings.length === 0) {
+                document.getElementById('purchase-status').innerHTML = 
+                    '<div class="status error">❌ No active instant sale listings found</div>';
+                return;
+            }
+            
+            const listing = listings[0];
+            const purchase = {
+                id: 'purchase-' + Date.now(),
+                listingId: listing.id,
+                buyerId: 'test-buyer-002',
+                buyerName: 'Bob Customer',
+                amount: listing.instantSalePrice,
+                timestamp: new Date(),
+                status: 'completed'
+            };
+            
+            // Update listing status
+            listing.status = 'sold';
+            listing.buyerId = purchase.buyerId;
+            listing.soldAt = new Date();
+            
+            // Save purchase to test data
+            testData.transactions.push(purchase);
+            localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(testData));
+            
+            document.getElementById('purchase-status').innerHTML = `
+                <div class="status success">✅ Immediate purchase completed</div>
+                <div class="test-data">Purchase Amount: $${purchase.amount}<br>Listing: ${listing.title}</div>
+            `;
+        }
+
+        function viewImmediateSaleResults() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const transactions = testData.transactions || [];
+            const listings = testData.listings || [];
+            
+            document.getElementById('immediate-sale-results').innerHTML = `
+                <div class="status info">📊 Immediate Sale Test Results</div>
+                <div class="test-data">
+Transactions: ${transactions.length}
+Instant Sale Listings: ${listings.filter(l => l.allowInstantSale).length}
+Sold Listings: ${listings.filter(l => l.status === 'sold').length}
+                </div>
+            `;
+        }
+
+        // Shipping Tests
+        function viewPackageDetails() {
+            const packageDetails = {
+                weight: '0.5 kg',
+                dimensions: '15cm x 10cm x 5cm',
+                insurance: 'Required for watches over $1000',
+                specialHandling: 'Fragile, handle with care',
+                tracking: 'Signature required upon delivery'
+            };
+            
+            document.getElementById('package-details').innerHTML = `
+                <div class="status info">📦 Package Details</div>
+                <div class="test-data">${JSON.stringify(packageDetails, null, 2)}</div>
+            `;
+        }
+
+        function testShippingCalculator() {
+            const shippingRates = {
+                domestic: {
+                    standard: 15.99,
+                    express: 29.99,
+                    overnight: 49.99
+                },
+                international: {
+                    standard: 45.99,
+                    express: 89.99,
+                    priority: 129.99
+                }
+            };
+            
+            document.getElementById('shipping-calculator-results').innerHTML = `
+                <div class="status info">💰 Shipping Cost Calculator Results</div>
+                <div class="test-data">${JSON.stringify(shippingRates, null, 2)}</div>
+            `;
+        }
+
+        function testInternationalShipping() {
+            const internationalShipping = {
+                origin: 'New York, USA',
+                destination: 'Madrid, Spain',
+                estimatedTime: '5-7 business days',
+                customsFees: 'Varies by country',
+                restrictions: 'Battery-powered devices may have restrictions'
+            };
+            
+            document.getElementById('international-shipping-results').innerHTML = `
+                <div class="status info">🌍 International Shipping Test</div>
+                <div class="test-data">${JSON.stringify(internationalShipping, null, 2)}</div>
+            `;
+        }
+
+        // Authentication & Payment Tests
+        function viewAuthPartners() {
+            const authPartners = [
+                {
+                    id: 'watchcsa',
+                    name: 'WatchCSA',
+                    cost: 150,
+                    turnaroundTime: '3-5 business days',
+                    description: 'Professional watch authentication'
+                },
+                {
+                    id: 'swiss-watch-group',
+                    name: 'Swiss Watch Group',
+                    cost: 200,
+                    turnaroundTime: '5-7 business days',
+                    description: 'Expert Swiss watch authentication'
+                }
+            ];
+            
+            document.getElementById('auth-partners').innerHTML = `
+                <div class="status info">🏢 Authentication Partners</div>
+                <div class="test-data">${JSON.stringify(authPartners, null, 2)}</div>
+            `;
+        }
+
+        function viewPaymentMethods() {
+            const paymentMethods = [
+                {
+                    type: 'credit_card',
+                    name: 'Credit Card',
+                    processingTime: '2-3 business days',
+                    fees: '2.9% + $0.30'
+                },
+                {
+                    type: 'bank_transfer',
+                    name: 'Bank Transfer',
+                    processingTime: '3-5 business days',
+                    fees: '1%'
+                },
+                {
+                    type: 'escrow',
+                    name: 'Escrow Service',
+                    processingTime: 'Upon authentication completion',
+                    fees: '2%'
+                }
+            ];
+            
+            document.getElementById('payment-methods').innerHTML = `
+                <div class="status info">💳 Payment Methods</div>
+                <div class="test-data">${JSON.stringify(paymentMethods, null, 2)}</div>
+            `;
+        }
+
+        function testCompleteTransaction() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            const listings = testData.listings.filter(l => l.status === 'active');
+            const users = testData.users;
+            
+            if (listings.length === 0 || users.length === 0) {
+                document.getElementById('transaction-results').innerHTML = 
+                    '<div class="status error">❌ Insufficient test data for complete transaction</div>';
+                return;
+            }
+            
+            const listing = listings[0];
+            const buyer = users.find(u => u.type === 'buyer');
+            
+            const transaction = {
+                id: 'transaction-' + Date.now(),
+                listingId: listing.id,
+                buyerId: buyer.id,
+                sellerId: listing.sellerId,
+                amount: listing.instantSalePrice || listing.currentPrice,
+                status: 'pending_authentication',
+                createdAt: new Date(),
+                steps: [
+                    'Listing created',
+                    'Purchase initiated',
+                    'Authentication requested',
+                    'Shipping calculated',
+                    'Payment processed'
+                ]
+            };
+            
+            testData.transactions.push(transaction);
+            localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(testData));
+            
+            document.getElementById('transaction-results').innerHTML = `
+                <div class="status success">✅ Complete transaction test completed</div>
+                <div class="test-data">Transaction ID: ${transaction.id}<br>Amount: $${transaction.amount}<br>Status: ${transaction.status}</div>
+            `;
+        }
+
+        // Data Management
+        function viewAllTestData() {
+            const testData = JSON.parse(localStorage.getItem(TEST_STORAGE_KEY));
+            
+            document.getElementById('all-test-data').innerHTML = `
+                <div class="status info">📊 All Test Data Summary</div>
+                <div class="test-data">
+Users: ${testData.users.length}
+Listings: ${testData.listings.length}
+Bids: ${testData.bids.length}
+Transactions: ${testData.transactions.length}
+Shipping: ${testData.shipping.length}
+Auth Requests: ${testData.authRequests.length}
+                </div>
+                <div class="test-data">${JSON.stringify(testData, null, 2)}</div>
+            `;
+        }
+
+        function cleanupTestData() {
+            localStorage.removeItem(TEST_STORAGE_KEY);
+            localStorage.removeItem('watch_ios_listings');
+            localStorage.removeItem('watch_ios_users');
+            localStorage.removeItem('watch_ios_bids');
+            
+            document.getElementById('cleanup-status').innerHTML = 
+                '<div class="status success">✅ All test data cleared successfully</div>';
+        }
+
+        // Initialize test environment when page loads
+        window.addEventListener('load', function() {
+            initializeTestEnvironment();
+            console.log('🧪 Watch iOS Test Suite loaded successfully');
+        });
+    </script>
+</body>
+</html>
