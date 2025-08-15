@@ -197,19 +197,25 @@
             Ends: {{ getListingEndTime(listing.endTime) }}
           </span>
         </div>
-        <div class="listing-actions">
+        <div class="watch-actions">
           <button class="share-btn" (click)="shareListing(listing)" title="Share this listing">
             Share
           </button>
-          <button class="bid-btn" (click)="openBidForm(listing)" title="Place a bid">
-            Place Bid
+          <button 
+            class="bid-btn" 
+            [class.disabled]="listing.status === 'sold' || listing.status === 'expired'"
+            (click)="openBidForm(listing)" 
+            title="Place a bid"
+            [disabled]="listing.status === 'sold' || listing.status === 'expired'">
+            {{ listing.status === 'sold' ? 'Sold' : listing.status === 'expired' ? 'Expired' : 'Place Bid' }}
           </button>
           <button 
             class="buy-now-btn" 
-            *ngIf="listing.buyNowPrice" 
+            [class.disabled]="listing.status === 'sold' || listing.status === 'expired'"
             (click)="openBuyNowForm(listing)" 
-            title="Purchase immediately">
-            Purchase
+            title="Purchase immediately"
+            [disabled]="listing.status === 'sold' || listing.status === 'expired'">
+            {{ listing.buyNowPrice ? 'Purchase' : 'Buy Now' }}
           </button>
         </div>
       </div>
