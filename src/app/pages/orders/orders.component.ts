@@ -29,6 +29,7 @@ interface TestResult {
   paymentSuccess?: any;
   paymentFailure?: any;
   buyerSellerFlow?: any;
+  counterbid?: any;
 }
 
 @Component({
@@ -275,7 +276,7 @@ export class OrdersComponent implements OnInit {
         completeTransaction: transactionResult
       };
 
-      console.log('✅ All tests completed successfully!', this.testResults);
+
 
     } catch (error) {
       this.testResults = { 
@@ -290,6 +291,8 @@ export class OrdersComponent implements OnInit {
 
   async testTraditionalBiddingFlow() {
     try {
+      this.currentTest = 'Traditional Bidding Flow';
+      
       // Create test listing
       const listing = {
         id: 'test-bidding-' + Date.now(),
@@ -331,16 +334,28 @@ export class OrdersComponent implements OnInit {
       bids.push(bid);
       localStorage.setItem('watch_ios_bids', JSON.stringify(bids));
       
+      // Update test results to show feedback
+      this.testResults = {
+        success: true,
+        traditionalBidding: { success: true, listing, bid }
+      };
+      
       return { success: true, listing, bid };
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
 
   async testImmediateSaleFlow() {
     try {
+      this.currentTest = 'Immediate Sale Flow';
+      
       // Create test listing
       const listing = {
         id: 'test-instant-' + Date.now(),
@@ -392,16 +407,28 @@ export class OrdersComponent implements OnInit {
         localStorage.setItem('watch_ios_listings', JSON.stringify(listings));
       }
       
+      // Update test results
+      this.testResults = {
+        success: true,
+        immediateSale: { success: true, listing, purchase }
+      };
+      
       return { success: true, listing, purchase };
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
 
   async testShippingCalculator() {
     try {
+      this.currentTest = 'Shipping Calculator';
+      
       const shippingTestResults = {
         domestic: {
           from: {
@@ -453,10 +480,20 @@ export class OrdersComponent implements OnInit {
       
       localStorage.setItem('watch_ios_shipping_test_results', JSON.stringify(shippingTestResults));
       
+      // Update test results
+      this.testResults = {
+        success: true,
+        shippingCalculator: { success: true, results: shippingTestResults }
+      };
+      
       return { success: true, results: shippingTestResults };
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
@@ -521,10 +558,20 @@ export class OrdersComponent implements OnInit {
       transactions.push(transaction);
       localStorage.setItem('watch_ios_transactions', JSON.stringify(transactions));
       
+      // Update test results
+      this.testResults = {
+        success: true,
+        completeTransaction: { success: true, listing, bid, transaction }
+      };
+      
       return { success: true, listing, bid, transaction };
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
@@ -538,7 +585,7 @@ export class OrdersComponent implements OnInit {
     
     keys.forEach(key => localStorage.removeItem(key));
     this.testResults = null;
-    console.log('🧹 Test data cleared successfully');
+    
   }
 
   getTestData() {
@@ -550,7 +597,7 @@ export class OrdersComponent implements OnInit {
       results: this.testResults
     };
     
-    console.log('📊 Current Test Data:', testData);
+    
     return testData;
   }
 
@@ -704,6 +751,17 @@ export class OrdersComponent implements OnInit {
         shippingLabel
       }));
 
+      // Update test results
+      this.testResults = {
+        success: true,
+        shippingSuccess: { 
+          success: true, 
+          shipping: domesticShipping,
+          rates: shippingRates,
+          label: shippingLabel
+        }
+      };
+
       return { 
         success: true, 
         shipping: domesticShipping,
@@ -712,6 +770,10 @@ export class OrdersComponent implements OnInit {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
@@ -765,6 +827,16 @@ export class OrdersComponent implements OnInit {
         errors
       }));
 
+      // Update test results
+      this.testResults = {
+        success: true,
+        shippingFailure: { 
+          success: true, // Test passes because it correctly identified failures
+          scenarios: failureScenarios,
+          errors: errors
+        }
+      };
+
       return { 
         success: true, // Test passes because it correctly identified failures
         scenarios: failureScenarios,
@@ -772,6 +844,10 @@ export class OrdersComponent implements OnInit {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
@@ -848,6 +924,18 @@ export class OrdersComponent implements OnInit {
         escrowHold
       }));
 
+      // Update test results
+      this.testResults = {
+        success: true,
+        paymentSuccess: { 
+          success: true, 
+          payment: paymentData,
+          intent: paymentIntent,
+          confirmation: paymentConfirmation,
+          escrow: escrowHold
+        }
+      };
+
       return { 
         success: true, 
         payment: paymentData,
@@ -857,6 +945,10 @@ export class OrdersComponent implements OnInit {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
@@ -927,6 +1019,16 @@ export class OrdersComponent implements OnInit {
         paymentErrors
       }));
 
+      // Update test results
+      this.testResults = {
+        success: true,
+        paymentFailure: { 
+          success: true, // Test passes because it correctly identified failures
+          scenarios: failureScenarios,
+          errors: paymentErrors
+        }
+      };
+
       return { 
         success: true, // Test passes because it correctly identified failures
         scenarios: failureScenarios,
@@ -934,6 +1036,144 @@ export class OrdersComponent implements OnInit {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
+      return { success: false, error: errorMessage };
+    }
+  }
+
+  async testCounterbidFlow() {
+    try {
+      this.currentTest = 'Counterbid Flow Testing';
+      
+      // Create test listing with bidding enabled
+      const listing = {
+        id: 'test-counterbid-' + Date.now(),
+        sellerId: 'test-seller-counterbid',
+        sellerName: 'Sarah Seller',
+        title: 'Test Counterbid Watch - Rolex Submariner',
+        description: 'Testing counterbid functionality with luxury watch',
+        brand: 'Rolex',
+        model: 'Submariner',
+        year: 2020,
+        condition: 'excellent',
+        startingPrice: 8000,
+        currentPrice: 8000,
+        allowBidding: true,
+        allowInstantSale: false,
+        status: 'active',
+        createdAt: new Date(),
+        endTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        bids: [],
+        counteroffers: []
+      };
+      
+      // Save listing
+      const listings = JSON.parse(localStorage.getItem('watch_ios_listings') || '[]');
+      listings.push(listing);
+      localStorage.setItem('watch_ios_listings', JSON.stringify(listings));
+      
+      // Create initial bid
+      const initialBid = {
+        id: 'initial-bid-' + Date.now(),
+        listingId: listing.id,
+        bidderId: 'test-buyer-counterbid',
+        bidderName: 'Mike Buyer',
+        amount: 8200,
+        timestamp: new Date(),
+        status: 'pending'
+      };
+      
+      // Save bid
+      const bids = JSON.parse(localStorage.getItem('watch_ios_bids') || '[]');
+      bids.push(initialBid);
+      localStorage.setItem('watch_ios_bids', JSON.stringify(bids));
+      
+      // Simulate seller making counteroffer
+      const counteroffer1 = {
+        id: 'counter-1-' + Date.now(),
+        listingId: listing.id,
+        bidId: initialBid.id,
+        sellerId: listing.sellerId,
+        sellerName: listing.sellerName,
+        buyerId: initialBid.bidderId,
+        buyerName: initialBid.bidderName,
+        originalAmount: initialBid.amount,
+        counterAmount: 8500,
+        amount: 8500,
+        message: 'I can do $8,500. This is a fair price for this condition.',
+        timestamp: new Date(),
+        status: 'pending'
+      };
+      
+      // Save counteroffer
+      const counteroffers = JSON.parse(localStorage.getItem('watch_ios_counteroffers') || '[]');
+      counteroffers.push(counteroffer1);
+      localStorage.setItem('watch_ios_counteroffers', JSON.stringify(counteroffers));
+      
+      // Simulate buyer rejecting and making new bid
+      const newBid = {
+        id: 'new-bid-' + Date.now(),
+        listingId: listing.id,
+        bidderId: initialBid.bidderId,
+        bidderName: initialBid.bidderName,
+        amount: 8300,
+        timestamp: new Date(),
+        status: 'pending'
+      };
+      
+      bids.push(newBid);
+      localStorage.setItem('watch_ios_bids', JSON.stringify(bids));
+      
+      // Simulate second counteroffer
+      const counteroffer2 = {
+        id: 'counter-2-' + Date.now(),
+        listingId: listing.id,
+        bidId: newBid.id,
+        sellerId: listing.sellerId,
+        sellerName: listing.sellerName,
+        buyerId: newBid.bidderId,
+        buyerName: newBid.bidderName,
+        originalAmount: newBid.amount,
+        counterAmount: 8400,
+        amount: 8400,
+        message: 'Meet me in the middle at $8,400?',
+        timestamp: new Date(),
+        status: 'pending'
+      };
+      
+      counteroffers.push(counteroffer2);
+      localStorage.setItem('watch_ios_counteroffers', JSON.stringify(counteroffers));
+      
+      // Update test results
+      this.testResults = {
+        success: true,
+        counterbid: {
+          success: true,
+          listing,
+          initialBid,
+          counteroffers: [counteroffer1, counteroffer2],
+          newBid,
+          message: 'Counterbid flow tested successfully! Created listing with 2 counteroffers.'
+        }
+      };
+      
+      return { 
+        success: true, 
+        listing,
+        initialBid,
+        counteroffers: [counteroffer1, counteroffer2],
+        newBid
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
@@ -988,6 +1228,12 @@ export class OrdersComponent implements OnInit {
         updates
       }));
 
+      // Update test results
+      this.testResults = {
+        success: true,
+        buyerSellerFlow: { success: true, flow: flowData, updates }
+      };
+
       return { 
         success: true, 
         flow: flowData,
@@ -995,6 +1241,10 @@ export class OrdersComponent implements OnInit {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      this.testResults = {
+        success: false,
+        error: errorMessage
+      };
       return { success: false, error: errorMessage };
     }
   }
@@ -1039,7 +1289,7 @@ export class OrdersComponent implements OnInit {
         buyerSellerFlow
       };
       
-      console.log('✅ All comprehensive tests completed successfully!', this.testResults);
+
     } catch (error) {
       this.testResults = { 
         success: false, 

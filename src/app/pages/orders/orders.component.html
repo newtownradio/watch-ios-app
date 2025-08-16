@@ -60,6 +60,10 @@
       <button class="test-btn" (click)="testBuyerSellerFlow()" [disabled]="isRunningTests">
         🤝 Test Buyer-Seller Flow
       </button>
+      
+      <button class="test-btn" (click)="testCounterbidFlow()" [disabled]="isRunningTests">
+        🔄 Test Counterbid Flow
+      </button>
     </div>
 
     <!-- Test Progress -->
@@ -148,6 +152,22 @@
           <span class="status" [class]="testResults.buyerSellerFlow.success ? 'success' : 'error'">
             {{ testResults.buyerSellerFlow.success ? '✅ Passed' : '❌ Failed' }}
           </span>
+        </div>
+        
+        <div class="breakdown-item" *ngIf="testResults.counterbid">
+          <span class="label">🔄 Counterbid Flow:</span>
+          <span class="status" [class]="testResults.counterbid.success ? 'success' : 'error'">
+            {{ testResults.counterbid.success ? '✅ Passed' : '❌ Failed' }}
+          </span>
+          <div class="counterbid-details" *ngIf="testResults.counterbid.success">
+            <p class="counterbid-message">{{ testResults.counterbid.message }}</p>
+            <div class="counterbid-summary">
+              <p><strong>Listing:</strong> {{ testResults.counterbid.listing.title }}</p>
+              <p><strong>Initial Bid:</strong> ${{ testResults.counterbid.initialBid.amount.toLocaleString() }}</p>
+              <p><strong>Counteroffers:</strong> {{ testResults.counterbid.counteroffers.length }}</p>
+              <p><strong>Final Bid:</strong> ${{ testResults.counterbid.newBid.amount.toLocaleString() }}</p>
+            </div>
+          </div>
         </div>
       </div>
 

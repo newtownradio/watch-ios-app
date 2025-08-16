@@ -44,17 +44,10 @@ export class DiscoveryComponent implements OnInit {
 
   ngOnInit() {
     // Check if user is authenticated
-    console.log('Discovery: Checking authentication...');
-    console.log('Is authenticated:', this.dataService.isAuthenticated());
-    console.log('Current user:', this.dataService.getCurrentUser());
-    
     if (!this.dataService.isAuthenticated()) {
-      console.log('Discovery: User not authenticated, redirecting to auth');
       this.router.navigate(['/auth']);
       return;
     }
-    
-    console.log('Discovery: User authenticated, loading data');
     
     // Clear any existing demo data to force fresh load
     this.clearDemoData();
@@ -199,42 +192,23 @@ export class DiscoveryComponent implements OnInit {
 
   // Bid functionality
   openBidForm(listing: Listing) {
-    console.log('Opening bid form for listing:', listing);
     this.selectedListing = listing;
     this.showBidForm = true;
-    console.log('showBidForm set to:', this.showBidForm);
-    
-    // Force a DOM update and check visibility
-    setTimeout(() => {
-      const bidFormSection = document.querySelector('.bid-form-section');
-      console.log('Bid form section element:', bidFormSection);
-      if (bidFormSection) {
-        console.log('Bid form display style:', window.getComputedStyle(bidFormSection).display);
-        console.log('Bid form visibility:', window.getComputedStyle(bidFormSection).visibility);
-        console.log('Bid form opacity:', window.getComputedStyle(bidFormSection).opacity);
-      } else {
-        console.log('Bid form section not found in DOM');
-      }
-    }, 100);
   }
 
   openBuyNowForm(listing: Listing) {
-    console.log('Opening buy now form for listing:', listing);
     this.selectedListing = listing;
     this.showBuyNowForm = true;
     this.showBidForm = false; // Close bid form if open
   }
 
   closeBuyNowForm() {
-    console.log('Closing buy now form');
     this.showBuyNowForm = false;
     this.selectedListing = null;
   }
 
   async handleBuyNow(listing: Listing) {
     try {
-      console.log('Processing buy now for listing:', listing);
-      
       // Create an immediate order
       const currentUser = this.dataService.getCurrentUser();
       if (!currentUser) {
@@ -276,8 +250,7 @@ export class DiscoveryComponent implements OnInit {
         this.router.navigate(['/orders']);
       }, 2000);
       
-    } catch (error) {
-      console.error('Error processing buy now:', error);
+    } catch {
       alert('Failed to process purchase. Please try again.');
     }
   }
@@ -287,14 +260,11 @@ export class DiscoveryComponent implements OnInit {
   }
 
   closeBidForm() {
-    console.log('Closing bid form');
     this.showBidForm = false;
     this.selectedListing = null;
-    console.log('showBidForm set to:', this.showBidForm);
   }
 
   onBidPlaced(response: BidResponse) {
-    console.log('Bid placed successfully:', response);
     this.closeBidForm();
     
     // Show success message and redirect to orders page
@@ -365,8 +335,7 @@ export class DiscoveryComponent implements OnInit {
         url: window.location.href,
         dialogTitle: 'Share Watch Listing'
       });
-    } catch (error) {
-      console.error('Error sharing:', error);
+    } catch {
       // Fallback to Web Share API
       if (navigator.share) {
         try {
@@ -375,8 +344,7 @@ export class DiscoveryComponent implements OnInit {
             text: shareText,
             url: window.location.href
           });
-        } catch (webShareError) {
-          console.error('Web Share API error:', webShareError);
+        } catch {
           this.fallbackShare(shareText);
         }
       } else {
@@ -405,16 +373,11 @@ export class DiscoveryComponent implements OnInit {
     // Get active listings from data service
     this.listings = this.dataService.getActiveListings();
     
-    console.log('Discovery: Loaded listings:', this.listings);
-    console.log('Discovery: Listings with Instant Purchase:', this.listings.filter(l => l.buyNowPrice));
-    
     // If no listings exist, create some demo data
     if (this.listings.length === 0) {
-      console.log('Discovery: No listings found, creating demo data...');
       this.createDemoListings();
       // After creating demo listings, reload them
       this.listings = this.dataService.getActiveListings();
-      console.log('Discovery: After demo creation, listings:', this.listings);
     }
   }
 
@@ -435,7 +398,7 @@ export class DiscoveryComponent implements OnInit {
       this.dataService.deleteListing(listing.id);
     });
     
-    console.log('Discovery: Cleared', demoListings.length, 'demo listings');
+
   }
 
   private createDemoListings() {

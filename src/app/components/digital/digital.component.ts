@@ -261,37 +261,30 @@ export class DigitalComponent implements OnInit {
   
   viewWatchDetails(watch: DigitalWatch | AppleWatch) {
     // Navigate to watch details page
-    console.log('Viewing details for:', watch);
   }
   
   contactSeller(watch: DigitalWatch | AppleWatch) {
     // Navigate to contact seller page
-    console.log('Contacting seller for:', watch);
   }
   
   makeOffer(watch: DigitalWatch | AppleWatch) {
     // Navigate to make offer page
-    console.log('Making offer for:', watch);
   }
   
   placeBid(watch: DigitalWatch | AppleWatch) {
     // Navigate to place bid page
-    console.log('Placing bid for:', watch);
   }
   
   purchaseWatch(watch: DigitalWatch | AppleWatch) {
     // Navigate to purchase page
-    console.log('Purchasing:', watch);
   }
   
   shareWatch(watch: DigitalWatch | AppleWatch) {
     // Share watch listing
-    console.log('Sharing:', watch);
   }
   
   messageSeller(watch: DigitalWatch | AppleWatch) {
     // Navigate to message seller page
-    console.log('Messaging seller for:', watch);
   }
   
   navigateToSell() {
