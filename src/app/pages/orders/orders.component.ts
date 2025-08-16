@@ -5,37 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { OrderService, Order } from '../../services/order.service';
 import { DataPersistenceService } from '../../services/data-persistence.service';
 import { AuthorizationService } from '../../services/authorization.service';
-import { StripeService, StripePaymentResult } from '../../services/stripe.service';
-import { ShippingCalculatorComponent } from '../../components/shipping-calculator/shipping-calculator.component';
-import { PackageTrackingComponent } from '../../components/package-tracking/package-tracking.component';
-import { StripePaymentComponent } from '../../components/stripe-payment/stripe-payment.component';
-
-// Test result interface
-interface TestResult {
-  success: boolean;
-  error?: string;
-  listing?: any;
-  bid?: any;
-  purchase?: any;
-  results?: any;
-  transaction?: any;
-  traditionalBidding?: any;
-  immediateSale?: any;
-  shippingCalculator?: any;
-  completeTransaction?: any;
-  // Comprehensive test results
-  shippingSuccess?: any;
-  shippingFailure?: any;
-  paymentSuccess?: any;
-  paymentFailure?: any;
-  buyerSellerFlow?: any;
-  counterbid?: any;
-}
+import { StripeService } from '../../services/stripe.service';
+import { ReturnRequest, ReturnType } from '../../models/order.interface';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ShippingCalculatorComponent, PackageTrackingComponent, StripePaymentComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss'
 })
@@ -47,1257 +23,746 @@ export class OrdersComponent implements OnInit {
 
   orders: Order[] = [];
   userRole: 'buyer' | 'seller' = 'buyer';
+  
+  // Order management
   selectedOrder: Order | null = null;
-  showShippingCalculator = false;
-  showPackageTracking = false;
   showPaymentForm = false;
+  showShippingForm = false;
   showReturnForm = false;
   currentPaymentAmount = 0;
   returnReason = '';
-  selectedReturnType: 'item_mismatch' | 'buyer_remorse' | 'damaged_in_transit' | 'not_as_described' = 'buyer_remorse';
+  selectedReturnType: ReturnType = 'buyer_remorse';
 
-  // Testing functionality - EASILY REMOVABLE FOR PRODUCTION
-  showTestingPanel = false;
-  testResults: TestResult | null = null;
-  isRunningTests = false;
-  testProgress = 0;
-  currentTest = '';
+  // Notification system
+  currentNotification: { title: string; message: string; type: 'success' | 'error' | 'info' } | null = null;
+
+  // Payment form
+  paymentForm = {
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    cardholderName: '',
+    billingAddress: {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      country: 'USA'
+    }
+  };
+
+  // Shipping form
+  shippingForm = {
+    trackingNumber: '',
+    carrier: '',
+    estimatedDelivery: '',
+    notes: ''
+  };
 
   ngOnInit() {
+    // Create test user for authentication (remove in production)
+    this.createTestUser();
+    
     this.loadUserOrders();
-    // Check for expired return windows
     this.orderService.checkReturnWindowExpiry();
+    this.updateUserAccount();
+    this.cleanupExpiredListings();
+    
+    // Create mock orders for testing (remove in production)
+    this.createMockOrders();
+  }
+
+  // Test User for Authentication - REMOVE IN PRODUCTION
+  private createTestUser() {
+    const testUser = {
+      id: 'user-001',
+      name: 'John Buyer',
+      email: 'john@test.com',
+      role: 'buyer',
+      idVerified: true,
+      verificationDate: new Date(),
+      createdAt: new Date(),
+      phone: '+1-555-0123',
+      address: {
+        street: '123 Test Street',
+        city: 'Test City',
+        state: 'TS',
+        zipCode: '12345',
+        country: 'USA'
+      }
+    };
+    
+    // Save test user to localStorage
+    localStorage.setItem('watch_ios_users', JSON.stringify([testUser]));
+    localStorage.setItem('watch_ios_current_user', JSON.stringify(testUser));
+    
+    console.log('👤 Test user created and logged in:', testUser);
+  }
+
+  // Mock Orders for Testing - REMOVE IN PRODUCTION
+  private createMockOrders() {
+    console.log('🔄 Creating mock orders...');
+    
+    const mockOrders = [
+      {
+        id: 'mock-order-1',
+        listingId: 'listing-001',
+        buyerId: 'user-001',
+        buyerName: 'John Buyer',
+        sellerId: 'seller-001',
+        sellerName: 'Luxury Watch Co.',
+        watchTitle: 'Rolex Submariner Date',
+        watchBrand: 'Rolex',
+        watchModel: 'Submariner Date',
+        finalPrice: 12500,
+        authenticationRequestId: 'auth-001',
+        status: 'pending_payment' as const,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        updatedAt: new Date(),
+        trackingNumber: undefined,
+        shippingCarrier: undefined,
+        shippedAt: undefined,
+        deliveredAt: undefined,
+        estimatedDeliveryDate: undefined,
+        actualDeliveryDate: undefined,
+        returnWindowStart: undefined,
+        returnWindowEnd: undefined,
+        returnRequestedAt: undefined,
+        returnReason: undefined,
+        returnType: undefined,
+        buyerConfirmationAt: undefined,
+        returnWindowExpiredAt: undefined,
+        returnShippingCost: undefined,
+        returnShippingPaidBy: undefined
+      },
+      {
+        id: 'mock-order-2',
+        listingId: 'listing-002',
+        buyerId: 'user-001',
+        buyerName: 'John Buyer',
+        sellerId: 'seller-002',
+        sellerName: 'Vintage Timepieces',
+        watchTitle: 'Omega Speedmaster Professional',
+        watchBrand: 'Omega',
+        watchModel: 'Speedmaster Professional',
+        finalPrice: 8500,
+        authenticationRequestId: 'auth-002',
+        status: 'payment_confirmed' as const,
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        updatedAt: new Date(),
+        paymentConfirmedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+        trackingNumber: undefined,
+        shippingCarrier: undefined,
+        shippedAt: undefined,
+        deliveredAt: undefined,
+        estimatedDeliveryDate: undefined,
+        actualDeliveryDate: undefined,
+        returnWindowStart: undefined,
+        returnWindowEnd: undefined,
+        returnRequestedAt: undefined,
+        returnReason: undefined,
+        returnType: undefined,
+        buyerConfirmationAt: undefined,
+        returnWindowExpiredAt: undefined,
+        returnShippingCost: undefined,
+        returnShippingPaidBy: undefined
+      },
+      {
+        id: 'mock-order-3',
+        listingId: 'listing-003',
+        buyerId: 'user-001',
+        buyerName: 'John Buyer',
+        sellerId: 'seller-003',
+        sellerName: 'Swiss Watch Gallery',
+        watchTitle: 'Patek Philippe Calatrava',
+        watchBrand: 'Patek Philippe',
+        watchModel: 'Calatrava',
+        finalPrice: 18500,
+        authenticationRequestId: 'auth-003',
+        status: 'shipped' as const,
+        createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), // 8 days ago
+        updatedAt: new Date(),
+        paymentConfirmedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        trackingNumber: '1Z999AA1234567890',
+        shippingCarrier: 'FedEx',
+        shippedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
+        deliveredAt: undefined,
+        estimatedDeliveryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+        actualDeliveryDate: undefined,
+        returnWindowStart: undefined,
+        returnWindowEnd: undefined,
+        returnRequestedAt: undefined,
+        returnReason: undefined,
+        returnType: undefined,
+        buyerConfirmationAt: undefined,
+        returnWindowExpiredAt: undefined,
+        returnShippingCost: undefined,
+        returnShippingPaidBy: undefined
+      },
+      {
+        id: 'mock-order-4',
+        listingId: 'listing-004',
+        buyerId: 'user-001',
+        buyerName: 'John Buyer',
+        sellerId: 'seller-004',
+        sellerName: 'Modern Watch Boutique',
+        watchTitle: 'Apple Watch Series 9',
+        watchBrand: 'Apple',
+        watchModel: 'Watch Series 9',
+        finalPrice: 450,
+        authenticationRequestId: 'auth-004',
+        status: 'delivered' as const,
+        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
+        updatedAt: new Date(),
+        paymentConfirmedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
+        trackingNumber: '1Z999AA0987654321',
+        shippingCarrier: 'UPS',
+        shippedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // 12 days ago
+        deliveredAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        estimatedDeliveryDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        actualDeliveryDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        returnWindowStart: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        returnWindowEnd: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        returnRequestedAt: undefined,
+        returnReason: undefined,
+        returnType: undefined,
+        buyerConfirmationAt: undefined,
+        returnWindowExpiredAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        returnShippingCost: undefined,
+        returnShippingPaidBy: undefined
+      },
+      {
+        id: 'mock-order-5',
+        listingId: 'listing-005',
+        buyerId: 'user-001',
+        buyerName: 'John Buyer',
+        sellerId: 'seller-005',
+        sellerName: 'Luxury Watch Exchange',
+        watchTitle: 'Audemars Piguet Royal Oak',
+        watchBrand: 'Audemars Piguet',
+        watchModel: 'Royal Oak',
+        finalPrice: 22500,
+        authenticationRequestId: 'auth-005',
+        status: 'completed' as const,
+        createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000), // 25 days ago
+        updatedAt: new Date(),
+        paymentConfirmedAt: new Date(Date.now() - 24 * 24 * 60 * 60 * 1000), // 24 days ago
+        trackingNumber: '1Z999AA1122334455',
+        shippingCarrier: 'DHL',
+        shippedAt: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000), // 22 days ago
+        deliveredAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
+        estimatedDeliveryDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
+        actualDeliveryDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
+        returnWindowStart: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
+        returnWindowEnd: new Date(Date.now() - 17 * 24 * 60 * 60 * 1000), // 17 days ago
+        returnRequestedAt: undefined,
+        returnReason: undefined,
+        returnType: undefined,
+        buyerConfirmationAt: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000), // 18 days ago
+        returnWindowExpiredAt: new Date(Date.now() - 17 * 24 * 60 * 60 * 1000), // 17 days ago
+        returnShippingCost: undefined,
+        returnShippingPaidBy: undefined
+      }
+    ];
+
+    console.log('📦 Mock orders created:', mockOrders);
+    
+    // Save mock orders to localStorage
+    localStorage.setItem('watch_ios_orders', JSON.stringify(mockOrders));
+    console.log('💾 Mock orders saved to localStorage');
+    
+    // Reload orders to display them
+    this.loadUserOrders();
   }
 
   loadUserOrders() {
+    console.log('🔄 Loading user orders...');
     const currentUser = this.dataService.getCurrentUser();
+    console.log('👤 Current user:', currentUser);
+    
     if (currentUser) {
       const role = this.authService.getUserRole();
+      console.log('🎭 User role:', role);
       this.userRole = (role === 'buyer' || role === 'seller') ? role : 'buyer';
-      this.orders = this.orderService.getUserOrders(currentUser.id, this.userRole);
-      console.log('Loaded orders:', this.orders);
-      console.log('User role:', this.userRole);
+      console.log('🎯 Final user role:', this.userRole);
+      
+      // Get orders and ensure they have required properties
+      const rawOrders = this.orderService.getUserOrders(currentUser.id, this.userRole);
+      console.log('📦 Raw orders from service:', rawOrders);
+      
+      this.orders = rawOrders;
+      
+      console.log('✅ Final orders array:', this.orders);
+      console.log('📊 Orders count:', this.orders.length);
+    } else {
+      console.log('❌ No current user found');
     }
   }
 
   selectOrder(order: Order) {
     this.selectedOrder = order;
-    this.showShippingCalculator = false;
-    this.showPackageTracking = false;
+    this.showPaymentForm = false;
+    this.showShippingForm = false;
+    this.showReturnForm = false;
   }
 
-  toggleShippingCalculator() {
-    this.showShippingCalculator = !this.showShippingCalculator;
-    this.showPackageTracking = false;
-  }
-
-  togglePackageTracking() {
-    this.showPackageTracking = !this.showPackageTracking;
-    this.showShippingCalculator = false;
-  }
-
-  togglePaymentForm() {
-    this.showPaymentForm = !this.showPaymentForm;
-    this.showShippingCalculator = false;
-    this.showPackageTracking = false;
-  }
-
+  // Payment Management
   async initiatePayment(order: Order) {
     if (order.status === 'pending_payment') {
       this.currentPaymentAmount = order.finalPrice * 100; // Convert to cents
       this.selectedOrder = order;
       this.showPaymentForm = true;
       
-      // Create payment intent for winning bid
-      const result = await this.stripeService.createWinningBidPaymentIntent(
-        order.id,
-        order.listingId,
-        order.buyerId,
-        order.sellerId,
-        order.finalPrice,
-        150 // Default verification cost
-      );
-
-      if (!result.success) {
-        console.error('Failed to create payment intent:', result.error);
+      try {
+        const result = await this.stripeService.createWinningBidPaymentIntent(
+          order.id,
+          order.listingId,
+          order.buyerId,
+          order.sellerId,
+          order.finalPrice,
+          150 // Default verification cost
+        );
+        
+        if (result.success && result.paymentIntentId) {
+          this.processPaymentSuccess(order, result.paymentIntentId);
+        } else {
+          this.showNotification('Payment Error', result.error || 'Failed to create payment intent', 'error');
+        }
+      } catch (_error) {
+        this.showNotification('Payment Error', 'Failed to process payment', 'error');
       }
     }
   }
 
-  onPaymentSuccess(result: StripePaymentResult) {
-    console.log('Payment successful:', result);
-    // Update order status to payment confirmed
-    if (this.selectedOrder) {
-      this.orderService.confirmPayment(this.selectedOrder.id);
-      this.loadUserOrders(); // Refresh orders
-    }
-    this.showPaymentForm = false;
-  }
-
-  onPaymentError(result: StripePaymentResult) {
-    console.error('Payment failed:', result);
-    // Handle payment error
-    this.showPaymentForm = false;
-  }
-
-  toggleReturnForm() {
-    this.showReturnForm = !this.showReturnForm;
-    this.showShippingCalculator = false;
-    this.showPackageTracking = false;
-    this.showPaymentForm = false;
-  }
-
-  async confirmItemReceived() {
-    if (this.selectedOrder) {
-      const result = await this.orderService.confirmItemReceived(this.selectedOrder.id);
-      if (result.success) {
-        // Release escrow funds to seller
-        await this.stripeService.releaseEscrowFunds(this.selectedOrder.id, 'buyer_confirmation');
-        this.loadUserOrders(); // Refresh orders
-        this.showReturnForm = false;
-      }
-    }
-  }
-
-  async requestReturn() {
-    if (this.selectedOrder && this.returnReason.trim()) {
-      const result = await this.orderService.requestReturn(
-        this.selectedOrder.id, 
-        this.returnReason.trim(),
-        this.selectedReturnType
-      );
-      if (result.success) {
-        this.loadUserOrders(); // Refresh orders
-        this.showReturnForm = false;
-        this.returnReason = '';
-        this.selectedReturnType = 'buyer_remorse';
-      }
-    }
-  }
-
-  getReturnWindowStatus(order: Order): { status: string; timeRemaining?: string; canConfirm: boolean; canReturn: boolean } {
-    if (order.status === 'delivered') {
-      return { status: 'Ready to start inspection period', canConfirm: false, canReturn: false };
-    }
-    
-    if (order.status === 'inspection_period') {
-      const remaining = this.orderService.getReturnWindowRemainingTime(order.id);
-      if (remaining.expired) {
-        return { status: 'Inspection period expired', canConfirm: false, canReturn: false };
-      }
+  async processPaymentSuccess(order: Order, paymentIntentId: string) {
+    try {
+      // Update order status
+      order.status = 'payment_confirmed';
+      order.paymentConfirmedAt = new Date();
       
-      const timeRemaining = `${remaining.hours}h ${remaining.minutes}m remaining`;
-      return { 
-        status: 'Inspection period active', 
-        timeRemaining, 
-        canConfirm: true, 
-        canReturn: true 
-      };
+      // Update in storage - use localStorage for now since updateOrder doesn't exist
+      this.updateOrderInStorage(order);
+      
+      // Send notification to seller
+      this.sendNotificationToUser(order.sellerId, 'Payment Received', 
+        `Payment received for ${order.watchTitle}. Please ship within 3 business days.`);
+      
+      // Update user account
+      this.updateUserAccount();
+      
+      // Clean up expired listings
+      this.cleanupExpiredListings();
+      
+      this.showNotification('Payment Successful', 'Payment processed successfully. Seller will ship soon.', 'success');
+      this.showPaymentForm = false;
+      
+    } catch (_error) {
+      this.showNotification('Error', 'Failed to update order status', 'error');
     }
-    
-    if (order.status === 'return_requested') {
-      return { status: 'Return requested', canConfirm: false, canReturn: false };
-    }
-    
-    if (order.status === 'returned') {
-      return { status: 'Item returned', canConfirm: false, canReturn: false };
-    }
-    
-    if (order.status === 'completed') {
-      return { status: 'Order completed', canConfirm: false, canReturn: false };
-    }
-    
-    return { status: 'Not ready for inspection', canConfirm: false, canReturn: false };
   }
 
-  canStartReturnWindow(order: Order): boolean {
-    return this.userRole === 'seller' && 
-           order.status === 'delivered' && 
-           !order.returnWindowStart;
+  // Shipping Management
+  updateShippingInfo(order: Order) {
+    if (this.shippingForm.trackingNumber && this.shippingForm.carrier) {
+      order.status = 'shipped';
+      order.trackingNumber = this.shippingForm.trackingNumber;
+      order.shippingCarrier = this.shippingForm.carrier;
+      order.estimatedDeliveryDate = new Date(this.shippingForm.estimatedDelivery);
+      order.shippedAt = new Date();
+      
+      // Update order
+      this.updateOrderInStorage(order);
+      
+      // Send notification to buyer
+      this.sendNotificationToUser(order.buyerId, 'Item Shipped', 
+        `Your ${order.watchTitle} has been shipped. Tracking: ${order.trackingNumber}`);
+      
+      // Send message to buyer
+      this.sendMessageToUser(order.buyerId, order.sellerId, 
+        'Shipping Update', `Your item has been shipped via ${order.shippingCarrier}. Tracking number: ${order.trackingNumber}`);
+      
+      this.showNotification('Shipping Updated', 'Shipping information updated successfully', 'success');
+      this.showShippingForm = false;
+      this.resetShippingForm();
+    }
+  }
+
+  // Return Management
+  initiateReturn(order: Order) {
+    if (this.canStartReturn(order)) {
+      this.selectedOrder = order;
+      this.showReturnForm = true;
+    }
+  }
+
+  submitReturnRequest() {
+    if (this.selectedOrder && this.returnReason) {
+      // Update order with return information
+      this.selectedOrder.status = 'return_requested';
+      this.selectedOrder.returnRequestedAt = new Date();
+      this.selectedOrder.returnReason = this.returnReason;
+      this.selectedOrder.returnType = this.selectedReturnType;
+      
+      // Update order
+      this.updateOrderInStorage(this.selectedOrder);
+      
+      // Send notification to seller
+      this.sendNotificationToUser(this.selectedOrder.sellerId, 'Return Requested', 
+        `Return requested for ${this.selectedOrder.watchTitle}. Reason: ${this.returnReason}`);
+      
+      // Send message to seller
+      this.sendMessageToUser(this.selectedOrder.sellerId, this.selectedOrder.buyerId,
+        'Return Request', `Return requested for ${this.selectedOrder.watchTitle}. Please review and respond.`);
+      
+      this.showNotification('Return Requested', 'Return request submitted successfully', 'success');
+      this.showReturnForm = false;
+      this.resetReturnForm();
+    }
+  }
+
+  // Notifications and Messages
+  private sendNotificationToUser(userId: string, title: string, message: string) {
+    const notification = {
+      id: Date.now().toString(),
+      userId: userId,
+      title: title,
+      message: message,
+      timestamp: new Date(),
+      read: false,
+      type: 'order_update'
+    };
+    
+    // Save notification
+    const notifications = JSON.parse(localStorage.getItem('watch_ios_notifications') || '[]');
+    notifications.push(notification);
+    localStorage.setItem('watch_ios_notifications', JSON.stringify(notifications));
+  }
+
+  private sendMessageToUser(toUserId: string, fromUserId: string, subject: string, content: string) {
+    const message = {
+      id: Date.now().toString(),
+      fromUserId: fromUserId,
+      toUserId: toUserId,
+      subject: subject,
+      content: content,
+      timestamp: new Date(),
+      read: false,
+      orderId: this.selectedOrder?.id
+    };
+    
+    // Save message
+    const messages = JSON.parse(localStorage.getItem('watch_ios_messages') || '[]');
+    messages.push(message);
+    localStorage.setItem('watch_ios_messages', JSON.stringify(messages));
+  }
+
+  private showNotification(title: string, message: string, type: 'success' | 'error' | 'info') {
+    // Create in-app notification
+    this.currentNotification = {
+      title: title,
+      message: message,
+      type: type
+    };
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      this.currentNotification = null;
+    }, 5000);
+  }
+
+  // User Account Updates
+  private updateUserAccount() {
+    const currentUser = this.dataService.getCurrentUser();
+    if (currentUser) {
+      // Update order count
+      const orderCount = this.orders.length;
+      
+      // Update user stats
+      const userStats = {
+        totalOrders: orderCount,
+        activeOrders: this.orders.filter(o => o.status === 'payment_confirmed' || o.status === 'shipped').length,
+        completedOrders: this.orders.filter(o => o.status === 'completed').length,
+        totalSpent: this.orders
+          .filter(o => o.status === 'completed' && this.userRole === 'buyer')
+          .reduce((sum, o) => sum + o.finalPrice, 0),
+        totalEarned: this.orders
+          .filter(o => o.status === 'completed' && this.userRole === 'seller')
+          .reduce((sum, o) => sum + o.finalPrice, 0)
+      };
+      
+      // Save updated user stats
+      localStorage.setItem(`watch_ios_user_stats_${currentUser.id}`, JSON.stringify(userStats));
+    }
+  }
+
+  // Cleanup Expired Listings
+  private cleanupExpiredListings() {
+    // Get all listings
+    const listings = JSON.parse(localStorage.getItem('watch_ios_listings') || '[]');
+    const currentTime = new Date();
+    
+    // Mark expired listings
+    listings.forEach((listing: any) => {
+      if (listing.endTime && new Date(listing.endTime) < currentTime && listing.status === 'active') {
+        listing.status = 'expired';
+      }
+    });
+    
+    // Remove sold/expired items from discovery and digital
+    const updatedListings = listings.filter((listing: any) => 
+      listing.status === 'active' || listing.status === 'scheduled'
+    );
+    
+    // Save updated listings
+    localStorage.setItem('watch_ios_listings', JSON.stringify(updatedListings));
+    
+    // Update discovery and digital page data
+    this.updateDiscoveryAndDigitalPages(updatedListings);
+  }
+
+  private updateDiscoveryAndDigitalPages(activeListings: any[]) {
+    // Update discovery page data
+    const discoveryData = activeListings.filter((listing: any) => 
+      listing.category === 'luxury' || listing.category === 'vintage'
+    );
+    localStorage.setItem('watch_ios_discovery_listings', JSON.stringify(discoveryData));
+    
+    // Update digital page data
+    const digitalData = activeListings.filter((listing: any) => 
+      listing.category === 'digital' || listing.brand === 'Apple'
+    );
+    localStorage.setItem('watch_ios_digital_listings', JSON.stringify(digitalData));
+  }
+
+  // Storage helper method
+  private updateOrderInStorage(order: Order) {
+    const orders = JSON.parse(localStorage.getItem('watch_ios_orders') || '[]');
+    const index = orders.findIndex((o: any) => o.id === order.id);
+    if (index !== -1) {
+      orders[index] = order;
+    } else {
+      orders.push(order);
+    }
+    localStorage.setItem('watch_ios_orders', JSON.stringify(orders));
+  }
+
+  // Utility Methods
+  getOrderStageNumber(order: Order): number {
+    switch (order.status) {
+      case 'pending_payment':
+        return 2; // Payment stage
+      case 'payment_confirmed':
+        return 3; // Shipped stage
+      case 'shipped':
+        return 3; // Shipped stage
+      case 'authentication_in_progress':
+        return 4; // Verification stage
+      case 'authenticated':
+        return 4; // Verification stage
+      case 'delivered':
+        return 5; // Delivered stage
+      case 'inspection_period':
+        return 5; // Still in delivered stage
+      case 'completed':
+        return 6; // Complete stage
+      case 'return_requested':
+        return 5; // Still in delivered stage
+      case 'returned':
+        return 5; // Still in delivered stage
+      default:
+        return 1; // Order Created stage
+    }
+  }
+
+  canShowPaymentForm(order: Order): boolean {
+    return order.status === 'pending_payment' && this.userRole === 'buyer';
+  }
+
+  canShowShippingForm(order: Order): boolean {
+    return order.status === 'payment_confirmed' && this.userRole === 'seller';
+  }
+
+  canStartReturn(order: Order): boolean {
+    // Check if order is in a state where returns can be requested
+    if (order.status !== 'delivered' && order.status !== 'inspection_period') {
+      return false;
+    }
+    
+    // Check if user is a buyer
+    if (this.userRole !== 'buyer') {
+      return false;
+    }
+    
+    // Check if return is already requested
+    if (order.returnRequestedAt) {
+      return false;
+    }
+    
+    // Check if return window has expired
+    if (order.returnWindowExpiredAt && new Date() > order.returnWindowExpiredAt) {
+      return false;
+    }
+    
+    // Check if return window is still active (within 72 hours of delivery)
+    if (order.deliveredAt) {
+      const deliveryTime = new Date(order.deliveredAt).getTime();
+      const currentTime = new Date().getTime();
+      const returnWindowMs = 72 * 60 * 60 * 1000; // 72 hours
+      
+      if (currentTime - deliveryTime > returnWindowMs) {
+        return false; // Return window expired
+      }
+    }
+    
+    return true;
   }
 
   canShowReturnActions(order: Order): boolean {
-    return this.userRole === 'buyer' && 
-           order.status === 'inspection_period';
+    return order.returnRequestedAt ? true : false;
   }
 
-  startReturnWindow(order: Order): void {
-    console.log('Starting return window for order:', order);
-    const result = this.orderService.startReturnWindow(order.id);
-    console.log('Return window result:', result);
-    
-    if (result.success) {
-      this.loadUserOrders();
-    } else {
-      alert('❌ Failed to start return window: ' + result.message);
-    }
-  }
-
-  // TESTING FUNCTIONS - EASILY REMOVABLE FOR PRODUCTION
-  toggleTestingPanel() {
-    this.showTestingPanel = !this.showTestingPanel;
-    this.showShippingCalculator = false;
-    this.showPackageTracking = false;
-    this.showPaymentForm = false;
-    this.showReturnForm = false;
-  }
-
-  async runAllTests() {
-    this.isRunningTests = true;
-    this.testProgress = 0;
-    this.testResults = null;
-
-    try {
-      // Test 1: Traditional Bidding Flow
-      this.currentTest = 'Traditional Bidding Flow';
-      this.testProgress = 25;
-      const biddingResult = await this.testTraditionalBiddingFlow();
-
-      // Test 2: Immediate Sale Flow
-      this.currentTest = 'Immediate Sale Flow';
-      this.testProgress = 50;
-      const immediateSaleResult = await this.testImmediateSaleFlow();
-
-      // Test 3: Shipping Calculator
-      this.currentTest = 'Shipping Calculator';
-      this.testProgress = 75;
-      const shippingResult = await this.testShippingCalculator();
-
-      // Test 4: Complete Transaction Flow
-      this.currentTest = 'Complete Transaction Flow';
-      this.testProgress = 100;
-      const transactionResult = await this.testCompleteTransactionFlow();
-
-      this.testResults = {
-        success: true,
-        traditionalBidding: biddingResult,
-        immediateSale: immediateSaleResult,
-        shippingCalculator: shippingResult,
-        completeTransaction: transactionResult
-      };
-
-
-
-    } catch (error) {
-      this.testResults = { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
-      };
-    } finally {
-      this.isRunningTests = false;
-      this.currentTest = '';
-    }
-  }
-
-  async testTraditionalBiddingFlow() {
-    try {
-      this.currentTest = 'Traditional Bidding Flow';
-      
-      // Create test listing
-      const listing = {
-        id: 'test-bidding-' + Date.now(),
-        sellerId: 'test-seller-001',
-        sellerName: 'John Seller',
-        title: 'Test Bidding Watch',
-        description: 'This is a test listing for bidding flow testing',
-        brand: 'Omega',
-        model: 'Speedmaster',
-        year: 2021,
-        condition: 'very-good',
-        startingPrice: 5000,
-        currentPrice: 5000,
-        allowBidding: true,
-        allowInstantSale: false,
-        status: 'active',
-        createdAt: new Date(),
-        endTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        bids: []
-      };
-      
-      // Save to localStorage
-      const listings = JSON.parse(localStorage.getItem('watch_ios_listings') || '[]');
-      listings.push(listing);
-      localStorage.setItem('watch_ios_listings', JSON.stringify(listings));
-      
-      // Simulate bid
-      const bid = {
-        id: 'test-bid-' + Date.now(),
-        listingId: listing.id,
-        bidderId: 'test-buyer-001',
-        bidderName: 'Alice Buyer',
-        amount: listing.currentPrice + 100,
-        timestamp: new Date(),
-        status: 'pending'
-      };
-      
-      const bids = JSON.parse(localStorage.getItem('watch_ios_bids') || '[]');
-      bids.push(bid);
-      localStorage.setItem('watch_ios_bids', JSON.stringify(bids));
-      
-      // Update test results to show feedback
-      this.testResults = {
-        success: true,
-        traditionalBidding: { success: true, listing, bid }
-      };
-      
-      return { success: true, listing, bid };
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testImmediateSaleFlow() {
-    try {
-      this.currentTest = 'Immediate Sale Flow';
-      
-      // Create test listing
-      const listing = {
-        id: 'test-instant-' + Date.now(),
-        sellerId: 'test-seller-001',
-        sellerName: 'John Seller',
-        title: 'Test Apple Watch Series 8',
-        description: 'Like new Apple Watch for testing',
-        brand: 'Apple',
-        model: 'Watch Series 8',
-        year: 2023,
-        condition: 'excellent',
-        startingPrice: 350,
-        currentPrice: 350,
-        instantSalePrice: 400,
-        allowBidding: false,
-        allowInstantSale: true,
-        status: 'active',
-        createdAt: new Date(),
-        endTime: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        bids: []
-      };
-      
-      // Save to localStorage
-      const listings = JSON.parse(localStorage.getItem('watch_ios_listings') || '[]');
-      listings.push(listing);
-      localStorage.setItem('watch_ios_listings', JSON.stringify(listings));
-      
-      // Simulate purchase
-      const purchase = {
-        id: 'test-purchase-' + Date.now(),
-        listingId: listing.id,
-        buyerId: 'test-buyer-002',
-        buyerName: 'Bob Customer',
-        amount: listing.instantSalePrice,
-        timestamp: new Date(),
-        status: 'completed'
-      };
-      
-      const transactions = JSON.parse(localStorage.getItem('watch_ios_transactions') || '[]');
-      transactions.push(purchase);
-      localStorage.setItem('watch_ios_transactions', JSON.stringify(transactions));
-      
-      // Update listing status
-      const listingIndex = listings.findIndex((l: any) => l.id === listing.id);
-      if (listingIndex !== -1) {
-        listings[listingIndex].status = 'sold';
-        listings[listingIndex].buyerId = purchase.buyerId;
-        listings[listingIndex].soldAt = new Date();
-        localStorage.setItem('watch_ios_listings', JSON.stringify(listings));
-      }
-      
-      // Update test results
-      this.testResults = {
-        success: true,
-        immediateSale: { success: true, listing, purchase }
-      };
-      
-      return { success: true, listing, purchase };
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testShippingCalculator() {
-    try {
-      this.currentTest = 'Shipping Calculator';
-      
-      const shippingTestResults = {
-        domestic: {
-          from: {
-            name: 'John Seller',
-            street: '123 Main Street',
-            city: 'New York',
-            state: 'NY',
-            zipCode: '10001',
-            country: 'USA'
-          },
-          to: {
-            name: 'Alice Buyer',
-            street: '456 Oak Avenue',
-            city: 'Los Angeles',
-            state: 'CA',
-            zipCode: '90210',
-            country: 'USA'
-          },
-          rates: {
-            standard: { cost: 15.99, time: '3-5 business days' },
-            express: { cost: 29.99, time: '1-2 business days' },
-            overnight: { cost: 49.99, time: 'Next business day' }
-          }
-        },
-        international: {
-          from: {
-            name: 'John Seller',
-            street: '123 Main Street',
-            city: 'New York',
-            state: 'NY',
-            zipCode: '10001',
-            country: 'USA'
-          },
-          to: {
-            name: 'Carlos Rodriguez',
-            street: 'Calle Principal 123',
-            city: 'Madrid',
-            state: 'Madrid',
-            zipCode: '28001',
-            country: 'Spain'
-          },
-          rates: {
-            standard: { cost: 45.99, time: '5-7 business days' },
-            express: { cost: 89.99, time: '2-3 business days' },
-            priority: { cost: 129.99, time: '1-2 business days' }
-          }
-        }
-      };
-      
-      localStorage.setItem('watch_ios_shipping_test_results', JSON.stringify(shippingTestResults));
-      
-      // Update test results
-      this.testResults = {
-        success: true,
-        shippingCalculator: { success: true, results: shippingTestResults }
-      };
-      
-      return { success: true, results: shippingTestResults };
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testCompleteTransactionFlow() {
-    try {
-      // Create test listing
-      const listing = {
-        id: 'test-complete-' + Date.now(),
-        title: 'Complete Transaction Test Watch',
-        description: 'This is a test listing for complete transaction flow testing',
-        brand: 'Omega',
-        model: 'Speedmaster',
-        year: 2021,
-        condition: 'excellent',
-        startingPrice: 6000,
-        instantSalePrice: 7000,
-        allowBidding: true,
-        allowInstantSale: true,
-        sellerId: 'test-seller-001',
-        sellerName: 'John Seller',
-        currentPrice: 6000,
-        status: 'active',
-        createdAt: new Date(),
-        endTime: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-        bids: []
-      };
-      
-      // Save to localStorage
-      const listings = JSON.parse(localStorage.getItem('watch_ios_listings') || '[]');
-      listings.push(listing);
-      localStorage.setItem('watch_ios_listings', JSON.stringify(listings));
-      
-      // Place bid
-      const bid = {
-        id: 'test-bid-complete-' + Date.now(),
-        listingId: listing.id,
-        bidderId: 'test-buyer-001',
-        bidderName: 'Alice Buyer',
-        amount: 6200,
-        timestamp: new Date(),
-        status: 'accepted'
-      };
-      
-      const bids = JSON.parse(localStorage.getItem('watch_ios_bids') || '[]');
-      bids.push(bid);
-      localStorage.setItem('watch_ios_bids', JSON.stringify(bids));
-      
-      // Create transaction
-      const transaction = {
-        id: 'test-transaction-' + Date.now(),
-        listingId: listing.id,
-        bidId: bid.id,
-        buyerId: bid.bidderId,
-        sellerId: listing.sellerId,
-        amount: bid.amount,
-        status: 'completed',
-        completedAt: new Date()
-      };
-      
-      const transactions = JSON.parse(localStorage.getItem('watch_ios_transactions') || '[]');
-      transactions.push(transaction);
-      localStorage.setItem('watch_ios_transactions', JSON.stringify(transactions));
-      
-      // Update test results
-      this.testResults = {
-        success: true,
-        completeTransaction: { success: true, listing, bid, transaction }
-      };
-      
-      return { success: true, listing, bid, transaction };
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  clearTestData() {
-    const keys = [
-      'watch_ios_test_results',
-      'watch_ios_shipping_test_results',
-      'watch_ios_final_costs'
-    ];
-    
-    keys.forEach(key => localStorage.removeItem(key));
-    this.testResults = null;
-    
-  }
-
-  getTestData() {
-    const testData = {
-      listings: JSON.parse(localStorage.getItem('watch_ios_listings') || '[]'),
-      bids: JSON.parse(localStorage.getItem('watch_ios_bids') || '[]'),
-      transactions: JSON.parse(localStorage.getItem('watch_ios_transactions') || '[]'),
-      shipping: localStorage.getItem('watch_ios_shipping_test_results'),
-      results: this.testResults
-    };
-    
-    
-    return testData;
-  }
-
-  // UTILITY FUNCTIONS FOR ORDERS PAGE
-  getReturnShippingInfo(order: Order): { message: string; sellerPays: boolean; cost: number } {
-    if (order.returnType === 'item_mismatch' || order.returnType === 'not_as_described') {
-      return {
-        message: 'Seller pays return shipping - item not as described',
-        sellerPays: true,
-        cost: 0
-      };
-    } else if (order.returnType === 'damaged_in_transit') {
-      return {
-        message: 'Seller pays return shipping - damaged during shipping',
-        sellerPays: true,
-        cost: 0
-      };
-    } else {
-      return {
-        message: 'Buyer pays return shipping - buyer\'s choice',
-        sellerPays: false,
-        cost: 15.99
-      };
-    }
+  getOrderProgress(order: Order): number {
+    const statusOrder = ['pending_payment', 'payment_confirmed', 'shipped', 'delivered', 'inspection_period', 'completed'];
+    const currentIndex = statusOrder.indexOf(order.status);
+    return ((currentIndex + 1) / statusOrder.length) * 100;
   }
 
   getStatusColor(status: Order['status']): string {
     switch (status) {
+      case 'pending_payment': return '#f59e0b';
+      case 'payment_confirmed': return '#3b82f6';
+      case 'shipped': return '#8b5cf6';
+      case 'delivered': return '#10b981';
+      case 'inspection_period': return '#f59e0b';
+      case 'completed': return '#059669';
+      case 'return_requested': return '#ef4444';
+      case 'returned': return '#dc2626';
+      default: return '#6b7280';
+    }
+  }
+
+  getReturnWindowStatus(order: Order): { status: string; timeRemaining?: string } {
+    if (order.status === 'delivered' && order.deliveredAt) {
+      const deliveryTime = new Date(order.deliveredAt).getTime();
+      const currentTime = new Date().getTime();
+      const timeElapsed = currentTime - deliveryTime;
+      const returnWindowMs = 72 * 60 * 60 * 1000; // 72 hours
+      
+      if (timeElapsed < returnWindowMs) {
+        const remainingMs = returnWindowMs - timeElapsed;
+        const remainingHours = Math.floor(remainingMs / (60 * 60 * 1000));
+        const remainingMinutes = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
+        
+        return {
+          status: 'Return Window Active',
+          timeRemaining: `${remainingHours}h ${remainingMinutes}m remaining`
+        };
+      } else {
+        return { status: 'Return Window Expired' };
+      }
+    }
+    
+    return { status: 'Return Window Not Started' };
+  }
+
+  getReturnShippingInfo(order: Order): { message: string; sellerPays: boolean; cost: number } {
+    if (order.returnType) {
+      if (order.returnType === 'item_mismatch' || order.returnType === 'not_as_described') {
+        return {
+          message: 'Seller pays return shipping - item not as described',
+          sellerPays: true,
+          cost: 0
+        };
+      } else if (order.returnType === 'damaged_in_transit') {
+        return {
+          message: 'Seller pays return shipping - damaged during shipping',
+          sellerPays: true,
+          cost: 0
+        };
+      } else {
+        return {
+          message: 'Buyer pays return shipping - buyer\'s choice',
+          sellerPays: false,
+          cost: 15.99
+        };
+      }
+    }
+    
+    return {
+      message: 'Return shipping cost depends on return reason',
+      sellerPays: false,
+      cost: 15.99
+    };
+  }
+
+  // Form Reset Methods
+  resetShippingForm() {
+    this.shippingForm = {
+      trackingNumber: '',
+      carrier: '',
+      estimatedDelivery: '',
+      notes: ''
+    };
+  }
+
+  resetReturnForm() {
+    this.returnReason = '';
+    this.selectedReturnType = 'buyer_remorse';
+  }
+
+  // Toggle Methods
+  togglePaymentForm() {
+    this.showPaymentForm = !this.showPaymentForm;
+    this.showShippingForm = false;
+    this.showReturnForm = false;
+  }
+
+  toggleShippingForm() {
+    this.showShippingForm = !this.showShippingForm;
+    this.showPaymentForm = false;
+    this.showReturnForm = false;
+  }
+
+  toggleReturnForm() {
+    this.showReturnForm = !this.showReturnForm;
+    this.showPaymentForm = false;
+    this.showShippingForm = false;
+  }
+
+  // Get current order stage for flow diagram
+  getCurrentOrderStage(order: Order): string {
+    switch (order.status) {
       case 'pending_payment':
-        return '#f59e0b';
+        return 'pending_payment';
       case 'payment_confirmed':
-        return '#3b82f6';
+        return 'payment_confirmed';
       case 'shipped':
-        return '#8b5cf6';
+        return 'shipped';
       case 'delivered':
-        return '#10b981';
+        return 'delivered';
       case 'inspection_period':
-        return '#f59e0b';
+        return 'inspection_period';
       case 'completed':
-        return '#059669';
-      case 'return_requested':
-        return '#ef4444';
-      case 'returned':
-        return '#6b7280';
+        return 'completed';
       default:
-        return '#6b7280';
+        return 'order_created';
     }
   }
 
-  getStatusIcon(status: Order['status']): string {
-    switch (status) {
-      case 'pending_payment':
-        return '💳';
-      case 'payment_confirmed':
-        return '✅';
-      case 'shipped':
-        return '📦';
-      case 'delivered':
-        return '🏠';
-      case 'inspection_period':
-        return '⏰';
-      case 'completed':
-        return '🎉';
-      case 'return_requested':
-        return '🔄';
-      case 'returned':
-        return '📤';
-      default:
-        return '❓';
-    }
-  }
-
-  canShowShippingCalculator(order: Order): boolean {
-    return this.userRole === 'seller' && 
-           (order.status === 'payment_confirmed' || order.status === 'shipped');
-  }
-
-  canShowPackageTracking(order: Order): boolean {
-    return (order.status === 'shipped' || order.status === 'delivered') && 
-           !!order.trackingNumber;
-  }
-
-  getOrderProgress(order: Order): number {
-    const statusOrder = [
-      'pending_payment',
-      'payment_confirmed', 
-      'shipped',
-      'delivered',
-      'inspection_period',
-      'completed'
-    ];
+  // Check if a stage is completed for the selected order
+  isStageCompleted(stage: string, order: Order): boolean {
+    if (!order) return false;
     
-    const currentIndex = statusOrder.indexOf(order.status);
-    if (currentIndex === -1) return 0;
+    const stageOrder = ['order_created', 'pending_payment', 'payment_confirmed', 'shipped', 'delivered', 'inspection_period', 'completed'];
+    const currentStageIndex = stageOrder.indexOf(this.getCurrentOrderStage(order));
+    const stageIndex = stageOrder.indexOf(stage);
     
-    return ((currentIndex + 1) / statusOrder.length) * 100;
+    return stageIndex < currentStageIndex;
   }
 
-  // COMPREHENSIVE SHIPPING & PAYMENT TESTING - EASILY REMOVABLE FOR PRODUCTION
-  async testShippingFlowSuccess() {
-    try {
-      this.currentTest = 'Shipping Flow Success';
-      
-      // Test domestic shipping calculation
-      const domesticShipping = {
-        from: {
-          name: 'John Seller',
-          street: '123 Main Street',
-          city: 'New York',
-          state: 'NY',
-          zipCode: '10001',
-          country: 'USA'
-        },
-        to: {
-          name: 'Alice Buyer',
-          street: '456 Oak Avenue',
-          city: 'Los Angeles',
-          state: 'CA',
-          zipCode: '90210',
-          country: 'USA'
-        },
-        package: {
-          weight: 2.5, // lbs
-          dimensions: '8x6x4', // inches
-          declaredValue: 5000
-        }
-      };
-
-      // Simulate shipping rate calculation
-      const shippingRates = {
-        standard: { cost: 15.99, time: '3-5 business days', carrier: 'USPS' },
-        express: { cost: 29.99, time: '1-2 business days', carrier: 'FedEx' },
-        overnight: { cost: 49.99, time: 'Next business day', carrier: 'UPS' }
-      };
-
-      // Simulate successful shipping label creation
-      const shippingLabel = {
-        id: 'label-' + Date.now(),
-        trackingNumber: '1Z999AA1' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-        carrier: 'FedEx',
-        service: 'Express',
-        cost: shippingRates.express.cost,
-        estimatedDelivery: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-        status: 'created'
-      };
-
-      // Save test data
-      localStorage.setItem('watch_ios_shipping_success_test', JSON.stringify({
-        domesticShipping,
-        shippingRates,
-        shippingLabel
-      }));
-
-      // Update test results
-      this.testResults = {
-        success: true,
-        shippingSuccess: { 
-          success: true, 
-          shipping: domesticShipping,
-          rates: shippingRates,
-          label: shippingLabel
-        }
-      };
-
-      return { 
-        success: true, 
-        shipping: domesticShipping,
-        rates: shippingRates,
-        label: shippingLabel
-      };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testShippingFlowFailure() {
-    try {
-      this.currentTest = 'Shipping Flow Failure';
-      
-      // Test shipping failure scenarios
-      const failureScenarios = {
-        invalidAddress: {
-          from: {
-            name: 'John Seller',
-            street: 'Invalid Street 999',
-            city: 'Nonexistent City',
-            state: 'XX',
-            zipCode: '00000',
-            country: 'USA'
-          },
-          to: {
-            name: 'Alice Buyer',
-            street: '456 Oak Avenue',
-            city: 'Los Angeles',
-            state: 'CA',
-            zipCode: '90210',
-            country: 'USA'
-          }
-        },
-        packageTooHeavy: {
-          weight: 150, // lbs - exceeds carrier limits
-          dimensions: '50x40x30', // inches - exceeds size limits
-          declaredValue: 50000
-        },
-        restrictedItem: {
-          type: 'luxury_watch',
-          restrictions: ['high_value', 'fragile', 'insurance_required']
-        }
-      };
-
-      // Simulate shipping calculation errors
-      const errors = [
-        'Invalid address: Address not found',
-        'Package weight exceeds carrier limits (150 lbs > 70 lbs)',
-        'Package dimensions exceed size limits',
-        'High-value item requires special handling and insurance'
-      ];
-
-      // Save test data
-      localStorage.setItem('watch_ios_shipping_failure_test', JSON.stringify({
-        failureScenarios,
-        errors
-      }));
-
-      // Update test results
-      this.testResults = {
-        success: true,
-        shippingFailure: { 
-          success: true, // Test passes because it correctly identified failures
-          scenarios: failureScenarios,
-          errors: errors
-        }
-      };
-
-      return { 
-        success: true, // Test passes because it correctly identified failures
-        scenarios: failureScenarios,
-        errors: errors
-      };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testPaymentEscrowSuccess() {
-    try {
-      this.currentTest = 'Payment Escrow Success';
-      
-      // Test successful payment and escrow flow
-      const paymentData = {
-        buyer: {
-          id: 'buyer-001',
-          name: 'Alice Buyer',
-          email: 'alice@example.com',
-          paymentMethod: 'stripe_card_4242'
-        },
-        seller: {
-          id: 'seller-001',
-          name: 'John Seller',
-          email: 'john@example.com',
-          bankAccount: '****1234'
-        },
-        transaction: {
-          id: 'txn-' + Date.now(),
-          amount: 5000,
-          currency: 'USD',
-          description: 'Omega Speedmaster Watch',
-          status: 'pending_escrow'
-        }
-      };
-
-      // Simulate Stripe payment intent creation
-      const paymentIntent = {
-        id: 'pi_' + Math.random().toString(36).substr(2, 15),
-        amount: paymentData.transaction.amount * 100, // Convert to cents
-        currency: paymentData.transaction.currency,
-        status: 'requires_payment_method',
-        client_secret: 'pi_' + Math.random().toString(36).substr(2, 15) + '_secret_' + Math.random().toString(36).substr(2, 15)
-      };
-
-      // Simulate successful payment confirmation
-      const paymentConfirmation = {
-        id: paymentIntent.id,
-        status: 'succeeded',
-        amount_received: paymentData.transaction.amount * 100,
-        charges: [{
-          id: 'ch_' + Math.random().toString(36).substr(2, 15),
-          amount: paymentData.transaction.amount * 100,
-          status: 'succeeded',
-          payment_method_details: {
-            card: {
-              brand: 'visa',
-              last4: '4242'
-            }
-          }
-        }]
-      };
-
-      // Simulate escrow hold
-      const escrowHold = {
-        id: 'escrow-' + Date.now(),
-        transactionId: paymentData.transaction.id,
-        amount: paymentData.transaction.amount,
-        status: 'held',
-        releaseConditions: ['buyer_confirmation', 'inspection_period_expiry'],
-        estimatedReleaseDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-      };
-
-      // Save test data
-      localStorage.setItem('watch_ios_payment_escrow_success_test', JSON.stringify({
-        paymentData,
-        paymentIntent,
-        paymentConfirmation,
-        escrowHold
-      }));
-
-      // Update test results
-      this.testResults = {
-        success: true,
-        paymentSuccess: { 
-          success: true, 
-          payment: paymentData,
-          intent: paymentIntent,
-          confirmation: paymentConfirmation,
-          escrow: escrowHold
-        }
-      };
-
-      return { 
-        success: true, 
-        payment: paymentData,
-        intent: paymentIntent,
-        confirmation: paymentConfirmation,
-        escrow: escrowHold
-      };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testPaymentEscrowFailure() {
-    try {
-      this.currentTest = 'Payment Escrow Failure';
-      
-      // Test payment and escrow failure scenarios
-      const failureScenarios = {
-        insufficientFunds: {
-          buyer: {
-            id: 'buyer-002',
-            name: 'Bob Buyer',
-            email: 'bob@example.com',
-            paymentMethod: 'stripe_card_4000' // Declined card
-          },
-          transaction: {
-            id: 'txn-fail-' + Date.now(),
-            amount: 5000,
-            currency: 'USD',
-            description: 'Omega Speedmaster Watch'
-          }
-        },
-        expiredCard: {
-          buyer: {
-            id: 'buyer-003',
-            name: 'Carol Buyer',
-            email: 'carol@example.com',
-            paymentMethod: 'stripe_card_4000' // Expired card
-          },
-          transaction: {
-            id: 'txn-expired-' + Date.now(),
-            amount: 5000,
-            currency: 'USD',
-            description: 'Omega Speedmaster Watch'
-          }
-        },
-        escrowError: {
-          reason: 'Escrow service temporarily unavailable',
-          errorCode: 'ESCROW_001',
-          retryAfter: new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
-        }
-      };
-
-      // Simulate payment failures
-      const paymentErrors = [
-        {
-          code: 'card_declined',
-          message: 'Your card was declined.',
-          decline_code: 'insufficient_funds'
-        },
-        {
-          code: 'card_declined',
-          message: 'Your card has expired.',
-          decline_code: 'expired_card'
-        },
-        {
-          code: 'escrow_error',
-          message: 'Escrow service is temporarily unavailable. Please try again later.',
-          error_code: 'ESCROW_001'
-        }
-      ];
-
-      // Save test data
-      localStorage.setItem('watch_ios_payment_escrow_failure_test', JSON.stringify({
-        failureScenarios,
-        paymentErrors
-      }));
-
-      // Update test results
-      this.testResults = {
-        success: true,
-        paymentFailure: { 
-          success: true, // Test passes because it correctly identified failures
-          scenarios: failureScenarios,
-          errors: paymentErrors
-        }
-      };
-
-      return { 
-        success: true, // Test passes because it correctly identified failures
-        scenarios: failureScenarios,
-        errors: paymentErrors
-      };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testCounterbidFlow() {
-    try {
-      this.currentTest = 'Counterbid Flow Testing';
-      
-      // Create test listing with bidding enabled
-      const listing = {
-        id: 'test-counterbid-' + Date.now(),
-        sellerId: 'test-seller-counterbid',
-        sellerName: 'Sarah Seller',
-        title: 'Test Counterbid Watch - Rolex Submariner',
-        description: 'Testing counterbid functionality with luxury watch',
-        brand: 'Rolex',
-        model: 'Submariner',
-        year: 2020,
-        condition: 'excellent',
-        startingPrice: 8000,
-        currentPrice: 8000,
-        allowBidding: true,
-        allowInstantSale: false,
-        status: 'active',
-        createdAt: new Date(),
-        endTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        bids: [],
-        counteroffers: []
-      };
-      
-      // Save listing
-      const listings = JSON.parse(localStorage.getItem('watch_ios_listings') || '[]');
-      listings.push(listing);
-      localStorage.setItem('watch_ios_listings', JSON.stringify(listings));
-      
-      // Create initial bid
-      const initialBid = {
-        id: 'initial-bid-' + Date.now(),
-        listingId: listing.id,
-        bidderId: 'test-buyer-counterbid',
-        bidderName: 'Mike Buyer',
-        amount: 8200,
-        timestamp: new Date(),
-        status: 'pending'
-      };
-      
-      // Save bid
-      const bids = JSON.parse(localStorage.getItem('watch_ios_bids') || '[]');
-      bids.push(initialBid);
-      localStorage.setItem('watch_ios_bids', JSON.stringify(bids));
-      
-      // Simulate seller making counteroffer
-      const counteroffer1 = {
-        id: 'counter-1-' + Date.now(),
-        listingId: listing.id,
-        bidId: initialBid.id,
-        sellerId: listing.sellerId,
-        sellerName: listing.sellerName,
-        buyerId: initialBid.bidderId,
-        buyerName: initialBid.bidderName,
-        originalAmount: initialBid.amount,
-        counterAmount: 8500,
-        amount: 8500,
-        message: 'I can do $8,500. This is a fair price for this condition.',
-        timestamp: new Date(),
-        status: 'pending'
-      };
-      
-      // Save counteroffer
-      const counteroffers = JSON.parse(localStorage.getItem('watch_ios_counteroffers') || '[]');
-      counteroffers.push(counteroffer1);
-      localStorage.setItem('watch_ios_counteroffers', JSON.stringify(counteroffers));
-      
-      // Simulate buyer rejecting and making new bid
-      const newBid = {
-        id: 'new-bid-' + Date.now(),
-        listingId: listing.id,
-        bidderId: initialBid.bidderId,
-        bidderName: initialBid.bidderName,
-        amount: 8300,
-        timestamp: new Date(),
-        status: 'pending'
-      };
-      
-      bids.push(newBid);
-      localStorage.setItem('watch_ios_bids', JSON.stringify(bids));
-      
-      // Simulate second counteroffer
-      const counteroffer2 = {
-        id: 'counter-2-' + Date.now(),
-        listingId: listing.id,
-        bidId: newBid.id,
-        sellerId: listing.sellerId,
-        sellerName: listing.sellerName,
-        buyerId: newBid.bidderId,
-        buyerName: newBid.bidderName,
-        originalAmount: newBid.amount,
-        counterAmount: 8400,
-        amount: 8400,
-        message: 'Meet me in the middle at $8,400?',
-        timestamp: new Date(),
-        status: 'pending'
-      };
-      
-      counteroffers.push(counteroffer2);
-      localStorage.setItem('watch_ios_counteroffers', JSON.stringify(counteroffers));
-      
-      // Update test results
-      this.testResults = {
-        success: true,
-        counterbid: {
-          success: true,
-          listing,
-          initialBid,
-          counteroffers: [counteroffer1, counteroffer2],
-          newBid,
-          message: 'Counterbid flow tested successfully! Created listing with 2 counteroffers.'
-        }
-      };
-      
-      return { 
-        success: true, 
-        listing,
-        initialBid,
-        counteroffers: [counteroffer1, counteroffer2],
-        newBid
-      };
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async testBuyerSellerFlow() {
-    try {
-      this.currentTest = 'Buyer-Seller Complete Flow';
-      
-      // Test complete buyer-seller interaction flow
-      const flowData = {
-        buyer: {
-          id: 'buyer-flow-001',
-          name: 'Alice Buyer',
-          email: 'alice@example.com',
-          role: 'buyer',
-          actions: ['browse', 'bid', 'pay', 'track', 'receive', 'inspect', 'confirm']
-        },
-        seller: {
-          id: 'seller-flow-001',
-          name: 'John Seller',
-          email: 'john@example.com',
-          role: 'seller',
-          actions: ['list', 'accept_bid', 'ship', 'track', 'receive_confirmation']
-        },
-        transaction: {
-          id: 'flow-txn-' + Date.now(),
-          status: 'in_progress',
-          currentStep: 'shipping',
-          steps: [
-            { name: 'Listing Created', status: 'completed', timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-            { name: 'Bid Accepted', status: 'completed', timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) },
-            { name: 'Payment Confirmed', status: 'completed', timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
-            { name: 'Item Shipped', status: 'completed', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
-            { name: 'In Transit', status: 'in_progress', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
-            { name: 'Delivered', status: 'pending', timestamp: null },
-            { name: 'Inspection Period', status: 'pending', timestamp: null },
-            { name: 'Completed', status: 'pending', timestamp: null }
-          ]
-        }
-      };
-
-      // Simulate real-time updates
-      const updates = [
-        { type: 'shipping_update', message: 'Package picked up by carrier', timestamp: new Date() },
-        { type: 'location_update', message: 'Package in transit - Current location: Memphis, TN', timestamp: new Date() },
-        { type: 'delivery_update', message: 'Out for delivery - Expected delivery: Today by 8:00 PM', timestamp: new Date() }
-      ];
-
-      // Save test data
-      localStorage.setItem('watch_ios_buyer_seller_flow_test', JSON.stringify({
-        flowData,
-        updates
-      }));
-
-      // Update test results
-      this.testResults = {
-        success: true,
-        buyerSellerFlow: { success: true, flow: flowData, updates }
-      };
-
-      return { 
-        success: true, 
-        flow: flowData,
-        updates: updates
-      };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.testResults = {
-        success: false,
-        error: errorMessage
-      };
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  async runComprehensiveTests() {
-    this.isRunningTests = true;
-    this.testProgress = 0;
-    this.testResults = null;
-    
-    try {
-      // Test 1: Shipping Success
-      this.currentTest = 'Shipping Flow Success';
-      this.testProgress = 20;
-      const shippingSuccess = await this.testShippingFlowSuccess();
-      
-      // Test 2: Shipping Failure
-      this.currentTest = 'Shipping Flow Failure';
-      this.testProgress = 40;
-      const shippingFailure = await this.testShippingFlowFailure();
-      
-      // Test 3: Payment Escrow Success
-      this.currentTest = 'Payment Escrow Success';
-      this.testProgress = 60;
-      const paymentSuccess = await this.testPaymentEscrowSuccess();
-      
-      // Test 4: Payment Escrow Failure
-      this.currentTest = 'Payment Escrow Failure';
-      this.testProgress = 80;
-      const paymentFailure = await this.testPaymentEscrowFailure();
-      
-      // Test 5: Complete Buyer-Seller Flow
-      this.currentTest = 'Buyer-Seller Complete Flow';
-      this.testProgress = 100;
-      const buyerSellerFlow = await this.testBuyerSellerFlow();
-      
-      this.testResults = {
-        success: true,
-        shippingSuccess,
-        shippingFailure,
-        paymentSuccess,
-        paymentFailure,
-        buyerSellerFlow
-      };
-      
-
-    } catch (error) {
-      this.testResults = { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
-      };
-    } finally {
-      this.isRunningTests = false;
-      this.currentTest = '';
-    }
+  // Check if a stage is current for the selected order
+  isStageCurrent(stage: string, order: Order): boolean {
+    if (!order) return false;
+    return this.getCurrentOrderStage(order) === stage;
   }
 }

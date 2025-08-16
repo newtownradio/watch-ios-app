@@ -4,182 +4,49 @@
     <p class="subtitle">
       {{ userRole === 'seller' ? 'Manage your watch sales and shipping' : 'Track your watch purchases and deliveries' }}
     </p>
-    
-    <!-- Testing Panel Toggle - EASILY REMOVABLE FOR PRODUCTION -->
-    <div class="testing-toggle">
-      <button class="testing-btn" (click)="toggleTestingPanel()">
-        🧪 {{ showTestingPanel ? 'Hide' : 'Show' }} Testing Panel
-      </button>
-    </div>
   </div>
 
-  <!-- Testing Panel - EASILY REMOVABLE FOR PRODUCTION -->
-  <div class="testing-panel" *ngIf="showTestingPanel">
-    <div class="testing-header">
-      <h3>🧪 Bid & Sale Flow Testing</h3>
-      <p>Test the complete transaction flows including bidding, immediate sales, shipping, and authentication</p>
+  <!-- Order Flow Diagram -->
+  <div class="order-flow-diagram">
+    <h3>How Orders Work</h3>
+    <div class="flow-timeline">
+      <div class="flow-stage">
+        <div class="stage-text">Order Created</div>
+      </div>
+      
+      <div class="flow-line"></div>
+      
+      <div class="flow-stage">
+        <div class="stage-text">Payment</div>
+      </div>
+      
+      <div class="flow-line"></div>
+      
+      <div class="flow-stage">
+        <div class="stage-text">Shipped</div>
+      </div>
+      
+      <div class="flow-line"></div>
+      
+      <div class="flow-stage">
+        <div class="stage-text">Authentication</div>
+      </div>
+      
+      <div class="flow-line"></div>
+      
+      <div class="flow-stage">
+        <div class="stage-text">Delivered</div>
+      </div>
+      
+      <div class="flow-line"></div>
+      
+      <div class="flow-stage">
+        <div class="stage-text">Complete</div>
+      </div>
     </div>
-
-    <div class="testing-controls">
-      <button class="test-btn primary" (click)="runComprehensiveTests()" [disabled]="isRunningTests">
-        🚀 {{ isRunningTests ? 'Running Tests...' : 'Run Comprehensive Tests' }}
-      </button>
-      
-      <button class="test-btn" (click)="testTraditionalBiddingFlow()" [disabled]="isRunningTests">
-        🏷️ Test Bidding Flow
-      </button>
-      
-      <button class="test-btn" (click)="testImmediateSaleFlow()" [disabled]="isRunningTests">
-        ⚡ Test Immediate Sale
-      </button>
-      
-      <button class="test-btn" (click)="testShippingCalculator()" [disabled]="isRunningTests">
-        🚚 Test Shipping
-      </button>
-      
-      <button class="test-btn" (click)="testCompleteTransactionFlow()" [disabled]="isRunningTests">
-        🔄 Test Complete Transaction
-      </button>
-      
-      <button class="test-btn" (click)="testShippingFlowSuccess()" [disabled]="isRunningTests">
-        📦 Test Shipping Success
-      </button>
-      
-      <button class="test-btn" (click)="testShippingFlowFailure()" [disabled]="isRunningTests">
-        ❌ Test Shipping Failure
-      </button>
-      
-      <button class="test-btn" (click)="testPaymentEscrowSuccess()" [disabled]="isRunningTests">
-        💳 Test Payment Success
-      </button>
-      
-      <button class="test-btn" (click)="testPaymentEscrowFailure()" [disabled]="isRunningTests">
-        🚫 Test Payment Failure
-      </button>
-      
-      <button class="test-btn" (click)="testBuyerSellerFlow()" [disabled]="isRunningTests">
-        🤝 Test Buyer-Seller Flow
-      </button>
-      
-      <button class="test-btn" (click)="testCounterbidFlow()" [disabled]="isRunningTests">
-        🔄 Test Counterbid Flow
-      </button>
-    </div>
-
-    <!-- Test Progress -->
-    <div class="test-progress" *ngIf="isRunningTests">
-      <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="testProgress"></div>
-      </div>
-      <p class="progress-text">{{ currentTest }} - {{ testProgress }}%</p>
-    </div>
-
-    <!-- Test Results -->
-    <div class="test-results" *ngIf="testResults">
-      <h4>📊 Test Results</h4>
-      
-      <div class="result-summary" [class]="testResults.success ? 'success' : 'error'">
-        <span class="result-icon">{{ testResults.success ? '✅' : '❌' }}</span>
-        <span class="result-text">
-          {{ testResults.success ? 'All tests completed successfully!' : 'Some tests failed' }}
-        </span>
-      </div>
-
-      <div class="result-details" *ngIf="testResults.error">
-        <p class="error-message">❌ Error: {{ testResults.error }}</p>
-      </div>
-
-      <div class="result-breakdown" *ngIf="testResults.success">
-        <div class="breakdown-item" *ngIf="testResults.traditionalBidding">
-          <span class="label">🏷️ Bidding Flow:</span>
-          <span class="status" [class]="testResults.traditionalBidding.success ? 'success' : 'error'">
-            {{ testResults.traditionalBidding.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.immediateSale">
-          <span class="label">⚡ Immediate Sale:</span>
-          <span class="status" [class]="testResults.immediateSale.success ? 'success' : 'error'">
-            {{ testResults.immediateSale.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.shippingCalculator">
-          <span class="label">🚚 Shipping Calculator:</span>
-          <span class="status" [class]="testResults.shippingCalculator.success ? 'success' : 'error'">
-            {{ testResults.shippingCalculator.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.completeTransaction">
-          <span class="label">🔄 Complete Transaction:</span>
-          <span class="status" [class]="testResults.completeTransaction.success ? 'success' : 'error'">
-            {{ testResults.completeTransaction.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <!-- Comprehensive Flow Tests -->
-        <div class="breakdown-item" *ngIf="testResults.shippingSuccess">
-          <span class="label">📦 Shipping Success:</span>
-          <span class="status" [class]="testResults.shippingSuccess.success ? 'success' : 'error'">
-            {{ testResults.shippingSuccess.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.shippingFailure">
-          <span class="label">❌ Shipping Failure:</span>
-          <span class="status" [class]="testResults.shippingFailure.success ? 'success' : 'error'">
-            {{ testResults.shippingFailure.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.paymentSuccess">
-          <span class="label">💳 Payment Success:</span>
-          <span class="status" [class]="testResults.paymentSuccess.success ? 'success' : 'error'">
-            {{ testResults.paymentSuccess.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.paymentFailure">
-          <span class="label">🚫 Payment Failure:</span>
-          <span class="status" [class]="testResults.paymentFailure.success ? 'success' : 'error'">
-            {{ testResults.paymentFailure.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.buyerSellerFlow">
-          <span class="label">🤝 Buyer-Seller Flow:</span>
-          <span class="status" [class]="testResults.buyerSellerFlow.success ? 'success' : 'error'">
-            {{ testResults.buyerSellerFlow.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-        </div>
-        
-        <div class="breakdown-item" *ngIf="testResults.counterbid">
-          <span class="label">🔄 Counterbid Flow:</span>
-          <span class="status" [class]="testResults.counterbid.success ? 'success' : 'error'">
-            {{ testResults.counterbid.success ? '✅ Passed' : '❌ Failed' }}
-          </span>
-          <div class="counterbid-details" *ngIf="testResults.counterbid.success">
-            <p class="counterbid-message">{{ testResults.counterbid.message }}</p>
-            <div class="counterbid-summary">
-              <p><strong>Listing:</strong> {{ testResults.counterbid.listing.title }}</p>
-              <p><strong>Initial Bid:</strong> ${{ testResults.counterbid.initialBid.amount.toLocaleString() }}</p>
-              <p><strong>Counteroffers:</strong> {{ testResults.counterbid.counteroffers.length }}</p>
-              <p><strong>Final Bid:</strong> ${{ testResults.counterbid.newBid.amount.toLocaleString() }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testing-actions">
-        <button class="action-btn" (click)="getTestData()">
-          📊 View Test Data
-        </button>
-        
-        <button class="action-btn danger" (click)="clearTestData()">
-          🗑️ Clear Test Data
-        </button>
-      </div>
+    
+    <div class="flow-description">
+      <p><strong>72-Hour Return Window:</strong> After delivery, you have 3 days to inspect your item and request a return if needed.</p>
     </div>
   </div>
 
@@ -204,6 +71,12 @@
                 [style.background-color]="getStatusColor(order.status)">
             {{ order.status.replace('_', ' ').toUpperCase() }}
           </span>
+        </div>
+        
+        <!-- Stage Indicator -->
+        <div class="stage-indicator">
+          <span class="stage-number">{{ getOrderStageNumber(order) }}</span>
+          <span class="stage-label">Stage {{ getOrderStageNumber(order) }}</span>
         </div>
       </div>
 
@@ -230,51 +103,133 @@
 
       <!-- Order Actions -->
       <div class="order-actions" *ngIf="selectedOrder?.id === order.id">
+        <!-- Payment Actions for Buyers -->
         <button class="action-btn payment-btn" 
-                *ngIf="order.status === 'pending_payment' && userRole === 'buyer'"
-                (click)="initiatePayment(order)">
-          Complete Payment
+                *ngIf="canShowPaymentForm(order)"
+                (click)="togglePaymentForm()">
+          {{ showPaymentForm ? 'Cancel Payment' : 'Complete Payment' }}
         </button>
         
-        <button class="action-btn" 
-                *ngIf="canShowShippingCalculator(order)"
-                (click)="toggleShippingCalculator()">
-          {{ showShippingCalculator ? 'Hide' : 'Show' }} Shipping Calculator
-        </button>
-        
-        <button class="action-btn" 
-                *ngIf="canShowPackageTracking(order)"
-                (click)="togglePackageTracking()">
-          {{ showPackageTracking ? 'Hide' : 'Show' }} Package Tracking
+        <!-- Shipping Actions for Sellers -->
+        <button class="action-btn shipping-btn" 
+                *ngIf="canShowShippingForm(order)"
+                (click)="toggleShippingForm()">
+          {{ showShippingForm ? 'Cancel Shipping' : 'Update Shipping' }}
         </button>
 
-        <!-- Return Window Actions -->
+        <!-- Return Actions for Buyers -->
         <button class="action-btn return-btn" 
-                *ngIf="canStartReturnWindow(order)"
-                (click)="startReturnWindow(order)">
-          Start 72-Hour Return Window
-        </button>
-
-        <button class="action-btn return-btn" 
-                *ngIf="canShowReturnActions(order)"
+                *ngIf="canStartReturn(order)"
                 (click)="toggleReturnForm()">
           {{ showReturnForm ? 'Hide' : 'Show' }} Return Actions
         </button>
+
+        <!-- Return Window Expired Message -->
+        <div class="return-window-expired" *ngIf="!canStartReturn(order) && order.status === 'delivered' && order.deliveredAt">
+          <div class="expired-message">
+            <span class="expired-icon">⏰</span>
+            <span class="expired-text">
+              <strong>Return Window Expired:</strong> The 72-hour return period has ended. 
+              For special circumstances, please <a href="mailto:customer-service@watch.style">contact customer service</a>.
+            </span>
+          </div>
+        </div>
       </div>
 
-      <!-- Shipping Calculator (for sellers) -->
-      <div class="shipping-section" *ngIf="selectedOrder?.id === order.id && showShippingCalculator">
-        <h4>Calculate Shipping</h4>
-        <app-shipping-calculator></app-shipping-calculator>
+      <!-- Shipping Form (for sellers) -->
+      <div class="shipping-section" *ngIf="selectedOrder?.id === order.id && showShippingForm">
+        <h4>Update Shipping Information</h4>
+        <div class="shipping-form">
+          <div class="form-group">
+            <label for="tracking-number">Tracking Number:</label>
+            <input 
+              type="text" 
+              id="tracking-number"
+              [(ngModel)]="shippingForm.trackingNumber"
+              placeholder="Enter tracking number"
+              required>
+          </div>
+          
+          <div class="form-group">
+            <label for="carrier">Shipping Carrier:</label>
+            <select id="carrier" [(ngModel)]="shippingForm.carrier" required>
+              <option value="">Select carrier</option>
+              <option value="FedEx">FedEx</option>
+              <option value="UPS">UPS</option>
+              <option value="USPS">USPS</option>
+              <option value="DHL">DHL</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="estimated-delivery">Estimated Delivery:</label>
+            <input 
+              type="date" 
+              id="estimated-delivery"
+              [(ngModel)]="shippingForm.estimatedDelivery">
+          </div>
+          
+          <div class="form-group">
+            <label for="shipping-notes">Notes:</label>
+            <textarea 
+              id="shipping-notes"
+              [(ngModel)]="shippingForm.notes"
+              placeholder="Optional shipping notes..."
+              rows="2">
+            </textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button class="btn-primary" (click)="updateShippingInfo(order)" 
+                    [disabled]="!shippingForm.trackingNumber || !shippingForm.carrier">
+              Update Shipping
+            </button>
+            <button class="btn-secondary" (click)="toggleShippingForm()">Cancel</button>
+          </div>
+        </div>
       </div>
 
-      <!-- Package Tracking -->
-      <div class="tracking-section" *ngIf="selectedOrder?.id === order.id && showPackageTracking">
-        <h4>Track Package</h4>
-        <app-package-tracking 
-          [trackingNumber]="order.trackingNumber || ''"
-          [showTrackingForm]="false">
-        </app-package-tracking>
+      <!-- Return Form (for buyers) -->
+      <div class="return-section" *ngIf="selectedOrder?.id === order.id && showReturnForm">
+        <h4>Return Request</h4>
+        
+        <div class="return-form">
+          <div class="form-group">
+            <label for="return-type">Return Type:</label>
+            <select id="return-type" [(ngModel)]="selectedReturnType" class="return-type-select">
+              <option value="buyer_remorse">Buyer Remorse / Changed Mind</option>
+              <option value="item_mismatch">Item Doesn't Match Listing</option>
+              <option value="not_as_described">Not As Described</option>
+              <option value="damaged_in_transit">Damaged in Transit</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="return-reason">Return Reason:</label>
+            <textarea 
+              id="return-reason"
+              [(ngModel)]="returnReason"
+              placeholder="Please describe why you want to return this item..."
+              rows="3"
+              required>
+            </textarea>
+          </div>
+
+          <div class="shipping-info" *ngIf="selectedReturnType">
+            <div class="shipping-note" [class.seller-pays]="getReturnShippingInfo(order).sellerPays">
+              <span class="shipping-text">
+                {{ getReturnShippingInfo(order).message }}
+              </span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-primary" (click)="submitReturnRequest()" [disabled]="!returnReason.trim()">
+              Submit Return Request
+            </button>
+            <button class="btn-secondary" (click)="toggleReturnForm()">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -313,8 +268,18 @@
         <span class="value">{{ selectedOrder.watchTitle }}</span>
       </div>
       <div class="detail-row">
+        <span class="label">Brand:</span>
+        <span class="value">{{ selectedOrder.watchBrand }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Model:</span>
+        <span class="value">{{ selectedOrder.watchModel }}</span>
+      </div>
+      <div class="detail-row">
         <span class="label">Status:</span>
-        <span class="value">{{ selectedOrder.status.replace('_', ' ').toUpperCase() }}</span>
+        <span class="value status-value" [style.color]="getStatusColor(selectedOrder.status)">
+          {{ selectedOrder.status.replace('_', ' ').toUpperCase() }}
+        </span>
       </div>
       <div class="detail-row">
         <span class="label">Price:</span>
@@ -324,111 +289,201 @@
         <span class="label">Created:</span>
         <span class="value">{{ selectedOrder.createdAt | date:'medium' }}</span>
       </div>
+      
+      <!-- Payment Information -->
+      <div class="detail-row" *ngIf="selectedOrder.paymentConfirmedAt">
+        <span class="label">Payment Date:</span>
+        <span class="value">{{ selectedOrder.paymentConfirmedAt | date:'medium' }}</span>
+      </div>
+
+      <!-- Shipping Information -->
       <div class="detail-row" *ngIf="selectedOrder.trackingNumber">
-        <span class="label">Tracking:</span>
+        <span class="label">Tracking Number:</span>
         <span class="value">{{ selectedOrder.trackingNumber }}</span>
+      </div>
+      
+      <div class="detail-row" *ngIf="selectedOrder.shippingCarrier">
+        <span class="label">Shipping Carrier:</span>
+        <span class="value">{{ selectedOrder.shippingCarrier }}</span>
+      </div>
+
+      <div class="detail-row" *ngIf="selectedOrder.shippedAt">
+        <span class="label">Shipped Date:</span>
+        <span class="value">{{ selectedOrder.shippedAt | date:'medium' }}</span>
+      </div>
+
+      <div class="detail-row" *ngIf="selectedOrder.estimatedDeliveryDate">
+        <span class="label">Estimated Delivery:</span>
+        <span class="value">{{ selectedOrder.estimatedDeliveryDate | date:'mediumDate' }}</span>
+      </div>
+
+      <div class="detail-row" *ngIf="selectedOrder.deliveredAt">
+        <span class="label">Delivered Date:</span>
+        <span class="value">{{ selectedOrder.deliveredAt | date:'medium' }}</span>
       </div>
 
       <!-- Return Information -->
-      <div class="detail-row" *ngIf="selectedOrder.status === 'return_requested' || selectedOrder.status === 'returned'">
-        <span class="label">Return Type:</span>
-        <span class="value">{{ selectedOrder.returnType ? selectedOrder.returnType.replace('_', ' ').toUpperCase() : 'N/A' }}</span>
+      <div class="detail-row" *ngIf="selectedOrder.returnRequestedAt">
+        <span class="label">Return Requested:</span>
+        <span class="value">{{ selectedOrder.returnRequestedAt | date:'medium' }}</span>
       </div>
       
-      <div class="detail-row" *ngIf="selectedOrder.status === 'return_requested' || selectedOrder.status === 'returned'">
-        <span class="label">Return Shipping:</span>
-        <span class="value" [class.seller-pays]="getReturnShippingInfo(selectedOrder).sellerPays">
-          {{ getReturnShippingInfo(selectedOrder).message }}
-        </span>
+      <div class="detail-row" *ngIf="selectedOrder.returnType">
+        <span class="label">Return Type:</span>
+        <span class="value">{{ selectedOrder.returnType.replace('_', ' ').toUpperCase() }}</span>
+      </div>
+      
+      <div class="detail-row" *ngIf="selectedOrder.returnReason">
+        <span class="label">Return Reason:</span>
+        <span class="value">{{ selectedOrder.returnReason }}</span>
       </div>
 
-      <div class="detail-row" *ngIf="selectedOrder.status === 'returned'">
-        <span class="label">Refund Amount:</span>
-        <span class="value">
-          ${{ orderService.calculateRefundAmount(selectedOrder.id).refundAmount.toLocaleString() }}
+      <div class="detail-row" *ngIf="selectedOrder.returnShippingPaidBy">
+        <span class="label">Return Shipping:</span>
+        <span class="value" [class.seller-pays]="selectedOrder.returnShippingPaidBy === 'seller'">
+          {{ selectedOrder.returnShippingPaidBy === 'seller' ? 'Seller pays return shipping' : 'Buyer pays return shipping' }}
         </span>
       </div>
     </div>
   </div>
 
-  <!-- Stripe Payment Form -->
+  <!-- Payment Form -->
   <div class="payment-section" *ngIf="showPaymentForm && selectedOrder">
-    <h4>Complete Payment</h4>
-    <app-stripe-payment
-      [paymentTitle]="'Payment for ' + selectedOrder.watchTitle"
-      [paymentAmount]="currentPaymentAmount"
-      [paymentButtonText]="'Pay $' + (currentPaymentAmount / 100).toFixed(2)"
-      [paymentType]="'winning_bid_payment'"
-      (paymentSuccess)="onPaymentSuccess($event)"
-      (paymentError)="onPaymentError($event)">
-    </app-stripe-payment>
-  </div>
-
-  <!-- Return Window Form -->
-  <div class="return-section" *ngIf="showReturnForm && selectedOrder">
-    <h4>72-Hour Return Window</h4>
-    
-    <div class="return-window-info">
-      <div class="return-status">
-        <p><strong>Status:</strong> {{ getReturnWindowStatus(selectedOrder).status }}</p>
-        <p *ngIf="getReturnWindowStatus(selectedOrder).timeRemaining">
-          <strong>Time Remaining:</strong> {{ getReturnWindowStatus(selectedOrder).timeRemaining }}
-        </p>
-      </div>
-
-      <div class="return-actions" *ngIf="getReturnWindowStatus(selectedOrder).canConfirm">
-        <button class="btn-confirm" (click)="confirmItemReceived()">
-          Confirm Item Received as Intended
-        </button>
-        <p class="confirm-note">
-          <strong>Note:</strong> Confirming will complete the order and release funds to the seller.
-        </p>
-      </div>
-
-      <div class="return-request" *ngIf="getReturnWindowStatus(selectedOrder).canReturn">
-        <h5>Request Return</h5>
+    <div class="payment-overlay">
+      <div class="payment-modal">
+        <div class="modal-header">
+          <h4>Complete Payment</h4>
+          <button class="close-btn" (click)="togglePaymentForm()">×</button>
+        </div>
         
-        <div class="form-group">
-          <label for="return-type">Return Type:</label>
-          <select id="return-type" [(ngModel)]="selectedReturnType" class="return-type-select">
-            <option value="buyer_remorse">Buyer Remorse / Changed Mind</option>
-            <option value="item_mismatch">Item Doesn't Match Listing</option>
-            <option value="not_as_described">Not As Described</option>
-            <option value="damaged_in_transit">Damaged in Transit</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="return-reason">Return Reason:</label>
-          <textarea 
-            id="return-reason"
-            [(ngModel)]="returnReason"
-            placeholder="Please describe why you want to return this item..."
-            rows="3"
-            required>
-          </textarea>
-        </div>
-
-        <div class="shipping-info" *ngIf="selectedReturnType">
-          <div class="shipping-note" [class.seller-pays]="selectedReturnType === 'item_mismatch' || selectedReturnType === 'not_as_described'">
-            <span class="shipping-text">
-              <strong *ngIf="selectedReturnType === 'item_mismatch' || selectedReturnType === 'not_as_described'">
-                Seller pays return shipping ($25)
-              </strong>
-              <strong *ngIf="selectedReturnType === 'buyer_remorse' || selectedReturnType === 'damaged_in_transit'">
-                Buyer pays return shipping ($25)
-              </strong>
-            </span>
+        <div class="payment-content">
+          <div class="payment-summary">
+            <h5>Payment Summary</h5>
+            <div class="summary-row">
+              <span>Watch:</span>
+              <span>{{ selectedOrder.watchTitle }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Amount:</span>
+              <span>${{ (currentPaymentAmount / 100).toFixed(2) }}</span>
+            </div>
+          </div>
+          
+          <div class="payment-form">
+            <div class="form-group">
+              <label for="card-number">Card Number:</label>
+              <input 
+                type="text" 
+                id="card-number"
+                [(ngModel)]="paymentForm.cardNumber"
+                placeholder="1234 5678 9012 3456"
+                maxlength="19"
+                required>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="expiry-date">Expiry Date:</label>
+                <input 
+                  type="text" 
+                  id="expiry-date"
+                  [(ngModel)]="paymentForm.expiryDate"
+                  placeholder="MM/YY"
+                  maxlength="5"
+                  required>
+              </div>
+              
+              <div class="form-group">
+                <label for="cvv">CVV:</label>
+                <input 
+                  type="text" 
+                  id="cvv"
+                  [(ngModel)]="paymentForm.cvv"
+                  placeholder="123"
+                  maxlength="4"
+                  required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="cardholder-name">Cardholder Name:</label>
+              <input 
+                type="text" 
+                id="cardholder-name"
+                [(ngModel)]="paymentForm.cardholderName"
+                placeholder="John Doe"
+                required>
+            </div>
+            
+            <div class="form-group">
+              <label for="billing-street">Billing Address:</label>
+              <input 
+                type="text" 
+                id="billing-street"
+                [(ngModel)]="paymentForm.billingAddress.street"
+                placeholder="123 Main Street"
+                required>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="billing-city">City:</label>
+                <input 
+                  type="text" 
+                  id="billing-city"
+                  [(ngModel)]="paymentForm.billingAddress.city"
+                  placeholder="New York"
+                  required>
+              </div>
+              
+              <div class="form-group">
+                <label for="billing-state">State:</label>
+                <input 
+                  type="text" 
+                  id="billing-state"
+                  [(ngModel)]="paymentForm.billingAddress.state"
+                  placeholder="NY"
+                  required>
+              </div>
+              
+              <div class="form-group">
+                <label for="billing-zip">ZIP Code:</label>
+                <input 
+                  type="text" 
+                  id="billing-zip"
+                  [(ngModel)]="paymentForm.billingAddress.zipCode"
+                  placeholder="10001"
+                  required>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button class="btn-primary" (click)="initiatePayment(selectedOrder)" 
+                      [disabled]="!paymentForm.cardNumber || !paymentForm.expiryDate || !paymentForm.cvv || !paymentForm.cardholderName">
+                Pay ${{ (currentPaymentAmount / 100).toFixed(2) }}
+              </button>
+              <button class="btn-secondary" (click)="togglePaymentForm()">Cancel</button>
+            </div>
           </div>
         </div>
-
-        <button class="btn-return" (click)="requestReturn()" [disabled]="!returnReason.trim()">
-          Request Return
-        </button>
-        <p class="return-note">
-          <strong>Note:</strong> Return requests must be made within the 72-hour window.
-        </p>
       </div>
+    </div>
+  </div>
+
+  <!-- In-App Notification -->
+  <div class="notification" *ngIf="currentNotification">
+    <div class="notification-content" [class]="'notification-' + currentNotification.type">
+      <span class="notification-title">{{ currentNotification.title }}</span>
+      <span class="notification-message">{{ currentNotification.message }}</span>
+      <button 
+        class="notification-close" 
+        (click)="currentNotification = null"
+        (keydown.enter)="currentNotification = null"
+        (keydown.space)="currentNotification = null"
+        tabindex="0"
+        aria-label="Close notification">
+        ×
+      </button>
     </div>
   </div>
 </div>
