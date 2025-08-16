@@ -7,6 +7,8 @@ import { SplashComponent } from './pages/splash/splash.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { MessagesComponent } from './pages/messages/messages.component';
 import { LegalComponent } from './pages/legal/legal.component';
+import { PrivacyPolicyComponent } from './pages/legal/privacy-policy.component';
+import { TermsOfServiceComponent } from './pages/legal/terms-of-service.component';
 import { DigitalComponent } from './components/digital/digital.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
@@ -39,5 +41,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   { path: 'legal', component: LegalComponent },
+  { path: 'legal/privacy', component: PrivacyPolicyComponent },
+  { path: 'legal/terms', component: TermsOfServiceComponent },
   { path: '**', redirectTo: '' }
 ];
